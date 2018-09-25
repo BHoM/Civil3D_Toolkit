@@ -8,7 +8,7 @@ using BH.Adapter;
 using BH.oM.Adapters.Civil3D;
 using BH.oM.Base;
 
-namespace BH.Adapter.Robot
+namespace BH.Adapter.Civil3D
 {
     public partial class Civil3DAdapter : BHoMAdapter
     {
