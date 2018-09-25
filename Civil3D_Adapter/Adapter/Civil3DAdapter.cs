@@ -7,16 +7,25 @@ using System.Threading.Tasks;
 using BH.Adapter;
 using BH.oM.Adapters.Civil3D;
 using BH.oM.Base;
+using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.ApplicationServices;
+using Autodesk.Civil.ApplicationServices;
+using Autodesk.Civil.DatabaseServices;
+using Autodesk.AutoCAD.EditorInput;
+using Autodesk.AutoCAD.Runtime;
+using Autodesk.AutoCAD.EditorInput;
 
 namespace BH.Adapter.Civil3D
 {
     public partial class Civil3DAdapter : BHoMAdapter
     {
         /***************************************************/
-        /****           Private Fields                  ****/
+        /****           Public  Fields                  ****/
         /***************************************************/
 
         public Civil3DConfig Civil3DConfig { get; set; } = new Civil3DConfig();
+
+        
 
         /***************************************************/
         /**** Constructors                              ****/
@@ -26,7 +35,12 @@ namespace BH.Adapter.Civil3D
         {
             if (Active)
             {
-
+                if (filePath == "")
+                {
+                    m_Document = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument;
+                    m_TransactionManager = m_Document.Database.TransactionManager;
+                    m_Editor = m_Document.Editor;
+                }
             }
         }
 
@@ -39,5 +53,14 @@ namespace BH.Adapter.Civil3D
         {
             throw new NotImplementedException();
         }
+
+        /***************************************************/
+        /****           Private  Fields                 ****/
+        /***************************************************/
+
+        private Autodesk.AutoCAD.DatabaseServices.TransactionManager m_TransactionManager;
+        private CivilDocument m_CivilDocument;
+        private Document m_Document;
+        private Editor m_Editor;
     }
 }
