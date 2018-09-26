@@ -13,7 +13,6 @@ using Autodesk.Civil.ApplicationServices;
 using Autodesk.Civil.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Runtime;
-using Autodesk.AutoCAD.EditorInput;
 
 namespace BH.Adapter.Civil3D
 {
@@ -25,7 +24,7 @@ namespace BH.Adapter.Civil3D
 
         public Civil3DConfig Civil3DConfig { get; set; } = new Civil3DConfig();
 
-        
+
 
         /***************************************************/
         /**** Constructors                              ****/
@@ -37,6 +36,7 @@ namespace BH.Adapter.Civil3D
             {
                 if (filePath == "")
                 {
+                    m_CivilDocument = Autodesk.Civil.ApplicationServices.CivilApplication.ActiveDocument;
                     m_Document = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument;
                     m_TransactionManager = m_Document.Database.TransactionManager;
                     m_Editor = m_Document.Editor;
