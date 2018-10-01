@@ -64,7 +64,7 @@ namespace BH.Adapter.Civil3D
 
             //Wait until the return message has been recieved
             if (!m_waitEvent.WaitOne(TimeSpan.FromMinutes(m_waitTime)))
-                BH.Engine.Reflection.Compute.RecordError("The connection with Revit timed out. If working on a big model, try to increase the max wait time");
+                BH.Engine.Reflection.Compute.RecordError("The connection with Civil3D timed out. If working on a big model, try to increase the max wait time");
 
             //Grab the return objects from the latest package
             List<IObject> returnObjs = m_returnPackage.Cast<IObject>().ToList();
@@ -100,7 +100,7 @@ namespace BH.Adapter.Civil3D
 
             //Wait until the return message has been recieved
             if (!m_waitEvent.WaitOne(TimeSpan.FromMinutes(m_waitTime)))
-                Engine.Reflection.Compute.RecordError("The connection with Revit timed out. If working on a big model, try to increase the max wait time");
+                Engine.Reflection.Compute.RecordError("The connection with Civil3D timed out. If working on a big model, try to increase the max wait time");
 
             //Grab the return objects from the latest package
             List<object> returnObjs = new List<object>(m_returnPackage);
@@ -142,7 +142,7 @@ namespace BH.Adapter.Civil3D
 
             //Wait until the return message has been recieved
             if (!m_waitEvent.WaitOne(TimeSpan.FromMinutes(m_waitTime)))
-                Engine.Reflection.Compute.RecordError("The connection with Revit timed out. If working on a big model, try to increase the max wait time");
+                Engine.Reflection.Compute.RecordError("The connection with Civil3D timed out. If working on a big model, try to increase the max wait time");
 
             int returnValue = 0;
             //Grab the return objects from the latest package
@@ -200,7 +200,7 @@ namespace BH.Adapter.Civil3D
             m_waitEvent.Reset();
 
             if (!returned)
-                Engine.Reflection.Compute.RecordError("Failed to connect to Revit");
+                Engine.Reflection.Compute.RecordError("Failed to connect to Civil3D");
 
             return returned;
         }
