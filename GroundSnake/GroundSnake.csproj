@@ -93,10 +93,14 @@
       <Name>Civil3D_oM</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="PluginFile\PackageContents.xml" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>call "$(TargetDir)UI_PostBuild.exe" ..\..\ "C:\Users\$(Username)\AppData\Roaming\Autodesk\ApplicationPlugins\GroundSnake"
-</PostBuildEvent>
+    <PostBuildEvent>call "$(TargetDir)UI_PostBuild.exe" ..\..\ "C:\Users\$(Username)\AppData\Roaming\Autodesk\ApplicationPlugins\GroundSnake.bundle\Contents"
+
+C:\Windows\System32\xcopy "$(ProjectDir)PluginFile\PackageContents.xml" "C:\Users\$(Username)\AppData\Roaming\Autodesk\ApplicationPlugins\GroundSnake.bundle"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

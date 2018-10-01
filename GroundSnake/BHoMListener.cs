@@ -28,7 +28,11 @@ namespace BH.UI.GroundSnake
         {
             Listener = this;
 
-            BH.Engine.Reflection.Compute.LoadAllAssemblies(@"C:\Users\iNaslund\AppData\Roaming\Autodesk\ApplicationPlugins\GroundSnake");
+            string folder = System.IO.Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData), @"Autodesk\ApplicationPlugins\GroundSnake");
+
+            //BH.Engine.Reflection.Compute.LoadAllAssemblies(@"C:\Users\iNaslund\AppData\Roaming\Autodesk\ApplicationPlugins\GroundSnake");
+            BH.Engine.Reflection.Compute.LoadAllAssemblies(folder);
+
 
             m_adapter = new GroundSnakeAdapter();
 
