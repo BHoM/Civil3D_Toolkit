@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{B5BDDDA4-E87F-4E4E-80A7-10B1E29AF4FA}</ProjectGuid>
+    <ProjectGuid>{24B2F603-3BC0-4E52-B7D0-1F9EB057CDE0}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>BH.Adapter</RootNamespace>
-    <AssemblyName>Civil3D_Adapter</AssemblyName>
+    <RootNamespace>BH.UI.GroundSnake</RootNamespace>
+    <AssemblyName>GroundSnake</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -31,15 +31,27 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="acdbmgd">
+      <HintPath>..\..\..\..\..\..\..\Program Files\Autodesk\AutoCAD 2016\acdbmgd.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="acmgd">
+      <HintPath>..\..\..\..\..\..\..\Program Files\Autodesk\AutoCAD 2016\acmgd.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="BHoM">
       <HintPath>..\..\BHoM\Build\BHoM.dll</HintPath>
     </Reference>
-    <Reference Include="BHoM_Adapter">
+    <Reference Include="BHoM_Adapter, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\BHoM_Adapter\Build\BHoM_Adapter.dll</HintPath>
     </Reference>
-    <Reference Include="Reflection_Engine, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Reflection_Engine">
       <HintPath>..\..\BHoM_Engine\Build\Reflection_Engine.dll</HintPath>
+    </Reference>
+    <Reference Include="Serialiser_Engine, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\BHoM_Engine\Build\Serialiser_Engine.dll</HintPath>
     </Reference>
     <Reference Include="Socket_Adapter">
       <HintPath>..\..\Socket_Toolkit\Build\Socket_Adapter.dll</HintPath>
@@ -55,19 +67,37 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="UI_PostBuild">
+      <HintPath>..\..\BHoM_UI\Build\UI_PostBuild.exe</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Civil3DAdapter.cs" />
+    <Compile Include="BHoMListener.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
+    <ProjectReference Include="..\Adapter_GroundSnake\Adapter_GroundSnake.csproj">
+      <Project>{5c152ab4-4111-48ff-b2d6-b9a557325595}</Project>
+      <Name>Adapter_GroundSnake</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Civil3D_Adapter\Civil3D_Adapter.csproj">
+      <Project>{b5bddda4-e87f-4e4e-80a7-10b1e29af4fa}</Project>
+      <Name>Civil3D_Adapter</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Civil3D_Engine\Civil3D_Engine.csproj">
+      <Project>{d244032d-d34e-4c0f-9062-408cd024881a}</Project>
+      <Name>Civil3D_Engine</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Civil3D_oM\Civil3D_oM.csproj">
       <Project>{4c95e234-56b2-4165-83a4-daf0d7d4d3b8}</Project>
       <Name>Civil3D_oM</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>call "$(TargetDir)UI_PostBuild.exe" ..\..\ "C:\Users\$(Username)\AppData\Roaming\Autodesk\ApplicationPlugins\GroundSnake"
+</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
