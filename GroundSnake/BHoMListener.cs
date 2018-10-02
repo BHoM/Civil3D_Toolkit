@@ -19,24 +19,17 @@ namespace BH.UI.GroundSnake
     public class BHoMListener : IExtensionApplication
     {
 
-        public static BHoMListener Listener { get; private set; } = null;
-
-
+        /***************************************************/
+        /**** Public Application methods                ****/
         /***************************************************/
 
         public void Initialize()
         {
-            Listener = this;
-
-            
-            //string folder = System.IO.Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData), @"Autodesk\ApplicationPlugins\GroundSnake");
-
+            //Get the folder path of the plugin to load up all dlls
             string folder = System.IO.Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData), @"Autodesk\ApplicationPlugins\GroundSnake.bundle\Contents");
-
-            //BH.Engine.Reflection.Compute.LoadAllAssemblies(@"C:\Users\iNaslund\AppData\Roaming\Autodesk\ApplicationPlugins\GroundSnake");
             BH.Engine.Reflection.Compute.LoadAllAssemblies(folder);
 
-
+            //Create the internal adapter to be used to cumminicate with Civil3d
             m_adapter = new GroundSnakeAdapter();
 
             //Socket link for listening and sending data
@@ -55,6 +48,8 @@ namespace BH.UI.GroundSnake
             m_linkIn.DataObservers -= M_linkIn_DataObservers;
         }
 
+        /***************************************************/
+        /**** Private Methods                           ****/
         /***************************************************/
 
         private void M_linkIn_DataObservers(DataPackage package)
