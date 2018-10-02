@@ -21,7 +21,7 @@ namespace BH.Engine.GroundSnake
             return new BHC.Pipe
             {
                 CentreLine = new BHG.Line { Start = acPipe.StartPoint.ToBHoM(), End = acPipe.EndPoint.ToBHoM() },
-                Diameter = acPipe.Radius * 2,
+                Diameter = acPipe.InnerDiameterOrWidth,
                 Thickness = acPipe.WallThickness
             };
         }
