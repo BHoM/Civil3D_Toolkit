@@ -58,7 +58,9 @@ namespace BH.UI.GroundSnake.Adapter
                     foreach (ObjectId pipeId in network.GetPipeIds())
                     {
                         ADC.Pipe pipe = trans.GetObject(pipeId, OpenMode.ForRead) as ADC.Pipe;
-                        pipeList.Add(pipe.ToBHoM());
+                        BHC.Pipe bhPipe = pipe.ToBHoM();
+                        bhPipe.CustomData[Engine.Civil3D.Query.AdapterID] = pipeId.ToString();
+                        pipeList.Add(bhPipe);
                     }
 
                 }

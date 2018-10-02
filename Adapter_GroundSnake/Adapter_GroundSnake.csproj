@@ -77,6 +77,10 @@
     <Folder Include="Update\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Civil3D_Engine\Civil3D_Engine.csproj">
+      <Project>{d244032d-d34e-4c0f-9062-408cd024881a}</Project>
+      <Name>Civil3D_Engine</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Civil3D_oM\Civil3D_oM.csproj">
       <Project>{4c95e234-56b2-4165-83a4-daf0d7d4d3b8}</Project>
       <Name>Civil3D_oM</Name>
