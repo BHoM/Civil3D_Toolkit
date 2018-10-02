@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Civil3DConfig.cs" />
+    <Compile Include="Elements\Pipe.cs" />
     <Compile Include="PackageType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

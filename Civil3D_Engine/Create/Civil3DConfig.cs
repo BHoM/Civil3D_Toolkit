@@ -13,7 +13,7 @@ namespace BH.Engine.Adapters.Civil3D
         /**** Public Methods                            ****/
         /***************************************************/
 
-        public static Civil3DConfig Civil3DConfig(int inPort = 14230, int returnPort = 14230, int maxMinToWait = 10)
+        public static Civil3DConfig Civil3DConfig(int inPort = 14230, int returnPort = 14231, int maxMinToWait = 10)
         {
             if (inPort == returnPort)
             {
