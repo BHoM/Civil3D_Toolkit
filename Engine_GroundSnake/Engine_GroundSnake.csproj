@@ -71,10 +71,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Convert\ToBHoM\AcCurve.cs" />
+    <Compile Include="Convert\ToBHoM\Curve.cs" />
     <Compile Include="Convert\ToBHoM\Pipe.cs" />
     <Compile Include="Convert\ToBHoM\Point.cs" />
     <Compile Include="Convert\ToBHoM\Vector.cs" />
+    <Compile Include="Convert\ToCivil3D\Pipe.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

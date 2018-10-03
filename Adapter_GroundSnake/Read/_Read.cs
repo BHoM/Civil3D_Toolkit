@@ -29,6 +29,7 @@ namespace BH.UI.GroundSnake.Adapter
         /**** Adapter Methods                           ****/
         /***************************************************/
 
+        //General method called by the adapter when reading in data
         protected override IEnumerable<IBHoMObject> Read(Type type, IList ids)
         {
 
