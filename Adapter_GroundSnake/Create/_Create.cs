@@ -20,16 +20,24 @@ namespace BH.UI.GroundSnake.Adapter
         /****           Adapter Methods                 ****/
         /***************************************************/
 
+        //General method called by the adapter for push
         protected override bool Create<T>(IEnumerable<T> objects, bool replaceAll = false)
         {
-            if (objects.Count() > 0)
-            {
-               
-            }
-
-            return true;
-
+            return CreateCollection(objects as dynamic);
         }
+
+
+        /***************************************************/
+        /**** Private Methods                           ****/
+        /***************************************************/
+
+        private bool CreateCollection(IEnumerable<BH.oM.Civils.Elements.Pipe> pipes)
+        {
+            //Add code here for creating pipes in Civil3d.
+            //Try to keep the converts in the Engine if possible. See the ToCivil3D files.
+            throw new NotImplementedException();
+        }
+
 
         /***************************************************/
 

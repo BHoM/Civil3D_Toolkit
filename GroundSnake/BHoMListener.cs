@@ -16,6 +16,8 @@ using BH.UI.GroundSnake.Adapter;
 
 namespace BH.UI.GroundSnake
 {
+    //Class handling the communication between outer application and Civil3d.
+    //Responsible for dispatching incoming data to the corret adapter method
     public class BHoMListener : IExtensionApplication
     {
 
@@ -52,12 +54,14 @@ namespace BH.UI.GroundSnake
         /**** Private Methods                           ****/
         /***************************************************/
 
+        //Callback method being triggered when the sockets recieves new data
         private void M_linkIn_DataObservers(DataPackage package)
         {
             BH.Engine.Reflection.Compute.ClearCurrentEvents();
 
             lock (m_packageLock)
             {
+                //General checks of the recived data
                 if (package.Data.Count < 1)
                 {
                     ReturnData(new List<string> { "Cant handle empty package" });
@@ -94,8 +98,7 @@ namespace BH.UI.GroundSnake
                 try
                 {
 
-
-
+                    //Handle the data recieved depending on the package
                     switch (packageType)
                     {
                         case PackageType.ConnectionCheck:
