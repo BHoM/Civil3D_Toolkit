@@ -9,7 +9,6 @@ using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 
-using BH.oM.Structure.Elements;
 
 namespace BH.UI.GroundSnake.Adapter
 {
