@@ -51,7 +51,7 @@ namespace BH.Engine.GroundSnake
             }
             else
             {
-                BHG.CoordinateSystem system = BH.Engine.Geometry.Create.CoordinateSystem(acCircArc.Center.ToBHoM(), acCircArc.ReferenceVector.ToBHoM(), acCircArc.Normal.CrossProduct(acCircArc.ReferenceVector).ToBHoM());
+                BHG.CoordinateSystem.Cartesian system = BH.Engine.Geometry.Create.CartesianCoordinateSystem(acCircArc.Center.ToBHoM(), acCircArc.ReferenceVector.ToBHoM(), acCircArc.Normal.CrossProduct(acCircArc.ReferenceVector).ToBHoM());
 
                 return BH.Engine.Geometry.Create.Arc(system, acCircArc.Radius, acCircArc.StartAngle, acCircArc.EndAngle);
             }
