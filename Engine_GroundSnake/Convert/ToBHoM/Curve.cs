@@ -37,7 +37,7 @@ namespace BH.Engine.GroundSnake
             }
             else
             {
-                return new BHG.NurbCurve { ControlPoints = pts, Knots = nurbsData.GetKnots().ToArray().ToList(), Weights = nurbsData.GetWeights().ToArray().ToList() };
+                return new BHG.NurbsCurve { ControlPoints = pts, Knots = nurbsData.GetKnots().ToArray().ToList(), Weights = nurbsData.GetWeights().ToArray().ToList() };
             }
         }
 
@@ -93,7 +93,7 @@ namespace BH.Engine.GroundSnake
             return new BHG.Polyline { ControlPoints = pts };
         }
 
-        public static BHG.NurbCurve ToBHoM(this ACG.NurbCurve3d acNurbsCurve)
+        public static BHG.NurbsCurve ToBHoM(this ACG.NurbCurve3d acNurbsCurve)
         {
 
             List<BHG.Point> pts = new List<oM.Geometry.Point>();
@@ -118,7 +118,7 @@ namespace BH.Engine.GroundSnake
             }
 
 
-            return new BHG.NurbCurve { ControlPoints = pts, Knots = knots, Weights = weights  };
+            return new BHG.NurbsCurve { ControlPoints = pts, Knots = knots, Weights = weights  };
         }
 
         /***************************************************/
