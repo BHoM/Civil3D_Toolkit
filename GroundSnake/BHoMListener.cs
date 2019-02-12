@@ -161,7 +161,7 @@ namespace BH.UI.GroundSnake
             oM.Socket.DataPackage package = new oM.Socket.DataPackage
             {
                 Data = objs.ToList(),
-                Events = BH.Engine.Reflection.Query.CurrentEvents(),
+                //Events = BH.Engine.Reflection.Query.CurrentEvents(),
                 Tag = ""
             };
 
