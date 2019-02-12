@@ -183,7 +183,7 @@ namespace BH.Adapter.Civil3D
             m_returnPackage = package.Data;
 
             //Store the events
-            m_returnEvents = package.Events;
+            //m_returnEvents = package.Events; //ToDo: Work out if we need this
 
             //Set the wait event to allow methods to continue
             m_waitEvent.Set();

@@ -82,6 +82,7 @@
     <Compile Include="Convert\ToBHoM\ChamberShape.cs" />
     <Compile Include="Convert\ToBHoM\Curve.cs" />
     <Compile Include="Convert\ToBHoM\ManholeChamber.cs" />
+    <Compile Include="Convert\ToBHoM\FlowDirection.cs" />
     <Compile Include="Convert\ToBHoM\Pipe.cs" />
     <Compile Include="Convert\ToBHoM\Point.cs" />
     <Compile Include="Convert\ToBHoM\Vector.cs" />

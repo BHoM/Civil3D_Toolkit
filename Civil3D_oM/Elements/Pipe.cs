@@ -14,11 +14,13 @@ namespace BH.oM.Civils.Elements
         /**** Public Properties                         ****/
         /***************************************************/
 
-        public ICurve CentreLine { get; set; } = new Line();
+        public ICurve CentreLine { get; set; } = new Polyline();
 
         public double Diameter { get; set; } = 0;
 
         public double Thickness { get; set; } = 0;
+
+        public FlowDirection FlowDirection { get; set; } = FlowDirection.Undefined;
 
         /***************************************************/
     }
