@@ -4,6 +4,7 @@
     {
         Undefined,
         Circular,
-        Rectangular
+        Rectangular,
+        Spherical
     }
 }
