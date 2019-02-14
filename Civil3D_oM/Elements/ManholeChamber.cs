@@ -14,7 +14,7 @@ namespace BH.oM.Civils.Elements
         /**** Public Properties                         ****/
         /***************************************************/
 
-        public double CentrePoint { get; set; } = 0;
+        public Point CentrePoint { get; set; } = new Point();
 
         public double InternalLength { get; set; } = 0;
 
