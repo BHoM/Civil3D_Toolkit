@@ -50,10 +50,13 @@
     <Compile Include="Civil3DConfig.cs" />
     <Compile Include="Elements\ManholeChamber.cs" />
     <Compile Include="Elements\Pipe.cs" />
+    <Compile Include="Elements\Surface.cs" />
     <Compile Include="Enums\ChamberShape.cs" />
-    <Compile Include="Enums\FlowDirection.cs" />
     <Compile Include="PackageType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="BHC\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
