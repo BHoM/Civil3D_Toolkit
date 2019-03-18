@@ -15,23 +15,36 @@ namespace BH.Engine.GroundSnake
         /**** Public Methods                            ****/
         /***************************************************/
 
-        public static BHC.Surface ToBHoM(this ADC.TinSurface acTinSurface)
+        public static BHC.Surface ToBHoM(this ADC.TinSurface acSurface)
         {
+            //Converting a Triangulated Irregular Network Surface (TinSurface)
             List<BHG.Polyline> polylines = new List<oM.Geometry.Polyline>();
 
-            foreach (ADC.TinSurfaceTriangle triangle in acTinSurface.Triangles)
-            {
-
-                List<BHG.Point> points = new List<BHG.Point> { ToBHoM(triangle.Vertex1.Location),
-                                                               ToBHoM(triangle.Vertex2.Location),
-                                                               ToBHoM(triangle.Vertex3.Location)};
-
-                polylines.Add(Geometry.Create.Polyline(points));
-            }
+            foreach (ADC.TinSurfaceTriangle triangle in acSurface.Triangles)
+                polylines.Add(triangle.ToBHoM());
 
             return new BHC.Surface
             {
-                Triangles = polylines
+                Triangles = polylines,
+            };
+        }
+
+        public static BHG.Polyline ToBHoM(this ADC.TinSurfaceTriangle triangle)
+        {
+            List<BHG.Point> pts = new List<oM.Geometry.Point>();
+            pts.Add(triangle.Vertex1.Location.ToBHoM());
+            pts.Add(triangle.Vertex2.Location.ToBHoM());
+            pts.Add(triangle.Vertex3.Location.ToBHoM());
+            return Geometry.Create.Polyline(pts);
+        }
+
+        public static BHC.Surface ToBHoM(this ADC.TinVolumeSurface acSurface)
+        {
+            List<BHG.Polyline> pLines = new List<oM.Geometry.Polyline>();
+            
+            return new BHC.Surface
+            {
+                Triangles = pLines,
             };
         }
     }

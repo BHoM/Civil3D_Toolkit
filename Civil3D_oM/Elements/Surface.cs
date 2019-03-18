@@ -16,16 +16,6 @@ namespace BH.oM.Civils.Elements
 
         public List<Polyline> Triangles { get; set; } = new List<Polyline>();
 
-        public double MaximumGradeOrSlope { get; set; } = 0;
-
-        public double MeanGradeOrSlope { get; set; } = 0;
-
-        public double MinimumGradeOrSlope { get; set; } = 0;
-
-        public double SurfaceArea2D { get; set; } = 0;
-
-        public double SurfaceArea3D { get; set; } = 0;
-
         /***************************************************/
     }
 }
