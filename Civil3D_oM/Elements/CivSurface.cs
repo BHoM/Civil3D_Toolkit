@@ -8,7 +8,7 @@ using BH.oM.Geometry;
 
 namespace BH.oM.Civils.Elements
 {
-    public class Surface : BHoMObject
+    public class CivSurface : BHoMObject
     {
         /***************************************************/
         /**** Public Properties                         ****/

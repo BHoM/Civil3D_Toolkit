@@ -85,7 +85,7 @@
     <Compile Include="Convert\ToBHoM\FlowDirection.cs" />
     <Compile Include="Convert\ToBHoM\Pipe.cs" />
     <Compile Include="Convert\ToBHoM\Point.cs" />
-    <Compile Include="Convert\ToBHoM\Surface.cs" />
+    <Compile Include="Convert\ToBHoM\CivSurface.cs" />
     <Compile Include="Convert\ToBHoM\Vector.cs" />
     <Compile Include="Convert\ToCivil3D\Pipe.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -15,7 +15,7 @@ namespace BH.Engine.GroundSnake
         /**** Public Methods                            ****/
         /***************************************************/
 
-        public static BHC.Surface ToBHoM(this ADC.TinSurface acSurface)
+        public static BHC.CivSurface ToBHoM(this ADC.TinSurface acSurface)
         {
             //Converting a Triangulated Irregular Network Surface (TinSurface)
             List<BHG.Polyline> polylines = new List<oM.Geometry.Polyline>();
@@ -23,7 +23,7 @@ namespace BH.Engine.GroundSnake
             foreach (ADC.TinSurfaceTriangle triangle in acSurface.Triangles)
                 polylines.Add(triangle.ToBHoM());
 
-            return new BHC.Surface
+            return new BHC.CivSurface
             {
                 Triangles = polylines,
             };
@@ -38,11 +38,11 @@ namespace BH.Engine.GroundSnake
             return Geometry.Create.Polyline(pts);
         }
 
-        public static BHC.Surface ToBHoM(this ADC.TinVolumeSurface acSurface)
+        public static BHC.CivSurface ToBHoM(this ADC.TinVolumeSurface acSurface)
         {
             List<BHG.Polyline> pLines = new List<oM.Geometry.Polyline>();
             
-            return new BHC.Surface
+            return new BHC.CivSurface
             {
                 Triangles = pLines,
             };
