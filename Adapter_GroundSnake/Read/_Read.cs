@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using BH.oM.Base;
 using BHC = BH.oM.Civils.Elements;
-using BH.Engine.GroundSnake;
+using BH.UI.Civil.Engine;
 //using BH.oM.Geometry;
 
 using Autodesk.Civil.ApplicationServices;
@@ -19,7 +19,7 @@ using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 //using Autodesk.AutoCAD.Geometry;
 
-namespace BH.UI.GroundSnake.Adapter
+namespace BH.UI.Civil.Adapter
 {
     public partial class GroundSnakeAdapter
     {
@@ -37,6 +37,10 @@ namespace BH.UI.GroundSnake.Adapter
                 return ReadPipes();
             }
 
+            if (type == typeof(BHC.ManholeChamber))
+            {
+               return ReadHoles();
+            }
             return new List<IBHoMObject>();
         }
 
@@ -59,7 +63,7 @@ namespace BH.UI.GroundSnake.Adapter
                     {
                         ADC.Pipe pipe = trans.GetObject(pipeId, OpenMode.ForRead) as ADC.Pipe;
                         BHC.Pipe bhPipe = pipe.ToBHoM();
-                        bhPipe.CustomData[Engine.Civil3D.Query.AdapterID] = pipeId.ToString();
+                       // bhPipe.CustomData[Engine.Civil3D.Query.AdapterID] = pipeId.ToString();
                         pipeList.Add(bhPipe);
                     }
 
@@ -71,8 +75,33 @@ namespace BH.UI.GroundSnake.Adapter
             return pipeList;
         }
 
+        private List<BHC.ManholeChamber> ReadHoles(List<string> ids = null)
+        {
+            CivilDocument doc = CivilApplication.ActiveDocument;
 
+            List<BHC.ManholeChamber> pipeList = new List<BHC.ManholeChamber>();
+
+            using (Transaction trans = Application.DocumentManager.MdiActiveDocument.Database.TransactionManager.StartTransaction())
+            {
+                foreach (ObjectId id in doc.GetPipeNetworkIds())
+                {
+                    ADC.Network network = trans.GetObject(id, OpenMode.ForRead) as ADC.Network;
+                    foreach (ObjectId pipeId in network.GetStructureIds())
+                    {
+                        ADC.Structure hole = trans.GetObject(pipeId, OpenMode.ForRead) as ADC.Structure;
+                        BHC.ManholeChamber bhPipe = hole.ToBHoM();
+                        //bhPipe.CustomData[Engine.Civil3D.Query.AdapterID] = pipeId.ToString();
+                        pipeList.Add(bhPipe);
+                    }
+
+                }
+
+                trans.Commit();
+            }
+
+            return pipeList;
+        }
         /***************************************************/
-        
+
     }
 }

@@ -7,8 +7,8 @@
     <ProjectGuid>{24B2F603-3BC0-4E52-B7D0-1F9EB057CDE0}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>BH.UI.GroundSnake</RootNamespace>
-    <AssemblyName>GroundSnake</AssemblyName>
+    <RootNamespace>BH.UI.Civil</RootNamespace>
+    <AssemblyName>Civil_UI</AssemblyName>
     <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -96,9 +96,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Adapter_GroundSnake\Adapter_GroundSnake.csproj">
+    <ProjectReference Include="..\Adapter_GroundSnake\Adapter_Civil_UI.csproj">
       <Project>{5c152ab4-4111-48ff-b2d6-b9a557325595}</Project>
-      <Name>Adapter_GroundSnake</Name>
+      <Name>Adapter_Civil_UI</Name>
     </ProjectReference>
     <ProjectReference Include="..\Civil3D_Adapter\Civil3D_Adapter.csproj">
       <Project>{b5bddda4-e87f-4e4e-80a7-10b1e29af4fa}</Project>

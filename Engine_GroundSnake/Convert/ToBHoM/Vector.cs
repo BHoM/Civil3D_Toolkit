@@ -7,7 +7,7 @@ using BHG = BH.oM.Geometry;
 
 using ACG = Autodesk.AutoCAD.Geometry;
 
-namespace BH.Engine.GroundSnake
+namespace BH.UI.Civil.Engine
 {
     public static partial class Convert
     {

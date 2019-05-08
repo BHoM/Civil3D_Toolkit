@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using BH.Adapter;
 using BH.oM.Base;
 
-namespace BH.UI.GroundSnake.Adapter
+namespace BH.UI.Civil.Adapter
 {
     public partial class GroundSnakeAdapter : BHoMAdapter
     {

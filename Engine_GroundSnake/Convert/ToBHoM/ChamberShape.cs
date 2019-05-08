@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using BHC = BH.oM.Civils.Elements;
 using ADC = Autodesk.Civil.DatabaseServices;
 
-namespace BH.Engine.GroundSnake
+namespace BH.UI.Civil.Engine
 {
     public static partial class Convert
     {
