@@ -2,10 +2,10 @@
 {
     public enum FlowDirection
     {
-        Undefined,
         Bidirectional,
-        StartToEnd,
+        BySlope,
         EndToStart,
-        BySlope
+        StartToEnd,
+        Undefined
     }
 }
