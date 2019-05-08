@@ -11,13 +11,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Civil3D_oM", "Civil3D_oM\Ci
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Civil3D_Engine", "Civil3D_Engine\Civil3D_Engine.csproj", "{D244032D-D34E-4C0F-9062-408CD024881A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GroundSnake", "GroundSnake\GroundSnake.csproj", "{24B2F603-3BC0-4E52-B7D0-1F9EB057CDE0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Civil_UI", "GroundSnake\Civil_UI.csproj", "{24B2F603-3BC0-4E52-B7D0-1F9EB057CDE0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Adapter_GroundSnake", "Adapter_GroundSnake\Adapter_GroundSnake.csproj", "{5C152AB4-4111-48FF-B2D6-B9A557325595}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Adapter_Civil_UI", "Adapter_GroundSnake\Adapter_Civil_UI.csproj", "{5C152AB4-4111-48FF-B2D6-B9A557325595}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Engine_GroundSnake", "Engine_GroundSnake\Engine_GroundSnake.csproj", "{901BA0A8-A324-435A-B5D4-A400F5BBAFAF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Engine_Civil_UI", "Engine_GroundSnake\Engine_Civil_UI.csproj", "{901BA0A8-A324-435A-B5D4-A400F5BBAFAF}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GroundSnake", "GroundSnake", "{1CA44817-F6F6-40C5-A186-83AFC0C00DFB}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Civil_UI", "Civil_UI", "{1CA44817-F6F6-40C5-A186-83AFC0C00DFB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

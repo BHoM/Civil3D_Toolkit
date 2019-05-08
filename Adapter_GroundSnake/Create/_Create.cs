@@ -10,7 +10,7 @@ using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 
 
-namespace BH.UI.GroundSnake.Adapter
+namespace BH.UI.Civil.Adapter
 {
     public partial class GroundSnakeAdapter
     {

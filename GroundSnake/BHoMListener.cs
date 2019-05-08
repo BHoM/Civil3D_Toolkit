@@ -11,10 +11,10 @@ using BH.oM.Base;
 using BH.oM.DataManipulation.Queries;
 using BH.oM.Socket;
 using BH.oM.Adapters.Civil3D;
-using BH.UI.GroundSnake.Adapter;
+using BH.UI.Civil.Adapter;
 
 
-namespace BH.UI.GroundSnake
+namespace BH.UI.Civil
 {
     //Class handling the communication between outer application and Civil3d.
     //Responsible for dispatching incoming data to the corret adapter method
