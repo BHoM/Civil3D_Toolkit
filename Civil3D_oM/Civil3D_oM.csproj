@@ -52,6 +52,7 @@
     <Compile Include="Elements\Pipe.cs" />
     <Compile Include="Elements\CivSurface.cs" />
     <Compile Include="Enums\ChamberShape.cs" />
+    <Compile Include="Enums\FlowDirection.cs" />
     <Compile Include="PackageType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 using BHG = BH.oM.Geometry;
 using BHC = BH.oM.Civils.Elements;
 using ADC = Autodesk.Civil.DatabaseServices;
+using BH.Engine.Geometry;
 
-namespace BH.Engine.GroundSnake
+namespace BH.UI.Civil.Engine
 {
     public static partial class Convert
     {
@@ -35,7 +36,7 @@ namespace BH.Engine.GroundSnake
             pts.Add(triangle.Vertex1.Location.ToBHoM());
             pts.Add(triangle.Vertex2.Location.ToBHoM());
             pts.Add(triangle.Vertex3.Location.ToBHoM());
-            return Geometry.Create.Polyline(pts);
+            return BH.Engine.Geometry.Create.Polyline(pts);
         }
 
         public static BHC.CivSurface ToBHoM(this ADC.TinVolumeSurface acSurface)
