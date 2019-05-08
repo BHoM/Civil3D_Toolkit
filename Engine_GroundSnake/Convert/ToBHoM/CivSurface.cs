@@ -36,6 +36,7 @@ namespace BH.UI.Civil.Engine
             pts.Add(triangle.Vertex1.Location.ToBHoM());
             pts.Add(triangle.Vertex2.Location.ToBHoM());
             pts.Add(triangle.Vertex3.Location.ToBHoM());
+            pts.Add(pts.First());
             return BH.Engine.Geometry.Create.Polyline(pts);
         }
 

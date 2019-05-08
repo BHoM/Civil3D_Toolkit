@@ -41,6 +41,12 @@ namespace BH.UI.Civil.Adapter
             {
                return ReadHoles();
             }
+
+            if (type == typeof(BHC.CivSurface))
+            {
+                return ReadTinSurface();
+            }
+
             return new List<IBHoMObject>();
         }
 
@@ -63,7 +69,7 @@ namespace BH.UI.Civil.Adapter
                     {
                         ADC.Pipe pipe = trans.GetObject(pipeId, OpenMode.ForRead) as ADC.Pipe;
                         BHC.Pipe bhPipe = pipe.ToBHoM();
-                       // bhPipe.CustomData[Engine.Civil3D.Query.AdapterID] = pipeId.ToString();
+                        bhPipe.CustomData[BH.Engine.Civil3D.Query.AdapterID] = pipeId.ToString();
                         pipeList.Add(bhPipe);
                     }
 
@@ -79,7 +85,7 @@ namespace BH.UI.Civil.Adapter
         {
             CivilDocument doc = CivilApplication.ActiveDocument;
 
-            List<BHC.ManholeChamber> pipeList = new List<BHC.ManholeChamber>();
+            List<BHC.ManholeChamber> manholeChamberList = new List<BHC.ManholeChamber>();
 
             using (Transaction trans = Application.DocumentManager.MdiActiveDocument.Database.TransactionManager.StartTransaction())
             {
@@ -88,10 +94,10 @@ namespace BH.UI.Civil.Adapter
                     ADC.Network network = trans.GetObject(id, OpenMode.ForRead) as ADC.Network;
                     foreach (ObjectId pipeId in network.GetStructureIds())
                     {
-                        ADC.Structure hole = trans.GetObject(pipeId, OpenMode.ForRead) as ADC.Structure;
-                        BHC.ManholeChamber bhPipe = hole.ToBHoM();
-                        //bhPipe.CustomData[Engine.Civil3D.Query.AdapterID] = pipeId.ToString();
-                        pipeList.Add(bhPipe);
+                        ADC.Structure manholeChamber = trans.GetObject(pipeId, OpenMode.ForRead) as ADC.Structure;
+                        BHC.ManholeChamber bhManholeChamber = manholeChamber.ToBHoM();
+                        bhManholeChamber.CustomData[BH.Engine.Civil3D.Query.AdapterID] = pipeId.ToString();
+                        manholeChamberList.Add(bhManholeChamber);
                     }
 
                 }
@@ -99,7 +105,30 @@ namespace BH.UI.Civil.Adapter
                 trans.Commit();
             }
 
-            return pipeList;
+            return manholeChamberList;
+        }
+
+        private List<BHC.CivSurface> ReadTinSurface(List<string> ids = null)
+        {
+            CivilDocument doc = CivilApplication.ActiveDocument;
+
+            List<BHC.CivSurface> tinSurfaceList = new List<BHC.CivSurface>();
+
+            using (Transaction trans = Application.DocumentManager.MdiActiveDocument.Database.TransactionManager.StartTransaction())
+            {
+                foreach (ObjectId id in doc.GetSurfaceIds())
+                {
+                    ADC.TinSurface tinSurface = trans.GetObject(id, OpenMode.ForRead) as ADC.TinSurface;
+                    if (tinSurface != null)
+                    {
+                        tinSurfaceList.Add(tinSurface.ToBHoM());
+                    }
+                }
+
+                trans.Commit();
+            }
+
+            return tinSurfaceList;
         }
         /***************************************************/
 
