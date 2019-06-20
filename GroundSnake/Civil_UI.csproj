@@ -58,9 +58,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\BHoM_Adapter\Build\BHoM_Adapter.dll</HintPath>
     </Reference>
-    <Reference Include="DataManipulation_oM, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Data_oM, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\BHoM\Build\DataManipulation_oM.dll</HintPath>
+      <HintPath>..\..\BHoM\Build\Data_oM.dll</HintPath>
     </Reference>
     <Reference Include="Reflection_Engine">
       <HintPath>..\..\BHoM_Engine\Build\Reflection_Engine.dll</HintPath>

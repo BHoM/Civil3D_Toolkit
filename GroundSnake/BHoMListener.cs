@@ -8,7 +8,7 @@ using Autodesk.AutoCAD.Runtime;
 using BH.Adapter;
 using BH.Adapter.Socket;
 using BH.oM.Base;
-using BH.oM.DataManipulation.Queries;
+using BH.oM.Data.Requests;
 using BH.oM.Socket;
 using BH.oM.Adapters.Civil3D;
 using BH.UI.Civil.Adapter;
@@ -118,12 +118,12 @@ namespace BH.UI.Civil
                             break;
                         case PackageType.Pull:
                             if (!CheckPackageSize(package)) return;
-                            IQuery query = package.Data[1] as IQuery;
-                            ReturnData(m_adapter.Pull(query, config));
+                            IRequest request = package.Data[1] as IRequest;
+                            ReturnData(m_adapter.Pull(request, config));
                             break;
                         case PackageType.UpdateProperty:
                             if (!CheckPackageSize(package)) return;
-                            var tuple = package.Data[1] as Tuple<FilterQuery, string, object>;
+                            var tuple = package.Data[1] as Tuple<FilterRequest, string, object>;
                             ReturnData(new List<object> { m_adapter.UpdateProperty(tuple.Item1, tuple.Item2, tuple.Item3) });
                             break;
                         default:
