@@ -1,6 +1,6 @@
 ﻿using BH.Adapter.Socket;
 using BH.oM.Base;
-using BH.oM.DataManipulation.Queries;
+using BH.oM.Data.Requests;
 using BH.oM.Reflection.Debugging;
 using BH.oM.Adapters.Civil3D;
 using System;
@@ -81,7 +81,7 @@ namespace BH.Adapter.Civil3D
 
         /***************************************************/
 
-        public override IEnumerable<object> Pull(IQuery query, Dictionary<string, object> config = null)
+        public override IEnumerable<object> Pull(IRequest request, Dictionary<string, object> config = null)
         {
             //Reset the wait event
             m_waitEvent.Reset();
@@ -92,11 +92,11 @@ namespace BH.Adapter.Civil3D
 
             config = config == null ? new Dictionary<string, object>() : null;
 
-            if (!(query is FilterQuery))
+            if (!(request is FilterRequest))
                 return new List<object>();
 
             //Send data through the socket link
-            m_linkIn.SendData(new List<object>() { PackageType.Pull, query as FilterQuery, config, Civil3DSettings });
+            m_linkIn.SendData(new List<object>() { PackageType.Pull, request as FilterRequest, config, Civil3DSettings });
 
             //Wait until the return message has been recieved
             if (!m_waitEvent.WaitOne(TimeSpan.FromMinutes(m_waitTime)))
@@ -118,7 +118,7 @@ namespace BH.Adapter.Civil3D
 
         /***************************************************/
 
-        public override int Delete(FilterQuery filter, Dictionary<string, object> config = null)
+        public override int Delete(FilterRequest filter, Dictionary<string, object> config = null)
         {
 
             throw new NotImplementedException();
@@ -126,7 +126,7 @@ namespace BH.Adapter.Civil3D
 
         /***************************************************/
 
-        public override int UpdateProperty(FilterQuery filter, string property, object newValue, Dictionary<string, object> config = null)
+        public override int UpdateProperty(FilterRequest filter, string property, object newValue, Dictionary<string, object> config = null)
         {
             //Reset the wait event
             m_waitEvent.Reset();
@@ -138,7 +138,7 @@ namespace BH.Adapter.Civil3D
             config = config == null ? new Dictionary<string, object>() : null;
 
             //Send data through the socket link
-            m_linkIn.SendData(new List<object>() { PackageType.UpdateProperty, new Tuple<FilterQuery, string, object>(filter, property, newValue), config, Civil3DSettings });
+            m_linkIn.SendData(new List<object>() { PackageType.UpdateProperty, new Tuple<FilterRequest, string, object>(filter, property, newValue), config, Civil3DSettings });
 
             //Wait until the return message has been recieved
             if (!m_waitEvent.WaitOne(TimeSpan.FromMinutes(m_waitTime)))
