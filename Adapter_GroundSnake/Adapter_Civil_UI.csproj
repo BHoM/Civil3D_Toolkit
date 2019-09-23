@@ -53,17 +53,21 @@
     </Reference>
     <Reference Include="BHoM">
       <HintPath>..\..\BHoM\Build\BHoM.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="BHoM_Adapter">
       <HintPath>..\..\BHoM_Adapter\Build\BHoM_Adapter.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Geometry_oM, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\BHoM\Build\Geometry_oM.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Reflection_Engine, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\BHoM_Engine\Build\Reflection_Engine.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -89,14 +93,17 @@
     <ProjectReference Include="..\Civil3D_Engine\Civil3D_Engine.csproj">
       <Project>{d244032d-d34e-4c0f-9062-408cd024881a}</Project>
       <Name>Civil3D_Engine</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\Civil3D_oM\Civil3D_oM.csproj">
       <Project>{4c95e234-56b2-4165-83a4-daf0d7d4d3b8}</Project>
       <Name>Civil3D_oM</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\Engine_GroundSnake\Engine_Civil_UI.csproj">
       <Project>{901ba0a8-a324-435a-b5d4-a400f5bbafaf}</Project>
       <Name>Engine_Civil_UI</Name>
+      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
