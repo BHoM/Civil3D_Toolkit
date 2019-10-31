@@ -20,7 +20,7 @@ namespace BH.UI.Civil.Adapter
         /***************************************************/
 
         //General method called by the adapter for push
-        protected override bool Create<T>(IEnumerable<T> objects, bool replaceAll = false)
+        protected override bool Create<T>(IEnumerable<T> objects)
         {
             return CreateCollection(objects as dynamic);
         }
