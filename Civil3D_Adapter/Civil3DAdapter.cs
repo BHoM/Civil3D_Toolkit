@@ -86,7 +86,6 @@ namespace BH.Adapter.Civil3D
             //Reset the wait event
             m_waitEvent.Reset();
 
-
             if (!CheckConnection())
                 return new List<object>();
 
@@ -115,50 +114,6 @@ namespace BH.Adapter.Civil3D
             return returnObjs;
 
         }
-
-        /***************************************************/
-
-        public override int Delete(FilterRequest filter, Dictionary<string, object> config = null)
-        {
-
-            throw new NotImplementedException();
-        }
-
-        /***************************************************/
-
-        public override int UpdateProperty(FilterRequest filter, string property, object newValue, Dictionary<string, object> config = null)
-        {
-            //Reset the wait event
-            m_waitEvent.Reset();
-
-
-            if (!CheckConnection())
-                return 0;
-
-            config = config == null ? new Dictionary<string, object>() : null;
-
-            //Send data through the socket link
-            m_linkIn.SendData(new List<object>() { PackageType.UpdateProperty, new Tuple<FilterRequest, string, object>(filter, property, newValue), config, Civil3DSettings });
-
-            //Wait until the return message has been recieved
-            if (!m_waitEvent.WaitOne(TimeSpan.FromMinutes(m_waitTime)))
-                TimeOutError();
-
-            int returnValue = 0;
-            //Grab the return objects from the latest package
-            if (m_returnPackage.Count > 0 && m_returnPackage[0] is int)
-                returnValue = (int)m_returnPackage[0];
-
-            //Clear the return list
-            m_returnPackage.Clear();
-
-            //Raise returned events
-            RaiseEvents();
-
-            //Return the package
-            return returnValue;
-        }
-
 
         /***************************************************/
         /**** Private  Fields                           ****/
@@ -230,7 +185,7 @@ namespace BH.Adapter.Civil3D
         /**** Protected  Methods                        ****/
         /***************************************************/
 
-        protected override bool Create<T>(IEnumerable<T> objects, bool replaceAll = false)
+        protected override bool Create<T>(IEnumerable<T> objects)
         {
             throw new NotImplementedException();
         }

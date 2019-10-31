@@ -121,11 +121,6 @@ namespace BH.UI.Civil
                             IRequest request = package.Data[1] as IRequest;
                             ReturnData(m_adapter.Pull(request, config));
                             break;
-                        case PackageType.UpdateProperty:
-                            if (!CheckPackageSize(package)) return;
-                            var tuple = package.Data[1] as Tuple<FilterRequest, string, object>;
-                            ReturnData(new List<object> { m_adapter.UpdateProperty(tuple.Item1, tuple.Item2, tuple.Item3) });
-                            break;
                         default:
                             ReturnData(new List<string> { "Unrecognized package type" });
                             return;
