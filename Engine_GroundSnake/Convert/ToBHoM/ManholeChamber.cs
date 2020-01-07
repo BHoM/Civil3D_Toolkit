@@ -20,7 +20,7 @@ namespace BH.UI.Civil.Engine
         {
             return new BHC.ManholeChamber
             {
-                CentrePoint = acStructure.Location.ToBHoM(),
+                CentrePoint = acStructure.Location.FromCivil3D(),
                 InternalLength = acStructure.InnerDiameterOrWidth,
                 //InternalWidth = acStructure.InnerLength,
                 InternalDepth = acStructure.Height,

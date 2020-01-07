@@ -16,19 +16,19 @@ namespace BH.UI.Civil.Engine
         /**** Public Methods                            ****/
         /***************************************************/
 
-        public static BHG.ICurve ToBHoM(this ACD.Curve acCurve)
+        public static BHG.ICurve FromCivil3D(this ACD.Curve acCurve)
         {
             ACD.NurbsData nurbsData = acCurve.Spline.NurbsData;
             ACG.Point3dCollection ptCollection = nurbsData.GetControlPoints();
 
             if (ptCollection.Count == 2)
-                return new BHG.Line { Start = ptCollection[0].ToBHoM(), End = ptCollection[1].ToBHoM() };
+                return new BHG.Line { Start = ptCollection[0].FromCivil3D(), End = ptCollection[1].FromCivil3D() };
 
             List<BHG.Point> pts = new List<oM.Geometry.Point>();
 
             foreach (ACG.Point3d pt in ptCollection)
             {
-                pts.Add(pt.ToBHoM());
+                pts.Add(pt.FromCivil3D());
             }
 
             if (nurbsData.Degree == 1)
@@ -43,15 +43,15 @@ namespace BH.UI.Civil.Engine
 
         /***************************************************/
 
-        public static BHG.ICurve ToBHoM(this ACG.CircularArc3d acCircArc)
+        public static BHG.ICurve FromCivil3D(this ACG.CircularArc3d acCircArc)
         {
             if (acCircArc.IsClosed())
             {
-                return new BHG.Circle { Centre = acCircArc.Center.ToBHoM(), Normal = acCircArc.Normal.ToBHoM(), Radius = acCircArc.Radius };
+                return new BHG.Circle { Centre = acCircArc.Center.FromCivil3D(), Normal = acCircArc.Normal.FromCivil3D(), Radius = acCircArc.Radius };
             }
             else
             {
-                BHG.CoordinateSystem.Cartesian system = BH.Engine.Geometry.Create.CartesianCoordinateSystem(acCircArc.Center.ToBHoM(), acCircArc.ReferenceVector.ToBHoM(), acCircArc.Normal.CrossProduct(acCircArc.ReferenceVector).ToBHoM());
+                BHG.CoordinateSystem.Cartesian system = BH.Engine.Geometry.Create.CartesianCoordinateSystem(acCircArc.Center.FromCivil3D(), acCircArc.ReferenceVector.FromCivil3D(), acCircArc.Normal.CrossProduct(acCircArc.ReferenceVector).FromCivil3D());
 
                 return BH.Engine.Geometry.Create.Arc(system, acCircArc.Radius, acCircArc.StartAngle, acCircArc.EndAngle);
             }
@@ -59,48 +59,48 @@ namespace BH.UI.Civil.Engine
 
         /***************************************************/
 
-        public static BHG.ICurve ToBHoM(this ACG.CompositeCurve3d acCurve)
+        public static BHG.ICurve FromCivil3D(this ACG.CompositeCurve3d acCurve)
         {
-            return new BHG.PolyCurve { Curves = acCurve.GetCurves().Select(x => x.IToBHoM()).ToList() };
+            return new BHG.PolyCurve { Curves = acCurve.GetCurves().Select(x => x.FromCivil3D()).ToList() };
         }
 
         /***************************************************/
 
-        public static BHG.ICurve ToBHoM(this ACG.EllipticalArc3d acEllipse)
+        public static BHG.ICurve FromCivil3D(this ACG.EllipticalArc3d acEllipse)
         {
             throw new NotImplementedException();
         }
 
         /***************************************************/
 
-        public static BHG.Line ToBHoM(this ACG.LinearEntity3d acLine)
+        public static BHG.Line FromCivil3D(this ACG.LinearEntity3d acLine)
         {
-            return new BHG.Line { Start = acLine.StartPoint.ToBHoM(), End = acLine.EndPoint.ToBHoM() };
+            return new BHG.Line { Start = acLine.StartPoint.FromCivil3D(), End = acLine.EndPoint.FromCivil3D() };
         }
 
         /***************************************************/
 
-        public static BHG.Polyline ToBHoM(this ACG.PolylineCurve3d acPolyLine)
+        public static BHG.Polyline FromCivil3D(this ACG.PolylineCurve3d acPolyLine)
         {
 
             List<BHG.Point> pts = new List<oM.Geometry.Point>();
 
             for (int i = 0; i < acPolyLine.NumberOfControlPoints; i++)
             {
-                pts.Add(acPolyLine.ControlPointAt(i).ToBHoM());
+                pts.Add(acPolyLine.ControlPointAt(i).FromCivil3D());
             }
 
             return new BHG.Polyline { ControlPoints = pts };
         }
 
-        public static BHG.NurbsCurve ToBHoM(this ACG.NurbCurve3d acNurbsCurve)
+        public static BHG.NurbsCurve FromCivil3D(this ACG.NurbCurve3d acNurbsCurve)
         {
 
             List<BHG.Point> pts = new List<oM.Geometry.Point>();
 
             for (int i = 0; i < acNurbsCurve.NumberOfControlPoints; i++)
             {
-                pts.Add(acNurbsCurve.ControlPointAt(i).ToBHoM());
+                pts.Add(acNurbsCurve.ControlPointAt(i).FromCivil3D());
             }
 
             List<double> knots = new List<double>();
@@ -127,7 +127,7 @@ namespace BH.UI.Civil.Engine
         /**** Public Methods - Interface                ****/
         /***************************************************/
 
-        public static BHG.ICurve IToBHoM(this ACG.Curve3d acCurve)
+        public static BHG.ICurve FromCivil3D(this ACG.Curve3d acCurve)
         {
             return ToBHoM(acCurve as dynamic);
         }

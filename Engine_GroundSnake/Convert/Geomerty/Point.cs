@@ -16,7 +16,7 @@ namespace BH.UI.Civil.Engine
         /**** Public Methods                            ****/
         /***************************************************/
 
-        public static BHG.Point ToBHoM(this ACG.Point3d pt)
+        public static BHG.Point FromCivil3D(this ACG.Point3d pt)
         {
             return new BHG.Point { X = pt.X, Y = pt.Y, Z = pt.Z };
         }
