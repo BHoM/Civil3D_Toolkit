@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>BH.UI.Civil</RootNamespace>
     <AssemblyName>Civil_UI</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -131,12 +131,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>RD /S /Q "C:\Users\$(Username)\AppData\Roaming\Autodesk\ApplicationPlugins\GroundSnake.bundle"
-
-call "$(TargetDir)UI_PostBuild.exe" ..\..\ "C:\Users\$(Username)\AppData\Roaming\Autodesk\ApplicationPlugins\GroundSnake.bundle\Contents"
-
-C:\Windows\System32\xcopy "$(ProjectDir)PluginFile\PackageContents.xml" "C:\Users\$(Username)\AppData\Roaming\Autodesk\ApplicationPlugins\GroundSnake.bundle"
-</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
