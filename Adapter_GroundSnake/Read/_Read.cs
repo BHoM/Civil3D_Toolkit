@@ -54,6 +54,24 @@ namespace BH.UI.Civil.Adapter
         /**** Private Methods                           ****/
         /***************************************************/
 
+        private List<BH.oM.Geometry.Point> ReadPoints()
+        {
+            CivilDocument doc = CivilApplication.ActiveDocument;
+
+            List<BH.oM.Geometry.Point> pnts = new List<oM.Geometry.Point>();
+
+            using (Transaction trans = Application.DocumentManager.MdiActiveDocument.Database.TransactionManager.StartTransaction())
+            {
+                foreach(ObjectId id in doc.GetAllPointIds())
+                {
+                    DBObject pnt = trans.GetObject(id, OpenMode.ForRead);
+                    ADC.Point p = (ADC.Point)pnt;
+                }
+            }
+
+                return pnts;
+        }
+
         private List<BHC.Pipe> ReadPipes(List<string> ids = null)
         {
             CivilDocument doc = CivilApplication.ActiveDocument;
