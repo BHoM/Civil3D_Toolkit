@@ -20,7 +20,7 @@ namespace BH.UI.Civil.Engine
         {
             return new BHC.Pipe
             {
-                CentreLine = new BHG.Line { Start = acPipe.StartPoint.ToBHoM(), End = acPipe.EndPoint.ToBHoM() },
+                CentreLine = new BHG.Line { Start = acPipe.StartPoint.FromCivil3D(), End = acPipe.EndPoint.FromCivil3D() },
                 Diameter = acPipe.InnerDiameterOrWidth,
                 Thickness = acPipe.WallThickness,
                 FlowDirection = acPipe.FlowDirectionMethod.ToBHoM(),

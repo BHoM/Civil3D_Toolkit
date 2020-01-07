@@ -16,7 +16,7 @@ namespace BH.UI.Civil.Engine
         /**** Public Methods                            ****/
         /***************************************************/
 
-        public static BHG.Vector ToBHoM(this ACG.Vector3d vec)
+        public static BHG.Vector FromCivil3D(this ACG.Vector3d vec)
         {
             return new BHG.Vector { X = vec.X, Y = vec.Y, Z = vec.Z };
         }

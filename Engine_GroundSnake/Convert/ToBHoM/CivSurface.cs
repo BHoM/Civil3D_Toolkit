@@ -33,9 +33,9 @@ namespace BH.UI.Civil.Engine
         public static BHG.Polyline ToBHoM(this ADC.TinSurfaceTriangle triangle)
         {
             List<BHG.Point> pts = new List<oM.Geometry.Point>();
-            pts.Add(triangle.Vertex1.Location.ToBHoM());
-            pts.Add(triangle.Vertex2.Location.ToBHoM());
-            pts.Add(triangle.Vertex3.Location.ToBHoM());
+            pts.Add(triangle.Vertex1.Location.FromCivil3D());
+            pts.Add(triangle.Vertex2.Location.FromCivil3D());
+            pts.Add(triangle.Vertex3.Location.FromCivil3D());
             pts.Add(pts.First());
             return BH.Engine.Geometry.Create.Polyline(pts);
         }
