@@ -54,7 +54,7 @@ namespace BH.UI.Civil.Adapter
         /**** Private Methods                           ****/
         /***************************************************/
 
-        private List<BH.oM.Geometry.Point> ReadPoints()
+        /*private List<BH.oM.Geometry.Point> ReadPoints()
         {
             CivilDocument doc = CivilApplication.ActiveDocument;
 
@@ -70,7 +70,7 @@ namespace BH.UI.Civil.Adapter
             }
 
                 return pnts;
-        }
+        }*/
 
         private List<BHC.Pipe> ReadPipes(List<string> ids = null)
         {
