@@ -21,7 +21,6 @@ namespace BH.oM.Civils.Elements
         public double MaxGrade { get; set; } = 0;
         public double MinElevation { get; set; } = 0;
         public double MinGrade { get; set; } = 0;
-        public string FeatureLineName { get; set; } = "";
         public double SiteID { get; set; } = 0;
 
         /***************************************************/
