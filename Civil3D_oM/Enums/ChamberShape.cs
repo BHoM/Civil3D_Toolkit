@@ -5,6 +5,6 @@
         Undefined,
         Circular,
         Rectangular,
-        Spherical
+        Spherical,
     }
 }

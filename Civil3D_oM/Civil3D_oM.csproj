@@ -50,11 +50,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Civil3DConfig.cs" />
-    <Compile Include="Elements\CoGoPoint.cs" />
+    <Compile Include="Elements\CivProfile.cs" />
     <Compile Include="Elements\ManholeChamber.cs" />
     <Compile Include="Elements\Pipe.cs" />
     <Compile Include="Elements\CivSurface.cs" />
     <Compile Include="Enums\ChamberShape.cs" />
+    <Compile Include="Enums\CivProfileType.cs" />
     <Compile Include="Enums\FlowDirection.cs" />
     <Compile Include="PackageType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
