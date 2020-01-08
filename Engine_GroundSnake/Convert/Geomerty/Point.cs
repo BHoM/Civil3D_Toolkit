@@ -22,5 +22,10 @@ namespace BH.UI.Civil.Engine
         }
 
         /***************************************************/
+
+        public static BHG.Point FromCivil3D(this ACG.Point2d pt)
+        {
+            return new BHG.Point { X = pt.X, Y = pt.Y, Z = 0 };
+        }
     }
 }

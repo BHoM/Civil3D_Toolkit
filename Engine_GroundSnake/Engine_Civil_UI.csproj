@@ -76,6 +76,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Convert\Civils\Alignment.cs" />
+    <Compile Include="Convert\Civils\AlignmentType.cs" />
     <Compile Include="Convert\Civils\CivProfile.cs" />
     <Compile Include="Convert\Civils\CoGoPoint.cs" />
     <Compile Include="Convert\Civils\Parcel.cs" />
