@@ -6,6 +6,6 @@
         Bidirectional,
         BySlope,
         EndToStart,
-        StartToEnd
+        StartToEnd,
     }
 }
