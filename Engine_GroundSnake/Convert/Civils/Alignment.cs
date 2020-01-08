@@ -20,7 +20,7 @@ namespace BH.UI.Civil.Engine
 
         public static BHC.Alignment FromCivil3D(this ADC.Alignment civAlignment)
         {
-            return new BHC.Alignment
+            BHC.Alignment alignment = new BHC.Alignment
             {
                 AlignmentType = civAlignment.AlignmentType.FromCivil3D(),
                 Description = civAlignment.Description,
@@ -33,6 +33,21 @@ namespace BH.UI.Civil.Engine
                 SiteName = civAlignment.SiteName,
                 StartingStation = civAlignment.StartingStation,
             };
+
+            foreach(ADC.AlignmentEntity aEntity in civAlignment.Entities)
+            {
+                switch(aEntity.EntityType)
+                {
+                    case ADC.AlignmentEntityType.Line:
+                        alignment.Curve.Add(FromCivil3D(aEntity as dynamic));
+                        break;
+                    default:
+                        alignment.Curve.Add(null);
+                        break;
+                }
+            }
+
+            return alignment;
         }
 
         /***************************************************/
