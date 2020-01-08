@@ -32,39 +32,58 @@ namespace BH.UI.Civil.Adapter
         protected override IEnumerable<IBHoMObject> Read(Type type, IList ids)
         {
 
-            if (type == typeof(BHC.Pipe))
+            try
             {
-                return ReadPipes();
-            }
+                if (type == typeof(BHC.Pipe))
+                {
+                    return ReadPipes();
+                }
 
-            if (type == typeof(BHC.ManholeChamber))
-            {
-               return ReadHoles();
-            }
+                if (type == typeof(BHC.ManholeChamber))
+                {
+                    return ReadHoles();
+                }
 
-            if (type == typeof(BHC.CivSurface))
-            {
-                return ReadTinSurface();
-            }
-            
-            if(type == typeof(BHC.CoGoPoint))
-            {
-                return ReadCoGoPoints();
-            }
+                if (type == typeof(BHC.CivSurface))
+                {
+                    return ReadTinSurface();
+                }
 
-            if(type == typeof(BHC.CivProfile))
-            {
-                return ReadProfiles();
-            }
+                if (type == typeof(BHC.CoGoPoint))
+                {
+                    return ReadCoGoPoints();
+                }
 
-            if(type == typeof(BHC.Parcel))
-            {
-                return ReadParcels();
-            }
+                if (type == typeof(BHC.CivProfile))
+                {
+                    return ReadProfiles();
+                }
 
-            if(type == typeof(BHC.Alignment))
+                if (type == typeof(BHC.Parcel))
+                {
+                    return ReadParcels();
+                }
+
+                if (type == typeof(BHC.Alignment))
+                {
+                    return ReadAlignments();
+                }
+            }
+            catch(Exception e)
             {
-                return ReadAlignments();
+                System.Windows.Forms.MessageBox.Show(e.ToString());
+                List<string> stack = e.StackTrace.Split(new char[] { '\n' })
+                    .Where(x => x.Contains(" BH."))
+                    .ToList();
+
+                foreach(string s in stack)
+                {
+                    System.Windows.Forms.MessageBox.Show(s);
+                }
+
+                System.Windows.Forms.MessageBox.Show("END");
+
+                throw e;
             }
 
             return new List<IBHoMObject>();

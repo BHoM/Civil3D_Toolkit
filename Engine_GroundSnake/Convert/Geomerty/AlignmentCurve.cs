@@ -9,6 +9,8 @@ using ACG = Autodesk.AutoCAD.Geometry;
 
 using ADC = Autodesk.Civil.DatabaseServices;
 
+using BHC = BH.oM.Civils.Elements;
+
 namespace BH.UI.Civil.Engine
 {
     public static partial class Convert
@@ -18,16 +20,21 @@ namespace BH.UI.Civil.Engine
         /**** Public Methods                            ****/
         /***************************************************/
 
-        public static BHG.Line FromCivil3D(ADC.AlignmentLine aLine)
+        public static BHC.AlignmentCurve FromCivil3D(ADC.AlignmentLine aLine)
         {
-            return new oM.Geometry.Line
+            BHG.Line line = new oM.Geometry.Line
             {
                 Start = aLine.StartPoint.FromCivil3D(),
                 End = aLine.EndPoint.FromCivil3D(),
             };
+
+            return new BHC.AlignmentCurve
+            {
+                Curve = line,
+            };
         }
 
-        public static BHG.ICurve FromCivil3D(object o)
+        public static BHC.AlignmentCurve FromCivil3D(object o)
         {
             return null;
         }
