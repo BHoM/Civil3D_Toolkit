@@ -46,6 +46,16 @@ namespace BH.UI.Civil.Adapter
             {
                 return ReadTinSurface();
             }
+            
+            if(type == typeof(BHC.CoGoPoint))
+            {
+                return ReadCoGoPoints();
+            }
+
+            if(type == typeof(BHC.CivProfile))
+            {
+                return ReadProfiles();
+            }
 
             return new List<IBHoMObject>();
         }
@@ -54,23 +64,41 @@ namespace BH.UI.Civil.Adapter
         /**** Private Methods                           ****/
         /***************************************************/
 
-        /*private List<BH.oM.Geometry.Point> ReadPoints()
+        private List<BHC.CivProfile> ReadProfiles()
         {
             CivilDocument doc = CivilApplication.ActiveDocument;
 
-            List<BH.oM.Geometry.Point> pnts = new List<oM.Geometry.Point>();
+            List<BHC.CivProfile> profiles = new List<BHC.CivProfile>();
+
+            using (Transaction trans = Application.DocumentManager.MdiActiveDocument.Database.TransactionManager.StartTransaction())
+            {
+                foreach (ObjectId id in doc.GetAllPointIds())
+                {
+                    ADC.Profile profile = id.GetObject(OpenMode.ForRead) as ADC.Profile;
+                    profiles.Add(profile.FromCivil3D());
+                }
+            }
+
+            return profiles;
+        }
+
+        private List<BHC.CoGoPoint> ReadCoGoPoints()
+        {
+            CivilDocument doc = CivilApplication.ActiveDocument;
+
+            List<BHC.CoGoPoint> pnts = new List<BHC.CoGoPoint>();
 
             using (Transaction trans = Application.DocumentManager.MdiActiveDocument.Database.TransactionManager.StartTransaction())
             {
                 foreach(ObjectId id in doc.GetAllPointIds())
                 {
-                    DBObject pnt = trans.GetObject(id, OpenMode.ForRead);
-                    ADC.Point p = (ADC.Point)pnt;
+                    ADC.CogoPoint pnt = id.GetObject(OpenMode.ForRead) as ADC.CogoPoint;
+                    pnts.Add(pnt.FromCivil3D());
                 }
             }
 
-                return pnts;
-        }*/
+            return pnts;
+        }
 
         private List<BHC.Pipe> ReadPipes(List<string> ids = null)
         {
