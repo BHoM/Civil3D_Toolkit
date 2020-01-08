@@ -13,10 +13,10 @@ namespace BH.oM.Civils.Elements
     /***************************************************/
     public class Pracel : BHoMObject
     {
+        public double Area { get; set; } = 0;
         public Point AreaLocation { get; set; } = new Point();
         public Point Centroid { get; set; } = new Point();
-        public string Desctiption { get; set; } = "";
-        public string ParcelName { get; set; } = "";
+        public string Description { get; set; } = "";
         public int Number { get; set; } = 0;
 
         /***************************************************/
