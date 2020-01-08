@@ -62,12 +62,35 @@ namespace BH.UI.Civil.Adapter
                 return ReadParcels();
             }
 
+            if(type == typeof(BHC.Alignment))
+            {
+                return ReadAlignments();
+            }
+
             return new List<IBHoMObject>();
         }
 
         /***************************************************/
         /**** Private Methods                           ****/
         /***************************************************/
+
+        private List<BHC.Alignment> ReadAlignments()
+        {
+            CivilDocument doc = CivilApplication.ActiveDocument;
+
+            List<BHC.Alignment> alignments = new List<BHC.Alignment>();
+
+            using (Transaction trans = Application.DocumentManager.MdiActiveDocument.Database.TransactionManager.StartTransaction())
+            {
+                foreach (ObjectId id in doc.GetAlignmentIds())
+                {
+                    ADC.Alignment alignment = id.GetObject(OpenMode.ForRead) as ADC.Alignment;
+                    alignments.Add(alignment.FromCivil3D());
+                }
+            }
+
+            return alignments;
+        }
 
         private List<BHC.Parcel> ReadParcels()
         {
@@ -113,7 +136,7 @@ namespace BH.UI.Civil.Adapter
 
             using (Transaction trans = Application.DocumentManager.MdiActiveDocument.Database.TransactionManager.StartTransaction())
             {
-                foreach(ObjectId id in doc.GetAllPointIds())
+                foreach(ObjectId id in doc.CogoPoints)
                 {
                     ADC.CogoPoint pnt = id.GetObject(OpenMode.ForRead) as ADC.CogoPoint;
                     pnts.Add(pnt.FromCivil3D());
