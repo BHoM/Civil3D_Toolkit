@@ -26,6 +26,8 @@ namespace BH.oM.Civils.Elements
 
         public double EndingStation { get; set; } = 0;
 
+        public List<ICivProfileEntity> Entities { get; set; } = new List<ICivProfileEntity>();
+
         public double Length { get; set; } = 0;
 
         public double Offset { get; set; } = 0;
