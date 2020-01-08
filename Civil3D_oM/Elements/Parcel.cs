@@ -11,7 +11,7 @@ namespace BH.oM.Civils.Elements
     /***************************************************/
     /**** Public Properties                         ****/
     /***************************************************/
-    public class Pracel : BHoMObject
+    public class Parcel : BHoMObject
     {
         public double Area { get; set; } = 0;
         public Point AreaLocation { get; set; } = new Point();
