@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using BH.oM.Base;
 using BH.oM.Geometry;
 
-namespace BH.oM.Civil.Elements
+namespace BH.oM.Civils.Elements
 {
     public class CoGoPoint : BHoMObject
     {

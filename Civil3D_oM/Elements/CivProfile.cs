@@ -14,8 +14,6 @@ namespace BH.oM.Civils.Elements
         /**** Public Properties                         ****/
         /***************************************************/
 
-        public string AlignmentId { get; set; } = "";
-
         public string DataSourceName { get; set; } = "";
 
         public string Description { get; set; } = "";
