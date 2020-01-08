@@ -82,6 +82,7 @@
     <Compile Include="Convert\Civils\CoGoPoint.cs" />
     <Compile Include="Convert\Civils\Parcel.cs" />
     <Compile Include="Convert\Civils\ProfileType.cs" />
+    <Compile Include="Convert\Geomerty\AlignmentCurve.cs" />
     <Compile Include="Convert\Geomerty\Point.cs" />
     <Compile Include="Convert\ToBHoM\ChamberShape.cs" />
     <Compile Include="Convert\Geomerty\Curve.cs" />
