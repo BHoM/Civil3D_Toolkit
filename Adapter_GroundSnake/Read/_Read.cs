@@ -57,6 +57,11 @@ namespace BH.UI.Civil.Adapter
                 return ReadProfiles();
             }
 
+            if(type == typeof(BHC.Parcel))
+            {
+                return ReadParcels();
+            }
+
             return new List<IBHoMObject>();
         }
 
@@ -64,20 +69,38 @@ namespace BH.UI.Civil.Adapter
         /**** Private Methods                           ****/
         /***************************************************/
 
+        private List<BHC.Parcel> ReadParcels()
+        {
+            CivilDocument doc = CivilApplication.ActiveDocument;
+
+            List<BHC.Parcel> parcels = new List<BHC.Parcel>();
+
+            using (Transaction trans = Application.DocumentManager.MdiActiveDocument.Database.TransactionManager.StartTransaction())
+            {
+                foreach (ObjectId id in doc.GetParcelTableIds())
+                {
+                    ADC.Parcel parcel = id.GetObject(OpenMode.ForRead) as ADC.Parcel;
+                    parcels.Add(parcel.FromCivil3D());
+                }
+            }
+
+            return parcels;
+        }
+
         private List<BHC.CivProfile> ReadProfiles()
         {
             CivilDocument doc = CivilApplication.ActiveDocument;
 
             List<BHC.CivProfile> profiles = new List<BHC.CivProfile>();
 
-            using (Transaction trans = Application.DocumentManager.MdiActiveDocument.Database.TransactionManager.StartTransaction())
+            /*using (Transaction trans = Application.DocumentManager.MdiActiveDocument.Database.TransactionManager.StartTransaction())
             {
-                foreach (ObjectId id in doc.GetAllPointIds())
+                foreach (ObjectId id in doc.GetProfiles())
                 {
                     ADC.Profile profile = id.GetObject(OpenMode.ForRead) as ADC.Profile;
                     profiles.Add(profile.FromCivil3D());
                 }
-            }
+            }*/
 
             return profiles;
         }
