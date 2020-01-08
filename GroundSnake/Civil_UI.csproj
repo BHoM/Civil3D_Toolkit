@@ -108,7 +108,6 @@
     <ProjectReference Include="..\Adapter_GroundSnake\Adapter_Civil_UI.csproj">
       <Project>{5c152ab4-4111-48ff-b2d6-b9a557325595}</Project>
       <Name>Adapter_Civil_UI</Name>
-      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\Civil3D_Adapter\Civil3D_Adapter.csproj">
       <Project>{b5bddda4-e87f-4e4e-80a7-10b1e29af4fa}</Project>

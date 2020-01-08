@@ -128,7 +128,7 @@ namespace BH.UI.Civil
                 }
                 catch (System.Exception e)              
                 {
-                    Engine.Reflection.Compute.RecordError("OPeration failed. Message from adapter: " + e.Message);
+                    BH.Engine.Reflection.Compute.RecordError("OPeration failed. Message from adapter: " + e.Message);
                     ReturnData(new List<string> { "Operation failed." });
                 }
 
