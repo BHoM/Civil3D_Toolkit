@@ -51,6 +51,8 @@
   <ItemGroup>
     <Compile Include="Civil3DConfig.cs" />
     <Compile Include="Elements\CivProfile.cs" />
+    <Compile Include="Elements\Alignment.cs" />
+    <Compile Include="Elements\FeatureLine.cs" />
     <Compile Include="Elements\Parcel.cs" />
     <Compile Include="Elements\FeatureLine.cs" />
     <Compile Include="Elements\CivProfileCircularCurve.cs" />
@@ -66,6 +68,7 @@
     <Compile Include="Enums\CivProfileConstraintType.cs" />
     <Compile Include="Enums\CivProfileCurveType.cs" />
     <Compile Include="Enums\CivProfileEntityType.cs" />
+    <Compile Include="Enums\CivAlignmentType.cs" />
     <Compile Include="Enums\CivProfileType.cs" />
     <Compile Include="Enums\FlowDirection.cs" />
     <Compile Include="PackageType.cs" />
