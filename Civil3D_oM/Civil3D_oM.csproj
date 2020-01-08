@@ -51,6 +51,7 @@
   <ItemGroup>
     <Compile Include="Civil3DConfig.cs" />
     <Compile Include="Elements\CivProfile.cs" />
+    <Compile Include="Elements\Pracel.cs" />
     <Compile Include="Elements\CoGoPoint.cs" />
     <Compile Include="Elements\ManholeChamber.cs" />
     <Compile Include="Elements\Pipe.cs" />
