@@ -6,27 +6,25 @@ using System.Threading.Tasks;
 using BH.oM.Base;
 using BH.oM.Geometry;
 
-namespace BH.UI.Civil.Engine
+namespace BH.oM.Civil.Elements
 {
-    public class COGOPoints : BHoMObject
+    public class CoGoPoint : BHoMObject
     {
         /***************************************************/
         /**** Public Properties                         ****/
         /***************************************************/
-        public double easting { get; set; } = 0;
-        public double elevation { get; set; } = 0;
-        public string fullDescription { get; set; } = "";
-        public double gridEasting { get; set; } = 0;
-        public double gridNorthing { get; set; } = 0;
-        public double latitude { get; set; } = 0;
-        public double location { get; set; } = 0;
-        public double longitude { get; set; } = 0;
-        public double northing { get; set; } = 0;
-        public Point point { get; set; } = new Point();
-        public string pointName { get; set; } = "";
-        public double pointNumber { get; set; } = 0;
-        public double primaryPointGroupID { get; set; } = 0;
-        public string rawDescription { get; set; } = "";
+        public double Easting { get; set; } = 0;
+        public double Elevation { get; set; } = 0;
+        public string FullDescription { get; set; } = "";
+        public double GridEasting { get; set; } = 0;
+        public double GridNorthing { get; set; } = 0;
+        public double Latitude { get; set; } = 0;
+        public Point Location { get; set; } = new Point();
+        public double Longitude { get; set; } = 0;
+        public double Northing { get; set; } = 0;
+        public string PointName { get; set; } = "";
+        public double PointNumber { get; set; } = 0;
+        public string RawDescription { get; set; } = "";
 
         /***************************************************/
 
