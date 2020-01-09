@@ -39,10 +39,10 @@ namespace BH.UI.Civil.Engine
                 switch(aEntity.EntityType)
                 {
                     case ADC.AlignmentEntityType.Line:
-                        alignment.Curve.Add(FromCivil3D(aEntity as dynamic));
+                        alignment.AlignmentCurves.Add(FromCivil3D(aEntity as dynamic));
                         break;
                     default:
-                        alignment.Curve.Add(null);
+                        alignment.AlignmentCurves.Add(null);
                         break;
                 }
             }

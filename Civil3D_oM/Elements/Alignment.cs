@@ -24,7 +24,7 @@ namespace BH.oM.Civils.Elements
         public string SiteName { get; set; } = "";
         public double StartingStation { get; set; } = 0;
 
-        public List<AlignmentCurve> Curve = new List<AlignmentCurve>();
+        public List<AlignmentCurve> AlignmentCurves { get; set; } = new List<AlignmentCurve>();
 
         /***************************************************/
     }
