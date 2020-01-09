@@ -155,7 +155,7 @@ namespace BH.UI.Civil.Adapter
 
             using (Transaction trans = Application.DocumentManager.MdiActiveDocument.Database.TransactionManager.StartTransaction())
             {
-                foreach(ObjectId id in doc.CogoPoints)
+                foreach(ObjectId id in doc.GetAllPointIds())
                 {
                     ADC.CogoPoint pnt = id.GetObject(OpenMode.ForRead) as ADC.CogoPoint;
                     pnts.Add(pnt.FromCivil3D());
