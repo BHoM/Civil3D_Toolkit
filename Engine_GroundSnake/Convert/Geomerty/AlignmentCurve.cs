@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BH.oM.Geometry;
 using BHG = BH.oM.Geometry;
 using ACD = Autodesk.AutoCAD.DatabaseServices;
 using ACG = Autodesk.AutoCAD.Geometry;
@@ -33,6 +34,22 @@ namespace BH.UI.Civil.Engine
                 Curve = line,
             };
         }
+
+        public static BHC.AlignmentCurve FromCivil3D(ADC.AlignmentArc aArc)
+        {
+            List<Point> controlpoints = new List<Point>();
+            controlpoints.Add(aArc.StartPoint.FromCivil3D());
+            controlpoints.Add(aArc.CenterPoint.FromCivil3D());
+            controlpoints.Add(aArc.EndPoint.FromCivil3D());
+
+            BHG.Polyline pl = new Polyline { ControlPoints = controlpoints };
+
+            return new BHC.AlignmentCurve
+            {
+                Curve = pl,
+            };
+        }
+
 
         public static BHC.AlignmentCurve FromCivil3D(object o)
         {
