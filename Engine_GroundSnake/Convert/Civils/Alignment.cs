@@ -41,6 +41,9 @@ namespace BH.UI.Civil.Engine
                     case ADC.AlignmentEntityType.Line:
                         alignment.AlignmentCurves.Add(FromCivil3D(aEntity as dynamic));
                         break;
+                    case ADC.AlignmentEntityType.Arc:
+                        alignment.AlignmentCurves.Add(FromCivil3D(aEntity as dynamic));
+                        break;
                     default:
                         alignment.AlignmentCurves.Add(null);
                         break;
