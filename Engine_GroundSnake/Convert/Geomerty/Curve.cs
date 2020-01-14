@@ -16,6 +16,11 @@ namespace BH.UI.Civil.Engine
         /**** Public Methods                            ****/
         /***************************************************/
 
+        public static ACD.Line ToCivil3D(this BHG.Line line)
+        {
+            return new Autodesk.AutoCAD.DatabaseServices.Line(line.Start.ToCivil3D(), line.End.ToCivil3D());
+        }
+
         public static BHG.ICurve FromCivil3D(this ACD.Curve acCurve)
         {
             ACD.NurbsData nurbsData = acCurve.Spline.NurbsData;
