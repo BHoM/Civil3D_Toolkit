@@ -27,5 +27,10 @@ namespace BH.UI.Civil.Engine
         {
             return new BHG.Point { X = pt.X, Y = pt.Y, Z = 0 };
         }
+
+        public static ACG.Point3d ToCivil3D(this BHG.Point pt)
+        {
+            return new Autodesk.AutoCAD.Geometry.Point3d(pt.X, pt.Y, pt.Z);
+        }
     }
 }
