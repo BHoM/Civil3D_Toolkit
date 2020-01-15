@@ -68,6 +68,9 @@ namespace BH.UI.Civil.Adapter
                 {
                     return ReadAlignments();
                 }
+
+                if (type == typeof(object))
+                    return ReadBlocks();
             }
             catch(Exception e)
             {
@@ -92,6 +95,30 @@ namespace BH.UI.Civil.Adapter
         /***************************************************/
         /**** Private Methods                           ****/
         /***************************************************/
+
+        private List<BHC.Block> ReadBlocks()
+        {
+            List<BHC.Block> blocks = new List<BHC.Block>();
+
+            using (Transaction trans = Application.DocumentManager.MdiActiveDocument.Database.TransactionManager.StartTransaction())
+            {
+                // Open the Block table record for read
+                BlockTable acBlkTbl;
+                acBlkTbl = trans.GetObject(Application.DocumentManager.MdiActiveDocument.Database.BlockTableId, OpenMode.ForRead) as BlockTable;
+
+                // Open the Block table record Model space for read
+                BlockTableRecord acBlkTblRec;
+                acBlkTblRec = trans.GetObject(acBlkTbl[BlockTableRecord.ModelSpace], OpenMode.ForRead) as BlockTableRecord;
+
+                foreach(ObjectId id in acBlkTblRec.GetBlockReferenceIds(true, true))
+                {
+                    BlockReference block = id.GetObject(OpenMode.ForRead) as BlockReference;
+                    blocks.Add(block.FromCivil3D());
+                }
+            }
+
+            return blocks;
+        }
 
         private List<BHC.Alignment> ReadAlignments()
         {
