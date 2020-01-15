@@ -1,17 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BH.oM.Adapters.Civil3D
+﻿namespace BH.oM.Civils.Elements
 {
-    public enum PackageType
+    public enum CollisionType
     {
-        Push,
-        Pull,
-        ConnectionCheck,
-        UpdateProperty,
+        Undefined,
+        None,
+        Solid,
     }
-
 }

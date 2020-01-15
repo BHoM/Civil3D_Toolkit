@@ -8,23 +8,25 @@ using BH.oM.Geometry;
 
 namespace BH.oM.Civils.Elements
 {
-    public class Alignment : BHoMObject
+    public class Block : BHoMObject
     {
         /***************************************************/
         /**** Public Properties                         ****/
         /***************************************************/
 
-        public CivAlignmentType AlignmentType { get; set; } = CivAlignmentType.Undefined;
-        public string Description { get; set; } = "";
-        public List<double> DesignSpeeds { get; set; } = new List<double>();
-        public double EndingStation { get; set; } = 0;
-        public double Length { get; set; } = 0;
-        public Point ReferencePoint { get; set; } = new Point();
-        public double ReferencePointStation { get; set; } = 0;
-        public string SiteName { get; set; } = "";
-        public double StartingStation { get; set; } = 0;
-
-        public List<AlignmentCurve> AlignmentCurves { get; set; } = new List<AlignmentCurve>();
+        public string BlockName { get; set; } = "";
+        public BoundingBox Bounds { get; set; } = new BoundingBox();
+        public bool CanCastShadow { get; set; } = false;
+        public CollisionType CollisionType { get; set; } = CollisionType.Undefined;
+        public bool IsPersistent { get; set; } = false;
+        public bool IsPlanar { get; set; } = false;
+        public string Layer { get; set; } = "";
+        public string Material { get; set; } = "";
+        public Vector Normal { get; set; } = new Vector();
+        public Point Position { get; set; } = new Point();
+        public bool CanReceiveShadow { get; set; } = false;
+        public double Rotation { get; set; } = 0;
+        public bool IsVisible { get; set; } = false;
 
         /***************************************************/
     }
