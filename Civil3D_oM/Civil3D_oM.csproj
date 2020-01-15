@@ -68,6 +68,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Civil3DConfig.cs" />
+    <Compile Include="Elements\Block.cs" />
     <Compile Include="Elements\AlignmentCurve.cs" />
     <Compile Include="Elements\CivProfile.cs" />
     <Compile Include="Elements\Alignment.cs" />
@@ -90,6 +91,7 @@
     <Compile Include="Enums\CivAlignmentType.cs" />
     <Compile Include="Enums\CivProfileType.cs" />
     <Compile Include="Enums\FlowDirection.cs" />
+    <Compile Include="Enums\CollisionType.cs" />
     <Compile Include="PackageType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
