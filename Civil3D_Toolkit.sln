@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29230.47
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Civil3D_Adapter", "Civil3D_Adapter\Civil3D_Adapter.csproj", "{B5BDDDA4-E87F-4E4E-80A7-10B1E29AF4FA}"
 EndProject
@@ -19,8 +19,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Engine_Civil_UI", "Engine_GroundSnake\Engine_Civil_UI.csproj", "{901BA0A8-A324-435A-B5D4-A400F5BBAFAF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Civil_UI", "Civil_UI", "{1CA44817-F6F6-40C5-A186-83AFC0C00DFB}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BHoM_Adapter", "..\BHoM_Adapter\BHoM_Adapter\BHoM_Adapter.csproj", "{C99A5DDF-78B1-4224-81AC-C5B90D03E423}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -78,14 +76,6 @@ Global
 		{901BA0A8-A324-435A-B5D4-A400F5BBAFAF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{901BA0A8-A324-435A-B5D4-A400F5BBAFAF}.Release|x64.ActiveCfg = Release|x64
 		{901BA0A8-A324-435A-B5D4-A400F5BBAFAF}.Release|x64.Build.0 = Release|x64
-		{C99A5DDF-78B1-4224-81AC-C5B90D03E423}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C99A5DDF-78B1-4224-81AC-C5B90D03E423}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C99A5DDF-78B1-4224-81AC-C5B90D03E423}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{C99A5DDF-78B1-4224-81AC-C5B90D03E423}.Debug|x64.Build.0 = Debug|Any CPU
-		{C99A5DDF-78B1-4224-81AC-C5B90D03E423}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C99A5DDF-78B1-4224-81AC-C5B90D03E423}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C99A5DDF-78B1-4224-81AC-C5B90D03E423}.Release|x64.ActiveCfg = Release|Any CPU
-		{C99A5DDF-78B1-4224-81AC-C5B90D03E423}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
