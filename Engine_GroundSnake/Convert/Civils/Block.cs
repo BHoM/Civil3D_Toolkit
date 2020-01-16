@@ -37,6 +37,7 @@ namespace BH.UI.Civil.Engine
                 Normal = civBlock.Normal.FromCivil3D(),
                 CollisionType = civBlock.CollisionType.FromCivil3D(),
                 Bounds = civBlock.Bounds.HasValue ? civBlock.Bounds.Value.FromCivil3D() : new oM.Geometry.BoundingBox(),
+                Name = civBlock.Name,
             };
         }
 
