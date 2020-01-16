@@ -18,7 +18,7 @@ namespace BH.UI.Civil
 {
     //Class handling the communication between outer application and Civil3d.
     //Responsible for dispatching incoming data to the corret adapter method
-    public class BHoMListener : IExtensionApplication
+    public class CivilListener : IExtensionApplication
     {
 
         /***************************************************/
@@ -28,11 +28,12 @@ namespace BH.UI.Civil
         public void Initialize()
         {
             //Get the folder path of the plugin to load up all dlls
-            string folder = System.IO.Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData), @"Autodesk\ApplicationPlugins\GroundSnake.bundle\Contents");
+            //string folder = System.IO.Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData), @"Autodesk\ApplicationPlugins\GroundSnake.bundle\Contents");
+            string folder = System.IO.Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData), @"BHoM\Assemblies");
             BH.Engine.Reflection.Compute.LoadAllAssemblies(folder);
 
             //Create the internal adapter to be used to cumminicate with Civil3d
-            m_adapter = new GroundSnakeAdapter();
+            m_adapter = new CivilUIAdapter();
 
             //Socket link for listening and sending data
             m_linkIn = new SocketLink_Tcp(14230);
@@ -40,7 +41,7 @@ namespace BH.UI.Civil
 
             m_linkOut = new SocketLink_Tcp(14231);
 
-            m_adapter = new GroundSnakeAdapter();
+            m_adapter = new CivilUIAdapter();
         }
 
         /***************************************************/
@@ -185,7 +186,7 @@ namespace BH.UI.Civil
         private SocketLink_Tcp m_linkIn;
         private SocketLink_Tcp m_linkOut;
 
-        private GroundSnakeAdapter m_adapter;
+        private CivilUIAdapter m_adapter;
 
         public object m_packageLock = new object();
 

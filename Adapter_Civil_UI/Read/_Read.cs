@@ -23,7 +23,7 @@ using Autodesk.AutoCAD.Internal.DatabaseServices;
 
 namespace BH.UI.Civil.Adapter
 {
-    public partial class GroundSnakeAdapter
+    public partial class CivilUIAdapter
     {
 
         /***************************************************/
