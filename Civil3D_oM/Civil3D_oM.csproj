@@ -74,7 +74,6 @@
     <Compile Include="Elements\Alignment.cs" />
     <Compile Include="Elements\FeatureLine.cs" />
     <Compile Include="Elements\Parcel.cs" />
-    <Compile Include="Elements\FeatureLine.cs" />
     <Compile Include="Elements\CivProfileCircularCurve.cs" />
     <Compile Include="Elements\CivProfileParabolaAsymmetric.cs" />
     <Compile Include="Elements\CivProfileParabolaSymmetric.cs" />
