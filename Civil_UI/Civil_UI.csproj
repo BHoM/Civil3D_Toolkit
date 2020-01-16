@@ -119,7 +119,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BHoMListener.cs" />
+    <Compile Include="CivilListener.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -152,11 +152,11 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>RD /S /Q "C:\Users\$(Username)\AppData\Roaming\Autodesk\ApplicationPlugins\GroundSnake.bundle"
+    <PostBuildEvent>RD /S /Q "C:\Users\$(Username)\AppData\Roaming\Autodesk\ApplicationPlugins\BHoM.bundle"
 
-call "$(TargetDir)UI_PostBuild.exe" ..\..\ "C:\Users\$(Username)\AppData\Roaming\Autodesk\ApplicationPlugins\GroundSnake.bundle\Contents"
+call "$(TargetDir)UI_PostBuild.exe" ..\..\ "C:\Users\$(Username)\AppData\Roaming\Autodesk\ApplicationPlugins\BHoM.bundle\Contents"
 
-C:\Windows\System32\xcopy "$(ProjectDir)PluginFile\PackageContents.xml" "C:\Users\$(Username)\AppData\Roaming\Autodesk\ApplicationPlugins\GroundSnake.bundle"</PostBuildEvent>
+C:\Windows\System32\xcopy "$(ProjectDir)PluginFile\PackageContents.xml" "C:\Users\$(Username)\AppData\Roaming\Autodesk\ApplicationPlugins\BHoM.bundle"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

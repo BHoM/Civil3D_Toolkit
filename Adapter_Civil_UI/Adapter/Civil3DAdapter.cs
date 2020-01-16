@@ -9,7 +9,7 @@ using BH.oM.Base;
 
 namespace BH.UI.Civil.Adapter
 {
-    public partial class GroundSnakeAdapter : BHoMAdapter
+    public partial class CivilUIAdapter : BHoMAdapter
     {
         /***************************************************/
         /****           Private Fields                  ****/
@@ -20,7 +20,7 @@ namespace BH.UI.Civil.Adapter
         /**** Constructors                              ****/
         /***************************************************/
 
-        public GroundSnakeAdapter()
+        public CivilUIAdapter()
         {
             Config.UseAdapterId = false; //To be switched to true at later stage;
             

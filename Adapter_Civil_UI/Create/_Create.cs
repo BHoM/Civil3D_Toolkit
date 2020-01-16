@@ -22,7 +22,7 @@ using BH.Engine.Geometry;
 
 namespace BH.UI.Civil.Adapter
 {
-    public partial class GroundSnakeAdapter
+    public partial class CivilUIAdapter
     {
 
         /***************************************************/

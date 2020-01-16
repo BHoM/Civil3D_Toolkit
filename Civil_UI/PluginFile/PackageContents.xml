@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<ApplicationPackage SchemaVersion="1.0" ProductType="Application" Name="BHoMListener" AppVersion="1.0" Description="MyAPP, My description" Author="My Name" Icon="./Contents/MyAPPIcon.ico" OnlineDocumentation="http://MyWebSite.com" HelpFile="" ProductCode="{585df318-d87b-442e-90d7-9299ed32cff4}" FriendlyVersion="1.0" SupportedLocales="Enu" AutodeskProduct="AutoCAD">
+<ApplicationPackage SchemaVersion="1.0" ProductType="Application" Name="CivilUIListener" AppVersion="1.0" Description="MyAPP, My description" Author="My Name" Icon="./Contents/MyAPPIcon.ico" OnlineDocumentation="http://MyWebSite.com" HelpFile="" ProductCode="{585df318-d87b-442e-90d7-9299ed32cff4}" FriendlyVersion="1.0" SupportedLocales="Enu" AutodeskProduct="AutoCAD">
   <CompanyDetails Name="My Name" Phone=" " Url="http://MyWebsite.com" Email="MyName@MyWebSite.com" />
   <Components Description="Main">
-    <RuntimeRequirements SupportPath="./Contents" OS="Win32|Win64" Platform="AutoCAD*" SeriesMin="R19.0" SeriesMax="R22.0" />
-    <ComponentEntry AppName="BHoMListener" Version="1.0" ModuleName="./Contents/GroundSnake.dll" AppDescription="My description" LoadOnAppearance="True" LoadOnAutoCADStartup="True" LoadOnCommandInvocation="True">
+    <RuntimeRequirements SupportPath="./Contents" OS="Win32|Win64" Platform="AutoCAD*|Civil3D" SeriesMin="R19.0" SeriesMax="R22.0" />
+    <ComponentEntry AppName="CivilUIListener" Version="1.0" ModuleName="./Contents/Civil_UI.dll" AppDescription="My description" LoadOnAppearance="True" LoadOnAutoCADStartup="True" LoadOnCommandInvocation="True">
     </ComponentEntry>
   </Components>
 </ApplicationPackage>
