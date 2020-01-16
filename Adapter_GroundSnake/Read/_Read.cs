@@ -17,6 +17,8 @@ using ADC = Autodesk.Civil.DatabaseServices;
 //using Autodesk.AutoCAD.Runtime;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.EditorInput;
+using Autodesk.AutoCAD.Internal.DatabaseServices;
 //using Autodesk.AutoCAD.Geometry;
 
 namespace BH.UI.Civil.Adapter
@@ -54,10 +56,10 @@ namespace BH.UI.Civil.Adapter
                     return ReadCoGoPoints();
                 }
 
-                if (type == typeof(BHC.CivProfile))
+              /* if (type == typeof(BHC.CivProfile))
                 {
                     return ReadProfiles();
-                }
+                } */
 
                 if (type == typeof(BHC.Parcel))
                 {
@@ -69,8 +71,11 @@ namespace BH.UI.Civil.Adapter
                     return ReadAlignments();
                 }
 
-                if (type == typeof(object))
+                if (type == typeof(BHC.Block))
                     return ReadBlocks();
+
+                if (type == typeof(BHC.FeatureLine))
+                    return ReadFeatureLines();
             }
             catch(Exception e)
             {
@@ -96,25 +101,59 @@ namespace BH.UI.Civil.Adapter
         /**** Private Methods                           ****/
         /***************************************************/
 
+        private List<BHC.FeatureLine> ReadFeatureLines()
+        {
+            List<BHC.FeatureLine> featureLines = new List<BHC.FeatureLine>();
+
+            using (Transaction trans = Application.DocumentManager.MdiActiveDocument.Database.TransactionManager.StartOpenCloseTransaction())
+            {
+                var btr =
+                     (BlockTableRecord)trans.GetObject(
+                    SymbolUtilityServices.GetBlockModelSpaceId(Application.DocumentManager.MdiActiveDocument.Database),
+                    OpenMode.ForRead
+                     );
+                var blockIDs =
+                from ObjectId id in btr
+                where id.ObjectClass.IsDerivedFrom(Autodesk.AutoCAD.Runtime.RXClass.GetClass(typeof(ADC.FeatureLine)))
+                select id;
+
+                foreach (ObjectId id in blockIDs)
+                {
+                    ADC.FeatureLine l = (trans.GetObject(id, OpenMode.ForRead) as ADC.FeatureLine);
+                    if (l != null)
+                        featureLines.Add(l.FromCivil3D());
+                }
+
+                trans.Commit();
+            }
+
+            return featureLines;
+        }
+
         private List<BHC.Block> ReadBlocks()
         {
             List<BHC.Block> blocks = new List<BHC.Block>();
 
-            using (Transaction trans = Application.DocumentManager.MdiActiveDocument.Database.TransactionManager.StartTransaction())
+            using (Transaction trans = Application.DocumentManager.MdiActiveDocument.Database.TransactionManager.StartOpenCloseTransaction())
             {
-                // Open the Block table record for read
-                BlockTable acBlkTbl;
-                acBlkTbl = trans.GetObject(Application.DocumentManager.MdiActiveDocument.Database.BlockTableId, OpenMode.ForRead) as BlockTable;
+                var btr =
+                     (BlockTableRecord)trans.GetObject(
+                    SymbolUtilityServices.GetBlockModelSpaceId(Application.DocumentManager.MdiActiveDocument.Database),
+                    OpenMode.ForRead
+                     );
+                var blockIDs =
+                from ObjectId id in btr
+                where id.ObjectClass.IsDerivedFrom(Autodesk.AutoCAD.Runtime.RXClass.GetClass(typeof(BlockReference)))
+                select id;
 
-                // Open the Block table record Model space for read
-                BlockTableRecord acBlkTblRec;
-                acBlkTblRec = trans.GetObject(acBlkTbl[BlockTableRecord.ModelSpace], OpenMode.ForRead) as BlockTableRecord;
-
-                foreach(ObjectId id in acBlkTblRec.GetBlockReferenceIds(true, true))
+                foreach(ObjectId id in blockIDs)
                 {
-                    BlockReference block = id.GetObject(OpenMode.ForRead) as BlockReference;
-                    blocks.Add(block.FromCivil3D());
+                    BlockReference b = (trans.GetObject(id, OpenMode.ForRead) as BlockReference);
+                    if(b != null)
+                        blocks.Add(b.FromCivil3D());
                 }
+
+                trans.Commit();
             }
 
             return blocks;
@@ -144,13 +183,26 @@ namespace BH.UI.Civil.Adapter
 
             List<BHC.Parcel> parcels = new List<BHC.Parcel>();
 
-            using (Transaction trans = Application.DocumentManager.MdiActiveDocument.Database.TransactionManager.StartTransaction())
+            using (Transaction trans = Application.DocumentManager.MdiActiveDocument.Database.TransactionManager.StartOpenCloseTransaction())
             {
-                foreach (ObjectId id in doc.GetParcelTableIds())
+                var btr =
+                     (BlockTableRecord)trans.GetObject(
+                    SymbolUtilityServices.GetBlockModelSpaceId(Application.DocumentManager.MdiActiveDocument.Database),
+                    OpenMode.ForRead
+                     );
+                var parcelIDs =
+                from ObjectId id in btr
+                where id.ObjectClass.IsDerivedFrom(Autodesk.AutoCAD.Runtime.RXClass.GetClass(typeof(ADC.Parcel)))
+                select id;
+
+                foreach (ObjectId id in parcelIDs)
                 {
-                    ADC.Parcel parcel = id.GetObject(OpenMode.ForRead) as ADC.Parcel;
-                    parcels.Add(parcel.FromCivil3D());
+                    ADC.Parcel p = (trans.GetObject(id, OpenMode.ForRead) as ADC.Parcel);
+                    if(p != null)
+                        parcels.Add(p.FromCivil3D());
                 }
+
+                trans.Commit();
             }
 
             return parcels;
@@ -162,14 +214,27 @@ namespace BH.UI.Civil.Adapter
 
             List<BHC.CivProfile> profiles = new List<BHC.CivProfile>();
 
-            /*using (Transaction trans = Application.DocumentManager.MdiActiveDocument.Database.TransactionManager.StartTransaction())
+            using (Transaction trans = Application.DocumentManager.MdiActiveDocument.Database.TransactionManager.StartOpenCloseTransaction())
             {
-                foreach (ObjectId id in doc.GetProfiles())
+                var btr =
+                     (BlockTableRecord)trans.GetObject(
+                    SymbolUtilityServices.GetBlockModelSpaceId(Application.DocumentManager.MdiActiveDocument.Database),
+                    OpenMode.ForRead
+                     );
+                var featureIDs =
+                from ObjectId id in btr
+                where id.ObjectClass.IsDerivedFrom(Autodesk.AutoCAD.Runtime.RXClass.GetClass(typeof(ADC.Profile)))
+                select id;
+
+                foreach (ObjectId id in featureIDs)
                 {
-                    ADC.Profile profile = id.GetObject(OpenMode.ForRead) as ADC.Profile;
-                    profiles.Add(profile.FromCivil3D());
+                    ADC.Profile p = (trans.GetObject(id, OpenMode.ForRead) as ADC.Profile);
+                    if (p != null)
+                        profiles.Add(p.FromCivil3D());
                 }
-            }*/
+
+                trans.Commit();
+            }
 
             return profiles;
         }

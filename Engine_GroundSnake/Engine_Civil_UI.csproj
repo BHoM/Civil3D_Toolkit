@@ -103,6 +103,7 @@
     <Compile Include="Convert\Civils\CivProfile.cs" />
     <Compile Include="Convert\Civils\CoGoPoint.cs" />
     <Compile Include="Convert\Civils\CollisionType.cs" />
+    <Compile Include="Convert\Civils\FeatureLine.cs" />
     <Compile Include="Convert\Civils\Parcel.cs" />
     <Compile Include="Convert\Civils\ProfileType.cs" />
     <Compile Include="Convert\Geomerty\AlignmentCurve.cs" />
