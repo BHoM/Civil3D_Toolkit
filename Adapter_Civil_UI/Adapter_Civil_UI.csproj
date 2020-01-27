@@ -104,8 +104,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AdapterActions\Push.cs" />
-    <Compile Include="Adapter\Civil3DAdapter.cs" />
+    <Compile Include="Civil3DAdapter.cs" />
     <Compile Include="CRUD\Create.cs" />
     <Compile Include="CRUD\Read.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
