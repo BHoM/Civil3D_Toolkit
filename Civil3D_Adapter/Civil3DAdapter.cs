@@ -48,73 +48,6 @@ namespace BH.Adapter.Civil3D
         /**** Public methods                            ****/
         /***************************************************/
 
-        public override List<IObject> Push(IEnumerable<IObject> objects, string tag = "", Dictionary<string, object> config = null)
-        {
-
-            //Reset the wait event
-            m_waitEvent.Reset();
-
-            if (!CheckConnection())
-                return new List<IObject>();
-
-            config = config == null ? new Dictionary<string, object>() : null;
-
-            //Send data through the socket link
-            m_linkIn.SendData(new List<object>() { PackageType.Push, objects.ToList(), config, Civil3DSettings }, tag);
-
-            //Wait until the return message has been recieved
-            if (!m_waitEvent.WaitOne(TimeSpan.FromMinutes(m_waitTime)))
-                TimeOutError();
-
-            //Grab the return objects from the latest package
-            List<IObject> returnObjs = m_returnPackage.Cast<IObject>().ToList();
-
-            //Clear the return list
-            m_returnPackage.Clear();
-
-            RaiseEvents();
-
-            //Return the package
-            return returnObjs;
-
-        }
-
-        /***************************************************/
-
-        public override IEnumerable<object> Pull(IRequest request, Dictionary<string, object> config = null)
-        {
-            //Reset the wait event
-            m_waitEvent.Reset();
-
-            if (!CheckConnection())
-                return new List<object>();
-
-            config = config == null ? new Dictionary<string, object>() : null;
-
-            if (!(request is FilterRequest))
-                return new List<object>();
-
-            //Send data through the socket link
-            m_linkIn.SendData(new List<object>() { PackageType.Pull, request as FilterRequest, config, Civil3DSettings });
-
-            //Wait until the return message has been recieved
-            if (!m_waitEvent.WaitOne(TimeSpan.FromMinutes(m_waitTime)))
-                TimeOutError();
-
-            //Grab the return objects from the latest package
-            List<object> returnObjs = new List<object>(m_returnPackage);
-
-            //Clear the return list
-            m_returnPackage.Clear();
-
-            //Raise returned events
-            RaiseEvents();
-
-            //Return the package
-            return returnObjs;
-
-        }
-
         /***************************************************/
         /**** Private  Fields                           ****/
         /***************************************************/
@@ -179,24 +112,5 @@ namespace BH.Adapter.Civil3D
 
             m_returnEvents = new List<Event>();
         }
-
-
-        /***************************************************/
-        /**** Protected  Methods                        ****/
-        /***************************************************/
-
-        protected override bool Create<T>(IEnumerable<T> objects)
-        {
-            throw new NotImplementedException();
-        }
-
-        /***************************************************/
-
-        protected override IEnumerable<IBHoMObject> Read(Type type, IList ids)
-        {
-            throw new NotImplementedException();
-        }
-
-        /***************************************************/
     }
 }

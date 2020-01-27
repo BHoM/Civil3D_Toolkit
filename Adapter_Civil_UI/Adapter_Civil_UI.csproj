@@ -58,6 +58,14 @@
     <Reference Include="acmgd">
       <HintPath>..\libs\acmgd.dll</HintPath>
     </Reference>
+    <Reference Include="Adapter_Engine">
+      <HintPath>..\..\BHoM_Adapter\Build\Adapter_Engine.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Adapter_oM">
+      <HintPath>..\..\BHoM_Adapter\Build\Adapter_oM.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="AecBaseMgd">
       <HintPath>..\libs\AecBaseMgd.dll</HintPath>
     </Reference>
@@ -96,16 +104,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AdapterActions\Push.cs" />
     <Compile Include="Adapter\Civil3DAdapter.cs" />
-    <Compile Include="Create\_Create.cs" />
+    <Compile Include="CRUD\Create.cs" />
+    <Compile Include="CRUD\Read.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Read\_Read.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Delete\" />
-    <Folder Include="Execute\" />
-    <Folder Include="Update\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\Civil3D_Engine\Civil3D_Engine.csproj">
       <Project>{d244032d-d34e-4c0f-9062-408cd024881a}</Project>

@@ -22,11 +22,8 @@ namespace BH.UI.Civil.Adapter
 
         public CivilUIAdapter()
         {
-            Config.UseAdapterId = false; //To be switched to true at later stage;
-            
+            AdapterIdName = "Civil3D_Adapter";            
         }
-
-
 
     }
 }

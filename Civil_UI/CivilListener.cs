@@ -13,6 +13,7 @@ using BH.oM.Socket;
 using BH.oM.Adapters.Civil3D;
 using BH.UI.Civil.Adapter;
 
+using BH.oM.Adapter;
 
 namespace BH.UI.Civil
 {
@@ -93,7 +94,7 @@ namespace BH.UI.Civil
 
 
                 string tag = package.Tag;
-                Dictionary<string, object> config = package.Data[2] as Dictionary<string, object>;
+                ActionConfig config = package.Data[2] as ActionConfig;
                 Civil3DConfig settings = package.Data[3] as Civil3DConfig;
 
                 try
@@ -115,12 +116,12 @@ namespace BH.UI.Civil
                                     pushData.Add(obj as IObject);
                             }
 
-                            ReturnData(m_adapter.Push(pushData, tag, config));
+                            ReturnData(m_adapter.Push(pushData, tag, PushType.AdapterDefault, config));
                             break;
                         case PackageType.Pull:
                             if (!CheckPackageSize(package)) return;
                             IRequest request = package.Data[1] as IRequest;
-                            ReturnData(m_adapter.Pull(request, config));
+                            ReturnData(m_adapter.Pull(request, PullType.AdapterDefault, config));
                             break;
                         default:
                             ReturnData(new List<string> { "Unrecognized package type" });

@@ -20,6 +20,8 @@ using Autodesk.AutoCAD.EditorInput;
 
 using BH.Engine.Geometry;
 
+using BH.oM.Adapter;
+
 namespace BH.UI.Civil.Adapter
 {
     public partial class CivilUIAdapter
@@ -30,7 +32,7 @@ namespace BH.UI.Civil.Adapter
         /***************************************************/
 
         //General method called by the adapter for push
-        protected override bool Create<T>(IEnumerable<T> objects)
+        protected override bool ICreate<T>(IEnumerable<T> objects, ActionConfig actionConfig = null)
         {
             return CreateCollection(objects as dynamic);
         }
@@ -67,7 +69,7 @@ namespace BH.UI.Civil.Adapter
                             acTrans.AddNewlyCreatedDBObject(crv, true);
                         }
                     }
-                    catch(System.Exception e)
+                    catch (System.Exception e)
                     {
                         System.Windows.Forms.MessageBox.Show(e.ToString());
                         List<string> stack = e.StackTrace.Split(new char[] { '\n' })
@@ -110,7 +112,7 @@ namespace BH.UI.Civil.Adapter
                             foreach (BH.oM.Geometry.Polyline pl in s.Triangles)
                             {
                                 List<BH.oM.Geometry.Point> pnts = pl.ControlPoints;
-                                for(int x = 0; x < pnts.Count-1; x++)
+                                for (int x = 0; x < pnts.Count - 1; x++)
                                 {
                                     Line crv = new Line(pnts[x].ToCivil3D(), pnts[x + 1].ToCivil3D());
                                     crv.SetDatabaseDefaults();
