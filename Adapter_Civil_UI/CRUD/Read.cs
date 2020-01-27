@@ -21,6 +21,8 @@ using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Internal.DatabaseServices;
 //using Autodesk.AutoCAD.Geometry;
 
+using BH.oM.Adapter;
+
 namespace BH.UI.Civil.Adapter
 {
     public partial class CivilUIAdapter
@@ -31,7 +33,7 @@ namespace BH.UI.Civil.Adapter
         /***************************************************/
 
         //General method called by the adapter when reading in data
-        protected override IEnumerable<IBHoMObject> Read(Type type, IList ids)
+        protected override IEnumerable<IBHoMObject> IRead(Type type, IList ids, ActionConfig actionConfig = null)
         {
 
             try
@@ -56,10 +58,10 @@ namespace BH.UI.Civil.Adapter
                     return ReadCoGoPoints();
                 }
 
-              /* if (type == typeof(BHC.CivProfile))
-                {
-                    return ReadProfiles();
-                } */
+                /* if (type == typeof(BHC.CivProfile))
+                  {
+                      return ReadProfiles();
+                  } */
 
                 if (type == typeof(BHC.Parcel))
                 {
@@ -77,14 +79,14 @@ namespace BH.UI.Civil.Adapter
                 if (type == typeof(BHC.FeatureLine))
                     return ReadFeatureLines();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 System.Windows.Forms.MessageBox.Show(e.ToString());
                 List<string> stack = e.StackTrace.Split(new char[] { '\n' })
                     .Where(x => x.Contains(" BH."))
                     .ToList();
 
-                foreach(string s in stack)
+                foreach (string s in stack)
                 {
                     System.Windows.Forms.MessageBox.Show(s);
                 }
@@ -146,10 +148,10 @@ namespace BH.UI.Civil.Adapter
                 where id.ObjectClass.IsDerivedFrom(Autodesk.AutoCAD.Runtime.RXClass.GetClass(typeof(BlockReference)))
                 select id;
 
-                foreach(ObjectId id in blockIDs)
+                foreach (ObjectId id in blockIDs)
                 {
                     BlockReference b = (trans.GetObject(id, OpenMode.ForRead) as BlockReference);
-                    if(b != null)
+                    if (b != null)
                         blocks.Add(b.FromCivil3D());
                 }
 
@@ -198,7 +200,7 @@ namespace BH.UI.Civil.Adapter
                 foreach (ObjectId id in parcelIDs)
                 {
                     ADC.Parcel p = (trans.GetObject(id, OpenMode.ForRead) as ADC.Parcel);
-                    if(p != null)
+                    if (p != null)
                         parcels.Add(p.FromCivil3D());
                 }
 
@@ -247,7 +249,7 @@ namespace BH.UI.Civil.Adapter
 
             using (Transaction trans = Application.DocumentManager.MdiActiveDocument.Database.TransactionManager.StartTransaction())
             {
-                foreach(ObjectId id in doc.GetAllPointIds())
+                foreach (ObjectId id in doc.GetAllPointIds())
                 {
                     ADC.CogoPoint pnt = id.GetObject(OpenMode.ForRead) as ADC.CogoPoint;
                     pnts.Add(pnt.FromCivil3D());
