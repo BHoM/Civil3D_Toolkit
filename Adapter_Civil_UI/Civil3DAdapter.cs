@@ -11,10 +11,6 @@ namespace BH.UI.Civil.Adapter
 {
     public partial class CivilUIAdapter : BHoMAdapter
     {
-        /***************************************************/
-        /****           Private Fields                  ****/
-        /***************************************************/
-
 
         /***************************************************/
         /**** Constructors                              ****/
