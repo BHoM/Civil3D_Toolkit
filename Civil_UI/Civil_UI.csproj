@@ -162,7 +162,7 @@
   <PropertyGroup>
     <PostBuildEvent>RD /S /Q "C:\Users\$(Username)\AppData\Roaming\Autodesk\ApplicationPlugins\BHoM.bundle"
 
-call "$(TargetDir)UI_PostBuild.exe" ..\..\ "C:\Users\$(Username)\AppData\Roaming\Autodesk\ApplicationPlugins\BHoM.bundle\Contents"
+call "$(TargetDir)../../BHoM_UI/Build/UI_PostBuild.exe" ..\..\ "C:\Users\$(Username)\AppData\Roaming\Autodesk\ApplicationPlugins\BHoM.bundle\Contents"
 
 C:\Windows\System32\xcopy "$(ProjectDir)PluginFile\PackageContents.xml" "C:\Users\$(Username)\AppData\Roaming\Autodesk\ApplicationPlugins\BHoM.bundle"</PostBuildEvent>
   </PropertyGroup>
