@@ -3,7 +3,7 @@
   <CompanyDetails Name="My Name" Phone=" " Url="http://MyWebsite.com" Email="MyName@MyWebSite.com" />
   <Components Description="Main">
     <RuntimeRequirements SupportPath="../../../BHoM/Assemblies" OS="Win32|Win64" Platform="AutoCAD*|Civil3D" SeriesMin="R19.0" SeriesMax="R22.0" />
-    <ComponentEntry AppName="CivilUIListener" Version="1.0" ModuleName="./Contents/Civil_UI.dll" AppDescription="My description" LoadOnAppearance="True" LoadOnAutoCADStartup="True" LoadOnCommandInvocation="True">
+    <ComponentEntry AppName="CivilUIListener" Version="1.0" ModuleName="../../../BHoM/Assemblies/Civil_UI.dll" AppDescription="My description" LoadOnAppearance="True" LoadOnAutoCADStartup="True" LoadOnCommandInvocation="True">
     </ComponentEntry>
   </Components>
 </ApplicationPackage>
