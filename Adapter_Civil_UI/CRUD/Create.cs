@@ -61,7 +61,7 @@ namespace BH.UI.Civil.Adapter
 
                         foreach (BH.oM.Civils.Elements.Pipe pipe in p)
                         {
-                            Line crv = ((p[0].CentreLine as BH.oM.Geometry.Line).ToCivil3D());
+                            Line crv = ((pipe.CentreLine as BH.oM.Geometry.Line).ToCivil3D());
                             crv.SetDatabaseDefaults();
 
                             acBlkTblRec.AppendEntity(crv);
