@@ -51,12 +51,15 @@
   <ItemGroup>
     <Reference Include="accoremgd">
       <HintPath>..\libs\accoremgd.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="acdbmgd">
       <HintPath>..\libs\acdbmgd.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="acmgd">
       <HintPath>..\libs\acmgd.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Adapter_Engine">
       <HintPath>..\..\BHoM_Adapter\Build\Adapter_Engine.dll</HintPath>
@@ -68,9 +71,11 @@
     </Reference>
     <Reference Include="AecBaseMgd">
       <HintPath>..\libs\AecBaseMgd.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="AeccDbMgd">
       <HintPath>..\libs\AeccDbMgd.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="BHoM">
       <HintPath>..\..\BHoM\Build\BHoM.dll</HintPath>
@@ -82,6 +87,7 @@
     </Reference>
     <Reference Include="Geometry_Engine">
       <HintPath>..\..\BHoM_Engine\Build\Geometry_Engine.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Geometry_oM, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
