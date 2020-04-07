@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,31 +14,31 @@ namespace BH.oM.Civils.Elements
         /**** Public Properties                         ****/
         /***************************************************/
 
-        public Point CentrePoint { get; set; } = new Point();
+        public virtual Point CentrePoint { get; set; } = new Point();
 
-        public double InternalLength { get; set; } = 0;
+        public virtual double InternalLength { get; set; } = 0;
 
-        public double InternalWidth { get; set; } = 0;
+        public virtual double InternalWidth { get; set; } = 0;
 
-        public double InternalDepth { get; set; } = 0;
+        public virtual double InternalDepth { get; set; } = 0;
 
-        public double WallThickness { get; set; } = 0;
+        public virtual double WallThickness { get; set; } = 0;
 
-        public double SurroundThickness { get; set; } = 0;
+        public virtual double SurroundThickness { get; set; } = 0;
 
-        public double ChamberOrientation { get; set; } = 0;
+        public virtual double ChamberOrientation { get; set; } = 0;
 
-        public ChamberShape ChamberShape { get; set; } = ChamberShape.Undefined;
+        public virtual ChamberShape ChamberShape { get; set; } = ChamberShape.Undefined;
 
-        public double CoverLength { get; set; } = 0;
+        public virtual double CoverLength { get; set; } = 0;
 
-        public double CoverWidth { get; set; } = 0;
+        public virtual double CoverWidth { get; set; } = 0;
 
-        public double CoverDepth { get; set; } = 0;
+        public virtual double CoverDepth { get; set; } = 0;
 
-        public double CoverOrientation { get; set; } = 0;
+        public virtual double CoverOrientation { get; set; } = 0;
 
-        public double BeddingDepth { get; set; } = 0;
+        public virtual double BeddingDepth { get; set; } = 0;
 
         /***************************************************/
     }

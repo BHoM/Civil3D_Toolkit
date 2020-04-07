@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,27 +14,27 @@ namespace BH.oM.Civils.Elements
         /**** Public Properties                         ****/
         /***************************************************/
 
-        public string DataSourceName { get; set; } = "";
+        public virtual string DataSourceName { get; set; } = "";
 
-        public string Description { get; set; } = "";
+        public virtual string Description { get; set; } = "";
 
-        public string DisplayName { get; set; } = "";
+        public virtual string DisplayName { get; set; } = "";
 
-        public double ElevationMax { get; set; } = 0;
+        public virtual double ElevationMax { get; set; } = 0;
 
-        public double ElevationMin { get; set; } = 0;
+        public virtual double ElevationMin { get; set; } = 0;
 
-        public double EndingStation { get; set; } = 0;
+        public virtual double EndingStation { get; set; } = 0;
 
-        public List<ICivProfileEntity> Entities { get; set; } = new List<ICivProfileEntity>();
+        public virtual List<ICivProfileEntity> Entities { get; set; } = new List<ICivProfileEntity>();
 
-        public double Length { get; set; } = 0;
+        public virtual double Length { get; set; } = 0;
 
-        public double Offset { get; set; } = 0;
+        public virtual double Offset { get; set; } = 0;
 
-        public CivProfileType ProfileType { get; set; } = CivProfileType.Undefined;
+        public virtual CivProfileType ProfileType { get; set; } = CivProfileType.Undefined;
 
-        public double StartingStation { get; set; } = 0;
+        public virtual double StartingStation { get; set; } = 0;
 
         /***************************************************/
     }
