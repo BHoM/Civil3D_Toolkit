@@ -1,4 +1,4 @@
-﻿namespace BH.oM.Civils.Elements
+namespace BH.oM.Civils.Elements
 {
     public enum CivAlignmentType
     {

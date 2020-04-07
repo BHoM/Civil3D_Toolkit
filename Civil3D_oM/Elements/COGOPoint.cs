@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,18 +13,18 @@ namespace BH.oM.Civils.Elements
         /***************************************************/
         /**** Public Properties                         ****/
         /***************************************************/
-        public double Easting { get; set; } = 0;
-        public double Elevation { get; set; } = 0;
-        public string FullDescription { get; set; } = "";
-        public double GridEasting { get; set; } = 0;
-        public double GridNorthing { get; set; } = 0;
-        public double Latitude { get; set; } = 0;
-        public Point Location { get; set; } = new Point();
-        public double Longitude { get; set; } = 0;
-        public double Northing { get; set; } = 0;
-        public string PointName { get; set; } = "";
-        public double PointNumber { get; set; } = 0;
-        public string RawDescription { get; set; } = "";
+        public virtual double Easting { get; set; } = 0;
+        public virtual double Elevation { get; set; } = 0;
+        public virtual string FullDescription { get; set; } = "";
+        public virtual double GridEasting { get; set; } = 0;
+        public virtual double GridNorthing { get; set; } = 0;
+        public virtual double Latitude { get; set; } = 0;
+        public virtual Point Location { get; set; } = new Point();
+        public virtual double Longitude { get; set; } = 0;
+        public virtual double Northing { get; set; } = 0;
+        public virtual string PointName { get; set; } = "";
+        public virtual double PointNumber { get; set; } = 0;
+        public virtual string RawDescription { get; set; } = "";
 
         /***************************************************/
 

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,13 +14,13 @@ namespace BH.oM.Civils.Elements
     /***************************************************/
     public class FeatureLine : BHoMObject
     {
-        public string Description { get; set; } = "";
-        public double Length2D { get; set; } = 0;
-        public double Length3D { get; set; } = 0;
-        public double MaxElevation { get; set; } = 0;
-        public double MaxGrade { get; set; } = 0;
-        public double MinElevation { get; set; } = 0;
-        public double MinGrade { get; set; } = 0;
+        public virtual string Description { get; set; } = "";
+        public virtual double Length2D { get; set; } = 0;
+        public virtual double Length3D { get; set; } = 0;
+        public virtual double MaxElevation { get; set; } = 0;
+        public virtual double MaxGrade { get; set; } = 0;
+        public virtual double MinElevation { get; set; } = 0;
+        public virtual double MinGrade { get; set; } = 0;
 
         /***************************************************/
     }

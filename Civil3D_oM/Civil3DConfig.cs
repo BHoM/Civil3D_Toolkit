@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,9 +13,9 @@ namespace BH.oM.Adapters.Civil3D
         /**** Public Properties                         ****/
         /***************************************************/
 
-        public int InPort { get; set; } = 14230;
-        public int ReturnPort { get; set; } = 14231;
-        public int MaxMinutesToWait { get; set; } = 10;
+        public virtual int InPort { get; set; } = 14230;
+        public virtual int ReturnPort { get; set; } = 14231;
+        public virtual int MaxMinutesToWait { get; set; } = 10;
 
         /***************************************************/
     }

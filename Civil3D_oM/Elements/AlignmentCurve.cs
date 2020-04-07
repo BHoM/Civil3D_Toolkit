@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,7 +14,7 @@ namespace BH.oM.Civils.Elements
         /**** Public Properties                         ****/
         /***************************************************/
 
-        public ICurve Curve { get; set; } = new Polyline();
+        public virtual ICurve Curve { get; set; } = new Polyline();
 
         /***************************************************/
     }

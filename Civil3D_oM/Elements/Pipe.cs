@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,13 +14,13 @@ namespace BH.oM.Civils.Elements
         /**** Public Properties                         ****/
         /***************************************************/
 
-        public ICurve CentreLine { get; set; } = new Polyline();
+        public virtual ICurve CentreLine { get; set; } = new Polyline();
 
-        public double Diameter { get; set; } = 0;
+        public virtual double Diameter { get; set; } = 0;
 
-        public double Thickness { get; set; } = 0;
+        public virtual double Thickness { get; set; } = 0;
 
-        public FlowDirection FlowDirection { get; set; } = FlowDirection.Undefined;
+        public virtual FlowDirection FlowDirection { get; set; } = FlowDirection.Undefined;
 
         /***************************************************/
     }

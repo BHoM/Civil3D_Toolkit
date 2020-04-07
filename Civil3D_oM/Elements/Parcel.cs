@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,11 +13,11 @@ namespace BH.oM.Civils.Elements
     /***************************************************/
     public class Parcel : BHoMObject
     {
-        public double Area { get; set; } = 0;
-        public Point AreaLocation { get; set; } = new Point();
-        public Point Centroid { get; set; } = new Point();
-        public string Description { get; set; } = "";
-        public int Number { get; set; } = 0;
+        public virtual double Area { get; set; } = 0;
+        public virtual Point AreaLocation { get; set; } = new Point();
+        public virtual Point Centroid { get; set; } = new Point();
+        public virtual string Description { get; set; } = "";
+        public virtual int Number { get; set; } = 0;
 
         /***************************************************/
     }
