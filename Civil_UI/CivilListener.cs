@@ -9,7 +9,7 @@ using BH.Adapter;
 using BH.Adapter.Socket;
 using BH.oM.Base;
 using BH.oM.Data.Requests;
-using BH.oM.Socket;
+using BH.oM.Adapters.Socket;
 using BH.oM.Adapters.Civil3D;
 using BH.UI.Civil.Adapter;
 
@@ -140,7 +140,7 @@ namespace BH.UI.Civil
 
         /***************************************************/
 
-        private bool CheckPackageSize(oM.Socket.DataPackage package)
+        private bool CheckPackageSize(DataPackage package)
         {
             if (package.Data.Count < 4)
             {
@@ -155,7 +155,7 @@ namespace BH.UI.Civil
         public void ReturnData(IEnumerable<object> objs)
         {
 
-            oM.Socket.DataPackage package = new oM.Socket.DataPackage
+            DataPackage package = new DataPackage
             {
                 Data = objs.ToList(),
                 //Events = BH.Engine.Reflection.Query.CurrentEvents(),
