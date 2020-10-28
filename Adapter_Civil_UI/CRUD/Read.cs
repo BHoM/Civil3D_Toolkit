@@ -274,7 +274,6 @@ namespace BH.UI.Civil.Adapter
                     {
                         ADC.Pipe pipe = trans.GetObject(pipeId, OpenMode.ForRead) as ADC.Pipe;
                         BHC.Pipe bhPipe = pipe.ToBHoM();
-                        bhPipe.CustomData[BH.Engine.Adapters.Civil3D.Query.AdapterID] = pipeId.ToString();
                         pipeList.Add(bhPipe);
                     }
 
@@ -301,7 +300,6 @@ namespace BH.UI.Civil.Adapter
                     {
                         ADC.Structure manholeChamber = trans.GetObject(pipeId, OpenMode.ForRead) as ADC.Structure;
                         BHC.ManholeChamber bhManholeChamber = manholeChamber.ToBHoM();
-                        bhManholeChamber.CustomData[BH.Engine.Adapters.Civil3D.Query.AdapterID] = pipeId.ToString();
                         manholeChamberList.Add(bhManholeChamber);
                     }
 
