@@ -18,7 +18,6 @@ namespace BH.UI.Civil.Adapter
 
         public CivilUIAdapter()
         {
-            AdapterIdName = "Civil3D_Adapter";
             m_AdapterSettings.DefaultPushType = oM.Adapter.PushType.CreateOnly;
         }
 
