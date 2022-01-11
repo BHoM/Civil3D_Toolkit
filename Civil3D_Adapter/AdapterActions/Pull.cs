@@ -2,13 +2,13 @@
 using BH.Adapter.Socket;
 using BH.oM.Base;
 using BH.oM.Data.Requests;
-using BH.oM.Reflection.Debugging;
+using BH.oM.Base.Debugging;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using BH.oM.Reflection.Attributes;
+using BH.oM.Base.Attributes;
 using System.ComponentModel;
 
 namespace BH.Adapter.Civil3D

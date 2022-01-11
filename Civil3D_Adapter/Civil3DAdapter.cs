@@ -1,7 +1,7 @@
 ﻿using BH.Adapter.Socket;
 using BH.oM.Base;
 using BH.oM.Data.Requests;
-using BH.oM.Reflection.Debugging;
+using BH.oM.Base.Debugging;
 using BH.oM.Adapters.Civil3D;
 using System;
 using System.Collections;
@@ -88,7 +88,7 @@ namespace BH.Adapter.Civil3D
             m_waitEvent.Reset();
 
             if (!returned)
-                Engine.Reflection.Compute.RecordError("Failed to connect to Civil3D");
+                Engine.Base.Compute.RecordError("Failed to connect to Civil3D");
 
             return returned;
         }
@@ -97,7 +97,7 @@ namespace BH.Adapter.Civil3D
 
         private void TimeOutError()
         {
-            Engine.Reflection.Compute.RecordError("The connection with Civil3D timed out. If working on a big model, try to increase the max wait time");
+            Engine.Base.Compute.RecordError("The connection with Civil3D timed out. If working on a big model, try to increase the max wait time");
         }
 
         /***************************************************/
@@ -107,8 +107,8 @@ namespace BH.Adapter.Civil3D
             if (m_returnEvents == null)
                 return;
 
-            Engine.Reflection.Query.CurrentEvents().AddRange(m_returnEvents);
-            Engine.Reflection.Query.AllEvents().AddRange(m_returnEvents);
+            Engine.Base.Query.CurrentEvents().AddRange(m_returnEvents);
+            Engine.Base.Query.AllEvents().AddRange(m_returnEvents);
 
             m_returnEvents = new List<Event>();
         }

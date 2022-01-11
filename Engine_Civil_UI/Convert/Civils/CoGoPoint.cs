@@ -28,7 +28,7 @@ namespace BH.UI.Civil.Engine
             }
             catch(Exception e)
             {
-                BH.Engine.Reflection.Compute.RecordError("Error reading Easting - " + e.ToString());
+                BH.Engine.Base.Compute.RecordError("Error reading Easting - " + e.ToString());
             }
 
             try
@@ -37,7 +37,7 @@ namespace BH.UI.Civil.Engine
             }
             catch (Exception e)
             {
-                BH.Engine.Reflection.Compute.RecordError("Error reading Elevation - " + e.ToString());
+                BH.Engine.Base.Compute.RecordError("Error reading Elevation - " + e.ToString());
             }
 
             try
@@ -46,7 +46,7 @@ namespace BH.UI.Civil.Engine
             }
             catch (Exception e)
             {
-                BH.Engine.Reflection.Compute.RecordError("Error reading FullDescription - " + e.ToString());
+                BH.Engine.Base.Compute.RecordError("Error reading FullDescription - " + e.ToString());
             }
 
             try
@@ -55,7 +55,7 @@ namespace BH.UI.Civil.Engine
             }
             catch (Exception e)
             {
-                BH.Engine.Reflection.Compute.RecordError("Error reading GridEasting - " + e.ToString());
+                BH.Engine.Base.Compute.RecordError("Error reading GridEasting - " + e.ToString());
             }
 
             try
@@ -64,7 +64,7 @@ namespace BH.UI.Civil.Engine
             }
             catch (Exception e)
             {
-                BH.Engine.Reflection.Compute.RecordError("Error reading GridNorthing - " + e.ToString());
+                BH.Engine.Base.Compute.RecordError("Error reading GridNorthing - " + e.ToString());
             }
 
             try
@@ -73,7 +73,7 @@ namespace BH.UI.Civil.Engine
             }
             catch (Exception e)
             {
-                BH.Engine.Reflection.Compute.RecordError("Error reading Latitude - " + e.ToString());
+                BH.Engine.Base.Compute.RecordError("Error reading Latitude - " + e.ToString());
             }
 
             try
@@ -82,7 +82,7 @@ namespace BH.UI.Civil.Engine
             }
             catch (Exception e)
             {
-                BH.Engine.Reflection.Compute.RecordError("Error reading Longitude - " + e.ToString());
+                BH.Engine.Base.Compute.RecordError("Error reading Longitude - " + e.ToString());
             }
 
             try
@@ -91,7 +91,7 @@ namespace BH.UI.Civil.Engine
             }
             catch (Exception e)
             {
-                BH.Engine.Reflection.Compute.RecordError("Error reading Northing - " + e.ToString());
+                BH.Engine.Base.Compute.RecordError("Error reading Northing - " + e.ToString());
             }
 
             try
@@ -100,7 +100,7 @@ namespace BH.UI.Civil.Engine
             }
             catch (Exception e)
             {
-                BH.Engine.Reflection.Compute.RecordError("Error reading PointName - " + e.ToString());
+                BH.Engine.Base.Compute.RecordError("Error reading PointName - " + e.ToString());
             }
 
             try
@@ -109,7 +109,7 @@ namespace BH.UI.Civil.Engine
             }
             catch (Exception e)
             {
-                BH.Engine.Reflection.Compute.RecordError("Error reading PointNumber - " + e.ToString());
+                BH.Engine.Base.Compute.RecordError("Error reading PointNumber - " + e.ToString());
             }
 
             try
@@ -118,7 +118,7 @@ namespace BH.UI.Civil.Engine
             }
             catch (Exception e)
             {
-                BH.Engine.Reflection.Compute.RecordError("Error reading RawDescription - " + e.ToString());
+                BH.Engine.Base.Compute.RecordError("Error reading RawDescription - " + e.ToString());
             }
 
             try
@@ -127,7 +127,7 @@ namespace BH.UI.Civil.Engine
             }
             catch (Exception e)
             {
-                BH.Engine.Reflection.Compute.RecordError("Error reading Location - " + e.ToString());
+                BH.Engine.Base.Compute.RecordError("Error reading Location - " + e.ToString());
             }
 
             return pt;
