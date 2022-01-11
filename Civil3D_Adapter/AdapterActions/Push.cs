@@ -26,7 +26,7 @@ namespace BH.Adapter.Civil3D
 
             if (objectsToPush.Count() == 0)
             {
-                Engine.Reflection.Compute.RecordError("Input objects were invalid.");
+                Engine.Base.Compute.RecordError("Input objects were invalid.");
                 return new List<object>();
             }
 

@@ -17,13 +17,13 @@ namespace BH.Engine.Adapters.Civil3D
         {
             if (inPort == returnPort)
             {
-                Engine.Reflection.Compute.RecordError("Can not use the same in port as return port");
+                Engine.Base.Compute.RecordError("Can not use the same in port as return port");
                 return null;
             }
 
             if (inPort < 3001 || returnPort < 3001)
             {
-                Engine.Reflection.Compute.RecordError("Can not use ports with number lower than 3000");
+                Engine.Base.Compute.RecordError("Can not use ports with number lower than 3000");
                 return null;
             }
 

@@ -31,7 +31,7 @@ namespace BH.UI.Civil
             //Get the folder path of the plugin to load up all dlls
             //string folder = System.IO.Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData), @"Autodesk\ApplicationPlugins\GroundSnake.bundle\Contents");
             string folder = System.IO.Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData), @"BHoM\Assemblies");
-            BH.Engine.Reflection.Compute.LoadAllAssemblies(folder);
+            BH.Engine.Base.Compute.LoadAllAssemblies(folder);
 
             //Create the internal adapter to be used to cumminicate with Civil3d
             m_adapter = new CivilUIAdapter();
@@ -59,7 +59,7 @@ namespace BH.UI.Civil
         //Callback method being triggered when the sockets recieves new data
         private void M_linkIn_DataObservers(DataPackage package)
         {
-            BH.Engine.Reflection.Compute.ClearCurrentEvents();
+            BH.Engine.Base.Compute.ClearCurrentEvents();
 
             lock (m_packageLock)
             {
@@ -130,7 +130,7 @@ namespace BH.UI.Civil
                 }
                 catch (System.Exception e)              
                 {
-                    BH.Engine.Reflection.Compute.RecordError("OPeration failed. Message from adapter: " + e.Message);
+                    BH.Engine.Base.Compute.RecordError("OPeration failed. Message from adapter: " + e.Message);
                     ReturnData(new List<string> { "Operation failed." });
                 }
 
