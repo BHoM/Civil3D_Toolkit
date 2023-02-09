@@ -27,6 +27,9 @@ using System.Text;
 using System.Threading.Tasks;
 using BH.oM.Adapters.Civil3D;
 
+using System.ComponentModel;
+using BH.oM.Base.Attributes;
+
 namespace BH.Engine.Adapters.Civil3D
 {
     public static partial class Create
@@ -35,6 +38,11 @@ namespace BH.Engine.Adapters.Civil3D
         /**** Public Methods                            ****/
         /***************************************************/
 
+        [Description("Create a config to connect to Civil3D on the specific ports.")]
+        [Input("inPort", "The incoming port for connection to Civil3D.")]
+        [Input("returnPort", "The outgoing port for connection to Civil3D.")]
+        [Input("maxMinToWait", "Set the maximum wait time in minutes for a connection to be made.")]
+        [Output("config", "The connection configuration for Civil3D.")]
         public static Civil3DConfig Civil3DConfig(int inPort = 14230, int returnPort = 14231, int maxMinToWait = 10)
         {
             if (inPort == returnPort)
