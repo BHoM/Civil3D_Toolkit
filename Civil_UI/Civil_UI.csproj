@@ -16,6 +16,26 @@
     <Exec Command="RD /S /Q &quot;C:\Users\$(Username)\AppData\Roaming\Autodesk\ApplicationPlugins\BHoM.bundle&quot;&#xD;&#xA;xcopy &quot;$(TargetDir)$(TargetFileName)&quot;  &quot;C:\ProgramData\BHoM\Assemblies&quot; /Y&#xD;&#xA;C:\Windows\System32\xcopy &quot;$(ProjectDir)PluginFile\PackageContents.xml&quot; &quot;C:\Users\$(Username)\AppData\Roaming\Autodesk\ApplicationPlugins\BHoM.bundle\&quot;" />
   </Target>
   <ItemGroup>
+    <Reference Include="accoremgd">
+      <HintPath>..\libs\accoremgd.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="acdbmgd">
+      <HintPath>..\libs\acdbmgd.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="acmgd">
+      <HintPath>..\libs\acmgd.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="AecBaseMgd">
+      <HintPath>..\libs\AecBaseMgd.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="AeccDbMgd">
+      <HintPath>..\libs\AeccDbMgd.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Adapter_Engine">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\ProgramData\BHoM\Assemblies\Adapter_Engine.dll</HintPath>
