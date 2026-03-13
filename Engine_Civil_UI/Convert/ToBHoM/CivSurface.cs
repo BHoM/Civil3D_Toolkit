@@ -1,30 +1,12 @@
 /*
  * This file is part of the Buildings and Habitats object Model (BHoM)
- * Copyright (c) 2015 - 2024, the respective contributors. All rights reserved.
- *
- * Each contributor holds copyright over their respective contributions.
- * The project versioning (Git) records all such contribution source information.
- *                                           
- *                                                                              
- * The BHoM is free software: you can redistribute it and/or modify         
- * it under the terms of the GNU Lesser General Public License as published by  
- * the Free Software Foundation, either version 3.0 of the License, or          
- * (at your option) any later version.                                          
- *                                                                              
- * The BHoM is distributed in the hope that it will be useful,              
- * but WITHOUT ANY WARRANTY; without even the implied warranty of               
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the                 
- * GNU Lesser General Public License for more details.                          
- *                                                                            
- * You should have received a copy of the GNU Lesser General Public License     
- * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
+ * Copyright (c) 2015 - 2024
+ * License: LGPL-3.0
  */
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using BHG = BH.oM.Geometry;
 using BHC = BH.oM.Civils.Elements;
 using ADC = Autodesk.Civil.DatabaseServices;
@@ -35,43 +17,116 @@ namespace BH.UI.Civil.Engine
     public static partial class Convert
     {
         /***************************************************/
-        /**** Public Methods                            ****/
+        /**** New: Mesh-based Converters                ****/
         /***************************************************/
 
+        // Convert a Civil 3D TIN surface to a BHoM Mesh
         public static BHC.CivSurface ToBHoM(this ADC.TinSurface acSurface)
         {
-            //Converting a Triangulated Irregular Network Surface (TinSurface)
-            List<BHG.Polyline> polylines = new List<oM.Geometry.Polyline>();
+            if (acSurface == null)
+                return null;
+            // Tolerance for vertex welding (e.g. 1mm)
+            double weldTolerance = 0.0005;
 
-            foreach (ADC.TinSurfaceTriangle triangle in acSurface.Triangles)
-                polylines.Add(triangle.ToBHoM());
+            // Vertex weld: map of rounded coordinate key -> index in vertices
+            var vertexIndex = new Dictionary<(long X, long Y, long Z), int>();
+            var vertices = new List<BHG.Point>();
+            var facesIdx = new List<int[]>(); // each is {i0, i1, i2}
 
-            return new BHC.CivSurface
+            foreach (ADC.TinSurfaceTriangle tri in acSurface.Triangles)
             {
-                Triangles = polylines,
+                int i0 = AddVertex(tri.Vertex1.Location.FromCivil3D(), weldTolerance, vertexIndex, vertices);
+                int i1 = AddVertex(tri.Vertex2.Location.FromCivil3D(), weldTolerance, vertexIndex, vertices);
+                int i2 = AddVertex(tri.Vertex3.Location.FromCivil3D(), weldTolerance, vertexIndex, vertices);
+
+                // Skip degenerate faces (identical indices)
+                if (i0 != i1 && i1 != i2 && i2 != i0)
+                    facesIdx.Add(new[] { i0, i1, i2, -1 }); // When face is triangular, set D = -1 per BHoM Face definitio
+            }
+ 
+
+
+            // Define bhomFaces and create each face via property initialiser (A,B,C,D)
+            var bhomFaces = new List<BHG.Face>(facesIdx.Count);
+            foreach (var idx in facesIdx)
+            {
+                var face = new BHG.Face
+                {
+                    A = idx[0],
+                    B = idx[1],
+                    C = idx[2],
+                    D = idx[3] // -1 for triangles
+                };
+                bhomFaces.Add(face);
+            }
+
+
+            
+            // Safest construction: assign Vertices/Faces directly
+
+            var mesh = new BHG.Mesh
+            {
+                Vertices = vertices,
+                Faces = bhomFaces
             };
-        }
 
-        public static BHG.Polyline ToBHoM(this ADC.TinSurfaceTriangle triangle)
-        {
-            List<BHG.Point> pts = new List<oM.Geometry.Point>();
-            pts.Add(triangle.Vertex1.Location.FromCivil3D());
-            pts.Add(triangle.Vertex2.Location.FromCivil3D());
-            pts.Add(triangle.Vertex3.Location.FromCivil3D());
-            pts.Add(pts.First());
-            return BH.Engine.Geometry.Create.Polyline(pts);
-        }
-
-        public static BHC.CivSurface ToBHoM(this ADC.TinVolumeSurface acSurface)
-        {
-            List<BHG.Polyline> pLines = new List<oM.Geometry.Polyline>();
             
             return new BHC.CivSurface
             {
-                Triangles = pLines,
+                Mesh = mesh   // BHG.Mesh
             };
+
+            
         }
+
+        // Helper: quantised weld + append
+        private static int AddVertex(BHG.Point p, double tol,
+            Dictionary<(long X, long Y, long Z), int> map, List<BHG.Point> verts)
+        {
+            // Quantise by tolerance to avoid floating point key drift
+            long qx = (long)Math.Round(p.X / tol);
+            long qy = (long)Math.Round(p.Y / tol);
+            long qz = (long)Math.Round(p.Z / tol);
+
+            var key = (qx, qy, qz);
+            if (map.TryGetValue(key, out int idx))
+                return idx;
+
+            idx = verts.Count;
+            verts.Add(p);
+            map[key] = idx;
+            return idx;
+        }
+
+        /***************************************************/
+        /**** Existing Methods (kept for compatibility) ****/
+        /***************************************************/
+
+        // public static BHC.CivSurface ToBHoM(this ADC.TinSurface acSurface)
+        // {
+            // Existing behaviour: polyline triangles
+        //     var polylines = new List<BHG.Polyline>();
+        //     foreach (ADC.TinSurfaceTriangle triangle in acSurface.Triangles)
+        //         polylines.Add(triangle.ToBHoM());
+
+        //     return new BHC.CivSurface
+        //     {
+        //         Triangles = polylines,
+        //     };
+        // }
+
+        public static BHG.Polyline ToBHoM(this ADC.TinSurfaceTriangle triangle)
+        {
+            var pts = new List<BHG.Point>
+            {
+                triangle.Vertex1.Location.FromCivil3D(),
+                triangle.Vertex2.Location.FromCivil3D(),
+                triangle.Vertex3.Location.FromCivil3D(),
+            };
+            // close
+            pts.Add(pts[0]);
+            return BH.Engine.Geometry.Create.Polyline(pts);
+        }
+
     }
 }
-
-

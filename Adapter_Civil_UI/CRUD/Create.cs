@@ -35,6 +35,7 @@ using Autodesk.Civil.ApplicationServices;
 using Autodesk.Civil.Runtime;
 using ADC = Autodesk.Civil.DatabaseServices;
 
+
 using BH.UI.Civil.Engine;
 
 using Autodesk.AutoCAD.DatabaseServices;
@@ -131,17 +132,106 @@ namespace BH.UI.Civil.Adapter
 
                         foreach (BH.oM.Civils.Elements.CivSurface s in srf)
                         {
-                            foreach (BH.oM.Geometry.Polyline pl in s.Triangles)
-                            {
-                                List<BH.oM.Geometry.Point> pnts = pl.ControlPoints;
-                                for (int x = 0; x < pnts.Count - 1; x++)
-                                {
-                                    Line crv = new Line(pnts[x].ToCivil3D(), pnts[x + 1].ToCivil3D());
-                                    crv.SetDatabaseDefaults();
-                                    acBlkTblRec.AppendEntity(crv);
+                            if (s?.Mesh == null || s.Mesh.Vertices == null || s.Mesh.Faces == null)
+                                continue;
 
-                                    acTrans.AddNewlyCreatedDBObject(crv, true);
-                                }
+                            var pts = s.Mesh.Vertices;   // List<BH.oM.Geometry.Point>
+                            var fcs = s.Mesh.Faces;      // List<BH.oM.Geometry.Face> (A,B,C,D; D == -1 => triangle)
+                            var name = string.IsNullOrEmpty(s.Name) ? "CivSurface_Mesh" : s.Name;
+
+                            // Define the style name
+                            string styleName = "Standard";
+
+                            // Get the Civil 3D document
+                            CivilDocument civDoc = CivilApplication.ActiveDocument;
+
+                            // Retrieve the style ObjectId from the name
+                            ObjectId styleId = ObjectId.Null;
+
+                            try
+                            {
+                                // SurfaceStyles[] indexer returns the ObjectId for the style
+                                styleId = civDoc.Styles.SurfaceStyles[styleName];
+                            }
+                            catch
+                            {
+                                throw new System.Exception(
+                                    $"Surface style '{styleName}' was not found in this drawing."
+                                );
+                            }
+
+                            // -----------------------------------------------------------------
+                            // 1) Create a new Civil 3D TIN surface in the drawing
+                            // -----------------------------------------------------------------
+                            ObjectId id = ADC.TinSurface.Create(name, styleId);
+
+                            // 2) Get the surface object
+                            ADC.TinSurface c3dSurface =
+                                acTrans.GetObject(id, OpenMode.ForWrite) as ADC.TinSurface;
+
+                            // -----------------------------------------------------------------
+                            // 2) Add vertices first (2024+: one-by-one; bulk overloads removed)
+                            // -----------------------------------------------------------------
+                            foreach (var p in pts)
+                                c3dSurface.AddVertex(p.ToCivil3D());
+
+                            // -----------------------------------------------------------------
+                            // 3) Build unique edges from triangles (triangles only; throw on quads)
+                            // -----------------------------------------------------------------
+                            var edges = new HashSet<(int u, int v)>();
+                            foreach (var f in fcs)
+                            {
+                                if (f.D >= 0)
+                                    throw new InvalidOperationException("Quad face encountered; only triangles allowed.");
+
+                                AddEdge(f.A, f.B);
+                                AddEdge(f.B, f.C);
+                                AddEdge(f.C, f.A);
+                            }
+
+                            // -----------------------------------------------------------------
+                            // 4) Create 3D polylines for each unique edge and collect their Ids
+                            // -----------------------------------------------------------------
+                            var breaklineIds = new ObjectIdCollection();
+
+                            foreach (var (u, v) in edges)
+                            {
+                                // Guard index validity (skip bad faces quietly; or throw if you prefer)
+                                if (u < 0 || v < 0 || u >= pts.Count || v >= pts.Count)
+                                    continue;
+
+                                Point3d pa = pts[u].ToCivil3D();
+                                Point3d pb = pts[v].ToCivil3D();
+
+                                // Create a simple 3D polyline with two vertices (A -> B)
+                                var coll = new Point3dCollection();
+                                coll.Add(pa);
+                                coll.Add(pb);
+
+                                var pl3d = new Polyline3d(Poly3dType.SimplePoly, coll, /*closed*/ false);
+                                acBlkTblRec.AppendEntity(pl3d);
+                                acTrans.AddNewlyCreatedDBObject(pl3d, true);
+
+                                breaklineIds.Add(pl3d.ObjectId);
+                            }
+
+                            // -----------------------------------------------------------------
+                            // 5) Register breaklines on the surface and rebuild
+                            //    Signature variations exist; the 3-parameter distances call is widely supported.
+                            //    
+                            // -----------------------------------------------------------------
+                            c3dSurface.BreaklinesDefinition.AddStandardBreaklines(
+                                breaklineIds, 5.0, 0.25, 0.25, 0.087
+                            );
+
+                            c3dSurface.Rebuild();
+
+                            // --- local helper: add undirected edge once ---
+                            void AddEdge(int i, int j)
+                            {
+                                int a = Math.Min(i, j);
+                                int b = Math.Max(i, j);
+                                edges.Add((a, b)); // HashSet prevents duplicates
                             }
                         }
                     }

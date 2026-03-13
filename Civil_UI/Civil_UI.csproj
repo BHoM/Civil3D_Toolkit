@@ -8,12 +8,16 @@
     <AssemblyTitle>Civil_UI</AssemblyTitle>
     <Description>https://github.com/BHoM/Civil3D_Toolkit</Description>
     <Product>Civil_UI</Product>
-    <Copyright>Copyright © https://github.com/BHoM</Copyright>
+    <Copyright>Copyright ï¿½ https://github.com/BHoM</Copyright>
     <AssemblyVersion>9.0.0.0</AssemblyVersion>
     <FileVersion>9.1.0.0</FileVersion>
+    <BHoMProgramData>$(ProgramData)\BHoM\Assemblies</BHoMProgramData>
+    <UserBundle>%AppData%\Autodesk\ApplicationPlugins\BHoM.bundle\Contents\Windows</UserBundle>
   </PropertyGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="RD /S /Q &quot;C:\Users\$(Username)\AppData\Roaming\Autodesk\ApplicationPlugins\BHoM.bundle&quot;&#xD;&#xA;xcopy &quot;$(TargetDir)$(TargetFileName)&quot;  &quot;C:\ProgramData\BHoM\Assemblies&quot; /Y&#xD;&#xA;C:\Windows\System32\xcopy &quot;$(ProjectDir)PluginFile\PackageContents.xml&quot; &quot;C:\Users\$(Username)\AppData\Roaming\Autodesk\ApplicationPlugins\BHoM.bundle\&quot;" />
+    <Exec Command="xcopy &quot;$(TargetDir)$(TargetFileName)&quot;  &quot;C:\ProgramData\BHoM\Assemblies&quot; /Y&#xD;&#xA;C:\Windows\System32\xcopy &quot;$(ProjectDir)PluginFile\PackageContents.xml&quot; &quot;C:\Users\$(Username)\AppData\Roaming\Autodesk\ApplicationPlugins\BHoM.bundle\&quot;" />
+    <Exec Command="if not exist &quot;$(UserBundle)&quot; mkdir &quot;$(UserBundle)&quot;" />
+    <Exec Command="xcopy &quot;$(TargetDir)$(TargetFileName)&quot; &quot;$(UserBundle)&quot; /Y /R /I" />
   </Target>
   <ItemGroup>
     <Reference Include="accoremgd">

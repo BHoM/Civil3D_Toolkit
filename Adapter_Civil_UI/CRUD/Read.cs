@@ -28,6 +28,7 @@ using System.Text;
 using System.Threading.Tasks;
 using BH.oM.Base;
 using BHC = BH.oM.Civils.Elements;
+using BHG = BH.oM.Geometry;
 using BH.UI.Civil.Engine;
 //using BH.oM.Geometry;
 
@@ -337,16 +338,16 @@ namespace BH.UI.Civil.Adapter
         {
             CivilDocument doc = CivilApplication.ActiveDocument;
 
-            List<BHC.CivSurface> tinSurfaceList = new List<BHC.CivSurface>();
+            var tinSurfaceList = new List<BHC.CivSurface>();
 
             using (Transaction trans = Application.DocumentManager.MdiActiveDocument.Database.TransactionManager.StartTransaction())
             {
                 foreach (ObjectId id in doc.GetSurfaceIds())
                 {
-                    ADC.TinSurface tinSurface = trans.GetObject(id, OpenMode.ForRead) as ADC.TinSurface;
+                    var tinSurface = trans.GetObject(id, OpenMode.ForRead) as ADC.TinSurface;
                     if (tinSurface != null)
                     {
-                        tinSurfaceList.Add(tinSurface.ToBHoM());
+                        tinSurfaceList.Add(tinSurface.ToBHoM()); // returns BHC.CivSurface
                     }
                 }
 

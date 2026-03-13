@@ -26,7 +26,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BH.oM.Base;
-using BH.oM.Geometry;
+using BHG = BH.oM.Geometry;
 
 namespace BH.oM.Civils.Elements
 {
@@ -36,7 +36,7 @@ namespace BH.oM.Civils.Elements
         /**** Public Properties                         ****/
         /***************************************************/
 
-        public virtual List<Polyline> Triangles { get; set; } = new List<Polyline>();
+        public virtual BHG.Mesh Mesh { get; set; }
 
         /***************************************************/
     }
