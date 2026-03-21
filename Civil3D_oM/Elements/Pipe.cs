@@ -44,6 +44,8 @@ namespace BH.oM.Civils.Elements
 
         public virtual FlowDirection FlowDirection { get; set; } = FlowDirection.Undefined;
 
+        public virtual PipeNetwork PipeNetwork { get; set; } = null;
+
         /***************************************************/
     }
 }

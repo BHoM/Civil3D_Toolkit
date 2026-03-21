@@ -25,26 +25,42 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using BHG = BH.oM.Geometry;
-using BHC = BH.oM.Civils.Elements;
-using ADC = Autodesk.Civil.DatabaseServices;
 
-namespace BH.UI.Civil.Engine
+using Autodesk.AutoCAD.ApplicationServices;
+using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.Civil.ApplicationServices;
+
+namespace BH.oM.Adapters.Civil3D
 {
-    public static partial class Convert
+    public class Civil3DRuntimeContext
     {
+        public CivilDocument CivilDocument { get; }
+        public Database Database { get; }
+        public Transaction Transaction { get; }
 
-        /***************************************************/
-        /**** Public Methods                            ****/
-        /***************************************************/
+        public Document Document { get; }
 
-        public static ADC.Pipe ToCivil3D(this BHC.Pipe bhPipe)
+        public BlockTable BlockTable { get; }
+        public BlockTableRecord BlockTableRecord { get; }
+
+        // public Civil3DRuntimeContext(CivilDocument civilDoc, Database db, Transaction tr)
+        // {
+        //     CivilDocument = civilDoc;
+        //     Database = db;
+        //     Transaction = tr;
+        // }
+        public Civil3DRuntimeContext(Document acDoc, CivilDocument civilDoc, Database db, Transaction tr, BlockTable acBlkTbl, BlockTableRecord acBlkTblRec)
         {
-            throw new NotImplementedException();
-        }
+            Document = acDoc;
+            CivilDocument = civilDoc;
+            Database = db;
+            Transaction = tr;
 
-        /***************************************************/
+            BlockTable = acBlkTbl;
+            BlockTableRecord = acBlkTblRec;
+        }
     }
 }
+
 
 

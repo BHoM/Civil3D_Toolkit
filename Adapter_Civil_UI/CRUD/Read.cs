@@ -27,6 +27,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BH.oM.Base;
+using BH.oM.Dimensional;
 using BHC = BH.oM.Civils.Elements;
 using BHG = BH.oM.Geometry;
 using BH.UI.Civil.Engine;
@@ -35,7 +36,8 @@ using BH.UI.Civil.Engine;
 using Autodesk.Civil.ApplicationServices;
 using Autodesk.Civil.Runtime;
 using ADC = Autodesk.Civil.DatabaseServices;
-
+using AAD = Autodesk.AutoCAD.DatabaseServices;
+using ACG = Autodesk.AutoCAD.Geometry;
 
 //using Autodesk.AutoCAD.Runtime;
 using Autodesk.AutoCAD.ApplicationServices;
@@ -56,11 +58,20 @@ namespace BH.UI.Civil.Adapter
         /***************************************************/
 
         //General method called by the adapter when reading in data
+
+
+
+
         protected override IEnumerable<IBHoMObject> IRead(Type type, IList ids, ActionConfig actionConfig = null)
         {
 
             try
             {
+                if (type == typeof(AAD.Polyline))
+                {
+                    return ReadPolyLines()
+                        .Cast<IBHoMObject>();
+                }
                 if (type == typeof(BHC.Pipe))
                 {
                     return ReadPipes();
@@ -125,7 +136,42 @@ namespace BH.UI.Civil.Adapter
         /***************************************************/
         /**** Private Methods                           ****/
         /***************************************************/
+        
+        /**** Geometry 3d Objects                       ****/
 
+        private List<BHG.ICurve> ReadPolyLines()
+        {
+            List<BHG.ICurve> polylines = new List<BHG.ICurve>();
+
+            using (Transaction trans = Application.DocumentManager.MdiActiveDocument.Database.TransactionManager.StartOpenCloseTransaction())
+            {
+                var btr =
+                     (BlockTableRecord)trans.GetObject(
+                    SymbolUtilityServices.GetBlockModelSpaceId(Application.DocumentManager.MdiActiveDocument.Database),
+                    OpenMode.ForRead
+                     );
+
+                var blockIDs =
+                from ObjectId id in btr
+                where id.ObjectClass.IsDerivedFrom(Autodesk.AutoCAD.Runtime.RXClass.GetClass(typeof(AAD.Polyline)))
+                select id;
+
+                foreach (ObjectId id in blockIDs)
+                {
+                    AAD.Polyline l = (trans.GetObject(id, OpenMode.ForRead) as AAD.Polyline);
+                    if (l != null)
+                        polylines.Add(l.FromCivil3D());
+                }
+
+                trans.Commit();
+            }
+
+            return polylines;
+        }
+
+
+
+        /**** Civils 3d Objects                         ****/
         private List<BHC.FeatureLine> ReadFeatureLines()
         {
             List<BHC.FeatureLine> featureLines = new List<BHC.FeatureLine>();
@@ -137,6 +183,7 @@ namespace BH.UI.Civil.Adapter
                     SymbolUtilityServices.GetBlockModelSpaceId(Application.DocumentManager.MdiActiveDocument.Database),
                     OpenMode.ForRead
                      );
+
                 var blockIDs =
                 from ObjectId id in btr
                 where id.ObjectClass.IsDerivedFrom(Autodesk.AutoCAD.Runtime.RXClass.GetClass(typeof(ADC.FeatureLine)))
@@ -356,6 +403,7 @@ namespace BH.UI.Civil.Adapter
 
             return tinSurfaceList;
         }
+
         /***************************************************/
 
     }
