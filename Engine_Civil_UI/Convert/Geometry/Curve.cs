@@ -43,6 +43,25 @@ namespace BH.UI.Civil.Engine
             return new Autodesk.AutoCAD.DatabaseServices.Line(line.Start.ToCivil3D(), line.End.ToCivil3D());
         }
 
+
+        public static BHG.Line FromCivil3D(this ACG.Line3d line)
+        {
+            return new BHG.Line
+            {
+                Start = line.StartPoint.FromCivil3D(),
+                End   = line.EndPoint.FromCivil3D()
+            };
+        }
+
+        public static BHG.Line FromCivil3D(this ACG.LineSegment3d line)
+        {
+            return new BHG.Line
+            {
+                Start = line.StartPoint.FromCivil3D(),
+                End   = line.EndPoint.FromCivil3D()
+            };
+        }
+
         public static BHG.ICurve FromCivil3D(this ACD.Curve acCurve)
         {
             ACD.NurbsData nurbsData = acCurve.Spline.NurbsData;
@@ -86,10 +105,51 @@ namespace BH.UI.Civil.Engine
 
         /***************************************************/
 
+        // public static BHG.ICurve FromCivil3D(this ACG.CompositeCurve3d acCurve)
+        // {
+        //     return new BHG.PolyCurve { Curves = acCurve.GetCurves().Select(x => x.FromCivil3D()).ToList() };
+        // }
+
         public static BHG.ICurve FromCivil3D(this ACG.CompositeCurve3d acCurve)
         {
-            return new BHG.PolyCurve { Curves = acCurve.GetCurves().Select(x => x.FromCivil3D()).ToList() };
+            var bhCurves = new List<BHG.ICurve>();
+
+            foreach (ACG.Curve3d c in acCurve.GetCurves())
+            {
+                if (c == null)
+                    continue;
+
+                // IMPORTANT: avoid calling c.FromCivil3D() where c is Curve3d (dynamic path)
+
+                if (c is ACG.CompositeCurve3d cc)
+                {
+                    bhCurves.Add(cc.FromCivil3D());                 // recursion uses this same method
+                }
+                else if (c is ACG.CircularArc3d arc)
+                {
+                    bhCurves.Add(arc.FromCivil3D()); 
+                }
+                else if (c is ACG.PolylineCurve3d plc)
+                {
+                    bhCurves.Add(plc.FromCivil3D());                
+                }
+                else if (c is ACG.LinearEntity3d le)
+                {
+                    bhCurves.Add(le.FromCivil3D());                 
+                }
+                else if (c is ACG.NurbCurve3d nc)
+                {
+                    bhCurves.Add(nc.FromCivil3D());                 
+                }
+                else
+                {
+                BH.Engine.Base.Compute.RecordWarning($"Skipped unsupported Curve3d subtype: {c.GetType().Name}");
+                }
+            }
+
+            return new BHG.PolyCurve { Curves = bhCurves };
         }
+
 
         /***************************************************/
 
@@ -154,10 +214,10 @@ namespace BH.UI.Civil.Engine
         /**** Public Methods - Interface                ****/
         /***************************************************/
 
-        public static BHG.ICurve FromCivil3D(this ACG.Curve3d acCurve)
-        {
-            return ToBHoM(acCurve as dynamic);
-        }
+        // public static BHG.ICurve FromCivil3D(this ACG.Curve3d acCurve)
+        // {
+        //     return ToBHoM(acCurve as dynamic);
+        // }
 
         /***************************************************/
     }
