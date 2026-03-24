@@ -43,12 +43,12 @@ namespace BH.UI.Civil.Engine
             return new BHG.Point { X = pt.X, Y = pt.Y, Z = pt.Z };
         }
 
-        /***************************************************/
-
         public static BHG.Point FromCivil3D(this ACG.Point2d pt)
         {
             return new BHG.Point { X = pt.X, Y = pt.Y, Z = 0 };
         }
+
+      /***************************************************/
 
         public static ACG.Point3d ToCivil3D(this BHG.Point pt)
         {
