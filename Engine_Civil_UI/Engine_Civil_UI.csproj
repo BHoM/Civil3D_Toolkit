@@ -8,7 +8,7 @@
     <AssemblyTitle>Engine_Civil_UI</AssemblyTitle>
     <Description>https://github.com/BHoM/Civil3D_Toolkit</Description>
     <Product>Engine_Civil_UI</Product>
-    <Copyright>Copyright © https://github.com/BHoM</Copyright>
+    <Copyright>Copyright ï¿½ https://github.com/BHoM</Copyright>
     <AssemblyVersion>9.0.0.0</AssemblyVersion>
     <FileVersion>9.1.0.0</FileVersion>
   </PropertyGroup>
@@ -59,6 +59,11 @@
     <Reference Include="Geometry_oM">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(ProgramData)\BHoM\Assemblies\Geometry_oM.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+        <Reference Include="Analytical_oM">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(ProgramData)\BHoM\Assemblies\Analytical_oM.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />

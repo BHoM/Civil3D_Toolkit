@@ -41,6 +41,7 @@ using Autodesk.Civil.Runtime;
 using ADC = Autodesk.Civil.DatabaseServices;
 using AAD = Autodesk.AutoCAD.DatabaseServices;
 using ACG = Autodesk.AutoCAD.Geometry;
+using BCF = BH.oM.Civils.Fragments;
 
 //using Autodesk.AutoCAD.Runtime;
 using Autodesk.AutoCAD.ApplicationServices;
@@ -91,6 +92,8 @@ namespace BH.UI.Civil.Adapter
 
 
 
+
+
                 // ---- Civils ----
                 if (requestedType == typeof(BHC.CivSurface))
                     return ReadTinSurface();
@@ -101,36 +104,22 @@ namespace BH.UI.Civil.Adapter
                 if (requestedType == typeof(BHC.FeatureLine))
                     return ReadFeatureLines();
 
+
+
                 // ---- Geometry ----
-                if (typeof(BHG.ICurve).IsAssignableFrom(requestedType))
-                {
-                    Log("Branch: ICurve (assignable) - requested: " + requestedType.FullName);
+                if (requestedType == typeof(BHG.Point))
+                    return ReadPoints();
 
-                    var raw = ReadCurves();
-                    Log("Returned Curves count (raw): " + raw.Count);
+                if (requestedType == typeof(BHG.ICurve))
+                    return ReadCurves();
+                    
+                // ---- CAD ----
+                if (requestedType == typeof(BHC.Block))
+                    return ReadBlocks();
 
-                    // If the request is ICurve itself, return everything.
-                    // If it's a concrete curve type (e.g. Polyline), return only those.
-                    var filtered = (requestedType == typeof(BHG.ICurve))
-                        ? raw
-                        : raw.Where(c => c != null && requestedType.IsAssignableFrom(c.GetType())).ToList();
-
-                    Log("Returned Curves count (filtered): " + filtered.Count);
-
-                    // Prefer returning the actual BHoM geometry objects when possible.
-                    // Fallback to wrapper only if something isn't an IBHoMObject.
-                    var result = new List<IBHoMObject>();
-                    foreach (var c in filtered)
-                    {
-                        if (c is IBHoMObject bho)
-                            result.Add(bho);
-                        else
-                            result.Add(WrapGeometry((BHG.IGeometry)c));
-                    }
-
-                    Log("Returned Curves count (as IBHoMObject): " + result.Count);
-                    return result;
-                }
+                // //----- Annotation
+                if (requestedType == typeof(BHC.CadTextNote))
+                    return ReadText();
 
                 // ---- Fallback ----
                 return new List<IBHoMObject>();
@@ -188,117 +177,6 @@ namespace BH.UI.Civil.Adapter
             catch { /* ignore */ }
         }
 
-        /***************************************************/
-        /**** Geometry Objects                          ****/
-        /***************************************************/
-        // private List<BHG.Line> ReadLines()
-        // {
-        //     Log("Read lines initiated...");
-
-        //     List<BHG.Line> lines = new List<BHG.Line>();
-
-        //     using (Transaction trans = Application.DocumentManager.MdiActiveDocument.Database.TransactionManager.StartOpenCloseTransaction())
-        //     {
-        //         var btr =
-        //              (BlockTableRecord)trans.GetObject(
-        //             SymbolUtilityServices.GetBlockModelSpaceId(Application.DocumentManager.MdiActiveDocument.Database),
-        //             OpenMode.ForRead
-        //              );
-
-        //         var blockIDs =
-        //         from ObjectId id in btr
-        //         where id.ObjectClass.IsDerivedFrom(Autodesk.AutoCAD.Runtime.RXClass.GetClass(typeof(AAD.Line)))
-        //         select id;
-
-        //         var idsList = blockIDs.ToList();
-
-        //         foreach (ObjectId id in blockIDs)
-        //         {
-        //             // Get the AutoCAD Line entity
-        //             var l = trans.GetObject(id, OpenMode.ForRead) as AAD.Line;
-        //             if (l == null)
-        //                 continue;
-
-        //             // Get and dispose of the geometric curve properly
-        //             using (var ge = l.GetGeCurve())
-        //             { 
-        //                 var geomLine = ge as ACG.LineSegment3d;
-        //                 if (geomLine == null)
-        //                     continue;
-
-        //                 // Convert to BHoM geometry
-        //                 var bhLine = geomLine.FromCivil3D();
-        //                 if (bhLine == null)
-        //                 {
-        //                     Log("FromCivil3D returned null");
-        //                     continue;
-        //                 }
-        //                 lines.Add(bhLine);
-        //             }
-        //         }
-
-        //         trans.Commit();
-        //     }
-        //     return lines;
-        // }
-
-
-        // private List<BHG.PolyCurve> ReadPolyLines()
-        // {
-        //     List<BHG.PolyCurve> polyCurves = new List<BHG.PolyCurve>();
-
-        //     using (Transaction trans = Application.DocumentManager.MdiActiveDocument.Database.TransactionManager.StartOpenCloseTransaction())
-        //     {
-        //         var btr =
-        //              (BlockTableRecord)trans.GetObject(
-        //             SymbolUtilityServices.GetBlockModelSpaceId(Application.DocumentManager.MdiActiveDocument.Database),
-        //             OpenMode.ForRead
-        //              );
-
-        //         var blockIDs =
-        //         from ObjectId id in btr
-        //         where id.ObjectClass.IsDerivedFrom(Autodesk.AutoCAD.Runtime.RXClass.GetClass(typeof(AAD.Polyline)))
-        //         select id;
-
-        //         foreach (ObjectId id in blockIDs)
-        //         {
-        //             var pl = trans.GetObject(id, OpenMode.ForRead) as Polyline;
-        //                 if (pl == null)
-        //                     continue;
-
-        //             ACG.Curve3d acCurve = pl.GetGeCurve();
-
-        //             // ---------- ROUTE BY AUTOCAD GEOMETRY TYPE ----------
-
-        //             // 1. Composite curve (most common when arcs are present)
-        //             if (acCurve is ACG.CompositeCurve3d cc)
-        //             {
-        //                 var bh = cc.FromCivil3D() as BHG.PolyCurve;
-        //                 if (bh != null)
-        //                     polyCurves.Add(bh);
-        //             }
-
-        //             // 2. PolylineCurve3d (purely linear)
-        //             else if (acCurve is ACG.PolylineCurve3d plc)
-        //             {
-        //                 var bhPl = plc.FromCivil3D() as BHG.Polyline;
-        //                 var bhPc = ToPolyCurve(bhPl);
-        //                 if (bhPc != null)
-        //                     polyCurves.Add(bhPc);
-        //             }
-
-        //             // 3. Fallback: sample any other Curve3d
-        //             else
-        //             {
-        //                 continue;
-        //             }
-        //         }
-        //         trans.Commit();
-        //     }
-        //     return polyCurves;
-        // }
-
-
         
         BHG.PolyCurve ToPolyCurve(BHG.Polyline pl)
         {
@@ -309,11 +187,103 @@ namespace BH.UI.Civil.Adapter
                         (a, b) => (BHG.ICurve)new BHG.Line { Start = a, End = b })
                     .ToList()
             };
+            
         }
 
-        private List<BHG.ICurve> ReadCurves()
+
+        /***************************************************/
+        /**** CAD Text ****/
+        /***************************************************/
+
+
+        private List<BHC.CadTextNote> ReadText()
         {
-            List<BHG.ICurve> curves = new List<BHG.ICurve>();
+            List<BHC.CadTextNote> textNotes = new List<BHC.CadTextNote>();
+
+            var doc = Application.DocumentManager.MdiActiveDocument;
+            var db  = doc.Database;
+
+            using (Transaction trans = db.TransactionManager.StartOpenCloseTransaction())
+            {
+                var btr = (BlockTableRecord)trans.GetObject(
+                    SymbolUtilityServices.GetBlockModelSpaceId(db),
+                    OpenMode.ForRead);
+
+                // Read mtext entities 
+                foreach (ObjectId id in btr)
+                {
+                    Entity ent = trans.GetObject(id, OpenMode.ForRead) as Entity;
+
+                    if (ent is MText mtext)
+                    {
+                        BHC.CadTextNote note = mtext.FromCivil3d();
+
+                        if (note != null)
+                        {
+                            AttachLayerFragment(mtext, note);
+                            textNotes.Add(note);                           
+                        }
+                    }
+                }
+            trans.Commit();
+            }
+        return textNotes;
+        }
+
+
+        /***************************************************/
+        /**** CAD Points                         ****/
+        /***************************************************/
+
+        private List<IBHoMObject> ReadPoints()
+        {
+            List<IBHoMObject> points = new List<IBHoMObject>();
+
+            var doc = Application.DocumentManager.MdiActiveDocument;
+            var db  = doc.Database;
+
+
+            using (Transaction trans = db.TransactionManager.StartOpenCloseTransaction())
+            {
+                var btr = (BlockTableRecord)trans.GetObject(
+                    SymbolUtilityServices.GetBlockModelSpaceId(db),
+                    OpenMode.ForRead);
+                // Read ALL point entities (DBPoint, etc.)
+                foreach (ObjectId id in btr)
+                {
+                    if (!id.ObjectClass.IsDerivedFrom(
+                        Autodesk.AutoCAD.Runtime.RXClass.GetClass(typeof(AAD.DBPoint))))
+                        continue;
+
+                    var pointEnt = trans.GetObject(id, OpenMode.ForRead) as AAD.DBPoint;
+                    if (pointEnt == null)
+                        continue;
+                    BHG.Point bhPoint = pointEnt.FromCivil3D();
+
+                    if (bhPoint != null)
+                    {
+                        var bho = WrapGeometry(bhPoint);
+                        if (bho != null)
+                        {
+                            AttachLayerFragment(pointEnt, bho);
+                            points.Add(bho);
+                        }
+                    }
+                }
+            }
+            return points;
+        }
+
+
+
+        /***************************************************/
+        /**** CAD Curves                         ****/
+        /***************************************************/
+
+
+        private List<IBHoMObject> ReadCurves()
+        {
+            List<IBHoMObject> curves = new List<IBHoMObject>();
 
             var doc = Application.DocumentManager.MdiActiveDocument;
             var db  = doc.Database;
@@ -335,60 +305,61 @@ namespace BH.UI.Civil.Adapter
                     if (curveEnt == null)
                         continue;
 
-                    using (var ge = curveEnt.GetGeCurve())
+                    BHG.IGeometry bh = null;
+
+                    if (curveEnt is AAD.Line line)
                     {
-                        // -------- Line --------
-                        if (ge is ACG.LineSegment3d l)
-                        {
-                            var bhl = l.FromCivil3D();
-                            if (bhl != null)
-                                curves.Add(bhl);
-                        }
+                        bh = line.FromCivil3D();
+                    }
+                    else if (curveEnt is AAD.Arc arc)
+                    {
+                        bh = arc.FromCivil3D();
+                    }
+                    else if (curveEnt is AAD.Circle circle)
+                    {
+                        bh = circle.FromCivil3D();
+                    }
+                    else if (curveEnt is AAD.Ellipse ellipse)
+                    {
+                        bh = ellipse.FromCivil3D();
+                    }
+                    else if (curveEnt is AAD.Polyline polyline)
+                    {
+                        bh = polyline.FromCivil3D();
+                    }
 
-                        // 1. Composite curve (most common when arcs are present)
-                        else if (ge is ACG.CompositeCurve3d cc)
-                        {
-                            var bh = cc.FromCivil3D();
-                            if (bh != null)
-                                curves.Add(bh);
-                        }
+                    // else if (curveEnt is AAD.Spline spline)
+                    // {
+                    //     bh = spline.FromCivil3D();
+                    // }
+                    else
+                    {
 
-                        // 2. PolylineCurve3d (purely linear)
-                        else if (ge is ACG.PolylineCurve3d plc)
-                        {
-                            var bhPl = plc.FromCivil3D();
-                            var bhPc = ToPolyCurve(bhPl);
-                            if (bhPc != null)
-                                curves.Add(bhPc);
-                        }                        
+                        Log("Curve Type not supported");
                         
-                        // -------- CIRCULAR ARC --------
-                        else if (ge is ACG.CircularArc3d circ)
-                        {
-                            var bhArc = circ.FromCivil3D();
-                            if (bhArc != null)
-                                curves.Add(bhArc);
-                        }
+                        // Fallback to geometry curve for unsupported types
+                        // using (var ge = curveEnt.GetGeCurve())
+                        // {
+                        //     if (ge is ACG.CompositeCurve3d cc)
+                        //         bh = cc.FromCivil3D();
+                        //     else if (ge is ACG.PolylineCurve3d plc)
+                        //         bh = ToPolyCurve(plc.FromCivil3D());
+                        //     else if (ge is ACG.CircularArc3d circ)
+                        //         bh = circ.FromCivil3D();
+                        //     else if (ge is ACG.EllipticalArc3d ell)
+                        //         bh = ell.FromCivil3D();
+                        //     else if (ge is ACG.NurbCurve3d nurb)
+                        //         bh = nurb.FromCivil3D();
+                        // }
+                    }
 
-                        // -------- ELLIPTICAL ARC --------
-                        else if (ge is ACG.EllipticalArc3d ell)
+                    if (bh != null)
+                    {
+                        var bho = WrapGeometry(bh);
+                        if (bho != null)
                         {
-                            var bhEll = ell.FromCivil3D();
-                            if (bhEll != null)
-                                curves.Add(bhEll);
-                        }
-
-                        // -------- NURBS CURVE --------
-                        else if (ge is ACG.NurbCurve3d nurb)
-                        {
-                            var bhNurb = nurb.FromCivil3D();
-                            if (bhNurb != null)
-                                curves.Add(bhNurb);
-                        }
-                        // -------- NO TYPE MATCH --------
-                        else
-                        {
-                            Log("No type match for the curve.");
+                            AttachLayerFragment(curveEnt, bho);
+                            curves.Add(bho);
                         }
                     }
                 }
@@ -438,28 +409,36 @@ namespace BH.UI.Civil.Adapter
         {
             List<BHC.Block> blocks = new List<BHC.Block>();
 
-            using (Transaction trans = Application.DocumentManager.MdiActiveDocument.Database.TransactionManager.StartOpenCloseTransaction())
+            var doc = Application.DocumentManager.MdiActiveDocument;
+            var db  = doc.Database;
+
+            using (Transaction tr = db.TransactionManager.StartTransaction())
             {
-                var btr =
-                     (BlockTableRecord)trans.GetObject(
-                    SymbolUtilityServices.GetBlockModelSpaceId(Application.DocumentManager.MdiActiveDocument.Database),
-                    OpenMode.ForRead
-                     );
-                var blockIDs =
-                from ObjectId id in btr
-                where id.ObjectClass.IsDerivedFrom(Autodesk.AutoCAD.Runtime.RXClass.GetClass(typeof(BlockReference)))
-                select id;
+                
+                BlockTable bt = (BlockTable)tr.GetObject(db.BlockTableId, OpenMode.ForRead);
 
-                foreach (ObjectId id in blockIDs)
-                {
-                    BlockReference b = (trans.GetObject(id, OpenMode.ForRead) as BlockReference);
-                    if (b != null)
-                        blocks.Add(b.FromCivil3D());
+                BlockTableRecord ms = (BlockTableRecord)tr.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForRead);
+
+                foreach (ObjectId id in ms)
+                {                 
+                    if (!id.ObjectClass.IsDerivedFrom(
+                            Autodesk.AutoCAD.Runtime.RXClass.GetClass(typeof(BlockReference))))
+                        continue;
+
+                    BlockReference br =
+                        tr.GetObject(id, OpenMode.ForRead) as BlockReference;
+
+                    BHC.Block bho = null;
+                    bho = br.FromCivil3D();
+
+                    if (bho != null)
+                    {
+                        AttachLayerFragment(br, bho);
+                        blocks.Add(bho);
+                    }
+
                 }
-
-                trans.Commit();
             }
-
             return blocks;
         }
 
@@ -635,6 +614,24 @@ namespace BH.UI.Civil.Adapter
         }
 
         /***************************************************/
+        // Helper method to attach layer information as a fragment to the BHoM object
+        /***************************************************/
+    
+        private static void AttachLayerFragment(AAD.Entity entity, IBHoMObject bhObj)
+        {
+            if (entity == null || bhObj == null)
+                return;
+
+            var layerName = entity.Layer;
+
+            if (!string.IsNullOrWhiteSpace(layerName))
+            {
+                bhObj.Fragments.Add(new BCF.CADLayerFragment
+                {
+                    CADLayerName = layerName
+                });
+            }
+        }
 
     }
 }

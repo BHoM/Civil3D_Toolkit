@@ -26,7 +26,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BHG = BH.oM.Geometry;
-
+using ACD = Autodesk.AutoCAD.DatabaseServices;
 using ACG = Autodesk.AutoCAD.Geometry;
 
 namespace BH.UI.Civil.Engine
@@ -37,6 +37,34 @@ namespace BH.UI.Civil.Engine
         /***************************************************/
         /**** Public Methods                            ****/
         /***************************************************/
+
+        /***********************To Civils3d****************************/
+
+        public static ACD.DBPoint ToCivil3D(this BHG.Point pt)
+        {
+            return new ACD.DBPoint(new ACG.Point3d(pt.X, pt.Y, pt.Z));
+        }
+
+
+        /***********************To ACG****************************/
+
+        public static ACG.Point3d ToACGPoint3d(this BHG.Point pt)
+        {
+            return new ACG.Point3d(pt.X, pt.Y, pt.Z);
+        }
+
+        public static ACG.Point2d ToACGPoint2d(this BHG.Point pt)
+        {
+            return new ACG.Point2d(pt.X, pt.Y);
+        }
+
+
+        /***********************From Civil3d to BHOM****************************/
+
+        public static BHG.Point FromCivil3D(this ACD.DBPoint acPoint)
+        {
+            return acPoint.Position.FromCivil3D();
+        }
 
         public static BHG.Point FromCivil3D(this ACG.Point3d pt)
         {
@@ -50,10 +78,7 @@ namespace BH.UI.Civil.Engine
 
       /***************************************************/
 
-        public static ACG.Point3d ToCivil3D(this BHG.Point pt)
-        {
-            return new Autodesk.AutoCAD.Geometry.Point3d(pt.X, pt.Y, pt.Z);
-        }
+
     }
 }
 

@@ -26,6 +26,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BHC = BH.oM.Civils.Elements;
+using BH.oM.Geometry;
 
 using ACG = Autodesk.AutoCAD.Geometry;
 
@@ -46,20 +47,14 @@ namespace BH.UI.Civil.Engine
         {
             return new BHC.Block
             {
-                BlockName = civBlock.BlockName,
-                CanCastShadow = civBlock.CastShadows,
-                IsPersistent = civBlock.IsPersistent,
-                IsPlanar = civBlock.IsPlanar,
-                Layer = civBlock.Layer,
-                Material = civBlock.Material,
-                CanReceiveShadow = civBlock.ReceiveShadows,
-                Rotation = civBlock.Rotation,
-                IsVisible = civBlock.Visible,
-                Position = civBlock.Position.FromCivil3D(),
-                Normal = civBlock.Normal.FromCivil3D(),
-                CollisionType = civBlock.CollisionType.FromCivil3D(),
-                Bounds = civBlock.Bounds.HasValue ? civBlock.Bounds.Value.FromCivil3D() : new oM.Geometry.BoundingBox(),
-                Name = civBlock.Name,
+                Position  = civBlock.Position.FromCivil3D(),
+                Rotation  = civBlock.Rotation,
+                Scale     = new Vector
+                {
+                    X = civBlock.ScaleFactors.X,
+                    Y = civBlock.ScaleFactors.Y,
+                    Z = civBlock.ScaleFactors.Z
+                },
             };
         }
 

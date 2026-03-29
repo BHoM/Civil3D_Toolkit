@@ -83,7 +83,7 @@ namespace BH.UI.Civil.Engine
                 // 2) Add vertices
                 // ----------------------------------------------------------
                 foreach (var p in pts)
-                    c3dSurface.AddVertex(p.ToCivil3D());
+                    c3dSurface.AddVertex(p.ToACGPoint2d());
                 
                 // // ----------------------------------------------------------
                 // // Create one 3D polyline per face
@@ -101,7 +101,7 @@ namespace BH.UI.Civil.Engine
 
                     foreach (var pt in facepts)
                     {
-                        C3Dfacepts.Add(BH.UI.Civil.Engine.Convert.ToCivil3D(pt));
+                        C3Dfacepts.Add(BH.UI.Civil.Engine.Convert.ToACGPoint3d(pt));
                     }
 
                     var pl3d = new Polyline3d(Poly3dType.SimplePoly, C3Dfacepts, /* closed */ true);
