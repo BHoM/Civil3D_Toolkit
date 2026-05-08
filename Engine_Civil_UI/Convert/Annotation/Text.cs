@@ -45,10 +45,19 @@ namespace BH.UI.Civil.Engine
         // To Civils 3d //
         /////////////////
         /***************   ********************/
-        
+        public static ACD.MText ToCivil3d(this BHCE.CadTextNote CadTextNote)
+         {
+             if (CadTextNote == null)
+                 return null;
 
-
-
+             ACD.MText mtext = new ACD.MText
+             {
+                 Contents = CadTextNote.Text,
+                 Location = new ACG.Point3d(CadTextNote.Position.X, CadTextNote.Position.Y, CadTextNote.Position.Z),
+                 Rotation = CadTextNote.Rotation
+             };
+             return mtext;
+         }
 
         /////////////////////
         // From Civils 3d //
@@ -60,7 +69,6 @@ namespace BH.UI.Civil.Engine
         {
             if (mtext == null)
                 return null;
-
 
             BHCE.CadTextNote note = new BHCE.CadTextNote
             {
@@ -74,8 +82,32 @@ namespace BH.UI.Civil.Engine
                 Rotation = mtext.Rotation
             };
 
-            // Attach CAD metadata as fragments
-            // note.Fragments.Add(mtext.ToCadTextFragment());
+            // Bounding box from Civil 3D geometric extents
+            try
+            {
+                ACD.Extents3d extents = mtext.GeometricExtents;
+
+                note.BoundingBox = new BHG.BoundingBox
+                {
+                    Min = new BHG.Point
+                    {
+                        X = extents.MinPoint.X,
+                        Y = extents.MinPoint.Y,
+                        Z = extents.MinPoint.Z
+                    },
+                    Max = new BHG.Point
+                    {
+                        X = extents.MaxPoint.X,
+                        Y = extents.MaxPoint.Y,
+                        Z = extents.MaxPoint.Z
+                    }
+                };
+            }
+            catch
+            {
+                // GeometricExtents can throw in rare cases (e.g. corrupted entities)
+                // Intentionally swallowing to avoid adapter failure
+            }
 
             return note;
         }

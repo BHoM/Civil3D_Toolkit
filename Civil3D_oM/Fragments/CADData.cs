@@ -31,15 +31,11 @@ using BH.oM.Base;
 
 namespace BH.oM.Civils.Fragments
 {
-    public class CADLayerFragment : IFragment
+    public class CADDataFragment : IFragment
     {       
         public string CADLayerName { get; set; }
+        public string CADObjectHandle { get; set; }
     }
-
-    // public class HandleFragment : IFragment
-    // {       
-    //     public string Handle { get; set; }
-    // }
 
     // public class CadTextFragment : IFragment
     // {

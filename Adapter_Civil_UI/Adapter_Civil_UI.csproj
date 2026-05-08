@@ -36,6 +36,10 @@
       <HintPath>..\libs\AeccDbMgd.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="AeccPressurePipesMgd">
+      <HintPath>..\libs\AeccPressurePipesMgd.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Adapter_Engine">
       <HintPath>$(ProgramData)\BHoM\Assemblies\Adapter_Engine.dll</HintPath>
       <Private>False</Private>
@@ -79,6 +83,11 @@
     <Reference Include="Data_oM">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(ProgramData)\BHoM\Assemblies\Data_oM.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Serialiser_Engine">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(ProgramData)\BHoM\Assemblies\Serialiser_Engine.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />

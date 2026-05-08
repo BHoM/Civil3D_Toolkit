@@ -27,7 +27,10 @@ using System.Text;
 using System.Threading.Tasks;
 using BHG = BH.oM.Geometry;
 using BHC = BH.oM.Civils.Elements;
-using ADC = Autodesk.Civil.DatabaseServices;
+using Autodesk.Civil.DatabaseServices;
+
+using Autodesk.AutoCAD.DatabaseServices;
+
 
 using Autodesk.Civil.ApplicationServices;
 namespace BH.UI.Civil.Engine
@@ -39,17 +42,43 @@ namespace BH.UI.Civil.Engine
         /**** Public Methods                            ****/
         /***************************************************/
 
-        public static BHC.Pipe ToBHoM(this ADC.Pipe acPipe)
+        public static BHC.Pipe ToBHoM(this Pipe acPipe, Transaction tr)
         {
+
+            ObjectId networkId = acPipe.NetworkId;
+            Network network = tr.GetObject(networkId, OpenMode.ForRead) as Network;
+            string networkName = network?.Name;
+
             return new BHC.Pipe
-            {
+            {          
+                Name = acPipe.Name,
                 CentreLine = new BHG.Line { Start = acPipe.StartPoint.FromCivil3D(), End = acPipe.EndPoint.FromCivil3D() },
                 Diameter = acPipe.InnerDiameterOrWidth,
                 Thickness = acPipe.WallThickness,
                 FlowDirection = acPipe.FlowDirectionMethod.ToBHoM(),
+                PipeNetworkName = networkName
             };
 
         }
+
+
+        public static BHC.Pipe ToBHoM(this PressurePipe acPipe, Transaction tr)
+        {
+            ObjectId networkId = acPipe.NetworkId;
+            PressurePipeNetwork network = tr.GetObject(networkId, OpenMode.ForRead) as PressurePipeNetwork;
+            string networkName = network?.Name;
+
+            return new BHC.Pipe
+            {
+                
+                Name = acPipe.Name,
+                CentreLine = new BHG.Line { Start = acPipe.StartPoint.FromCivil3D(), End = acPipe.EndPoint.FromCivil3D() },
+                Diameter = acPipe.InnerDiameter,
+                Thickness = acPipe.WallThickness,
+                PipeNetworkName = networkName
+            };
+
+        }        
 
         /***************************************************/
     }

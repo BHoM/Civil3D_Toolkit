@@ -36,6 +36,10 @@
       <HintPath>..\libs\AeccDbMgd.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="AeccPressurePipesMgd">
+      <HintPath>..\libs\AeccPressurePipesMgd.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="BHoM">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(ProgramData)\BHoM\Assemblies\BHoM.dll</HintPath>

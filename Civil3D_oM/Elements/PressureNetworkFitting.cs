@@ -25,40 +25,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using BHC = BH.oM.Civils.Elements;
+using BH.oM.Base;
 using BH.oM.Geometry;
 
-using ACG = Autodesk.AutoCAD.Geometry;
-
-using ADC = Autodesk.Civil.DatabaseServices;
-
-using Autodesk.AutoCAD.DatabaseServices;
-
-namespace BH.UI.Civil.Engine
+namespace BH.oM.Civils.Elements
 {
-    public static partial class Convert
+    public class PressureNetworkFitting : BHoMObject
     {
-
         /***************************************************/
-        /**** Public Methods                            ****/
+        /**** Public Properties                         ****/
         /***************************************************/
 
-        public static BHC.Block FromCivil3D(this BlockReference civBlock)
-        {
-            return new BHC.Block
-            {
-                Position  = civBlock.Position.FromCivil3D(),
-                Rotation  = civBlock.Rotation,
-                Scale     = new Vector
-                {
-                    X = civBlock.ScaleFactors.X,
-                    Y = civBlock.ScaleFactors.Y,
-                    Z = civBlock.ScaleFactors.Z
-                },
-            };
-        }
+        public virtual Point CentrePoint { get; set; } = new Point();
+        public virtual double Rotation { get; set; } = 0;
+        public virtual string FittingType { get; set; } = "";
 
-        /***************************************************/
     }
 }
 

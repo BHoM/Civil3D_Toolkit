@@ -38,15 +38,12 @@ namespace BH.UI.Civil.Engine
         /**** Public Methods                            ****/
         /***************************************************/
 
-        /***********************To Civils3d****************************/
+        /***********************From BHoM to Civil3D****************************/
 
         public static ACD.DBPoint ToCivil3D(this BHG.Point pt)
         {
             return new ACD.DBPoint(new ACG.Point3d(pt.X, pt.Y, pt.Z));
         }
-
-
-        /***********************To ACG****************************/
 
         public static ACG.Point3d ToACGPoint3d(this BHG.Point pt)
         {
@@ -59,7 +56,7 @@ namespace BH.UI.Civil.Engine
         }
 
 
-        /***********************From Civil3d to BHOM****************************/
+        /***********************From Civil3D to BHoM****************************/
 
         public static BHG.Point FromCivil3D(this ACD.DBPoint acPoint)
         {

@@ -38,7 +38,25 @@ namespace BH.UI.Civil.Engine
         /**** Public Methods                            ****/
         /***************************************************/
 
+        public static ACG.Vector3d ToCivil3D(this BHG.Vector vec)
+        {
+            return new ACG.Vector3d(vec.X, vec.Y, vec.Z);
+        }
+
+        /// This is a scaling vector only
+        public static ACG.Scale3d ToCivil3DScale(this BHG.Vector vec)
+        {
+            return new ACG.Scale3d(vec.X, vec.Y, vec.Z);
+        }
+
         public static BHG.Vector FromCivil3D(this ACG.Vector3d vec)
+        {
+            return new BHG.Vector { X = vec.X, Y = vec.Y, Z = vec.Z };
+        }
+
+
+        /// This is a scaling vector only
+        public static BHG.Vector FromCivil3D(this ACG.Scale3d vec)
         {
             return new BHG.Vector { X = vec.X, Y = vec.Y, Z = vec.Z };
         }

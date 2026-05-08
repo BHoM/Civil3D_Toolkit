@@ -22,31 +22,26 @@
 
 using System;
 using System.Collections.Generic;
-using BH.oM.Analytical.Graph;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using BH.oM.Base;
+using BH.oM.Geometry;
 
-
-namespace BH.Engine.Adapters.Civil3D
+namespace BH.oM.Civils.Elements
 {
-    // Lightweight result object (engine-side DTO).
-    // If you want this in oM later, move it to BH.oM.Analytical.* and make it a BHoMObject.
-    public class DijkstraTreeResult
+    public class PressureNetworkAppurtenance : BHoMObject
     {
-        public Guid GraphId { get; internal set; }
-        public Guid Start { get; internal set; }
+        /***************************************************/
+        /**** Public Properties                         ****/
+        /***************************************************/
 
-        // Distances from Start (cost)
-        public Dictionary<Guid, double> Dist { get; internal set; }
+        public virtual Point CentrePoint { get; set; } = new Point();
 
-        // Predecessor pointers: Prev[v] = u
-        public Dictionary<Guid, Guid> Prev { get; internal set; }
+        public virtual double Rotation { get; set; } = 0;
+        public virtual string AppurtenanceType { get; set; } = "";
 
-        // The relation used to reach v from Prev[v]
-        public Dictionary<Guid, IRelation> PrevRelation { get; internal set; }
-
-        // Visited nodes (for debugging / diagnostics)
-        public HashSet<Guid> Visited { get; internal set; }
-
-        // Adjacency cached for this run (optional, but handy if you want to reuse it)
-        internal Dictionary<Guid, List<IRelation>> Adjacency { get; set; }
     }
 }
+
+

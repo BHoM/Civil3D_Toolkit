@@ -28,6 +28,8 @@ using System.Threading.Tasks;
 using BHG = BH.oM.Geometry;
 using ACD = Autodesk.AutoCAD.DatabaseServices;
 using ACG = Autodesk.AutoCAD.Geometry;
+using Autodesk.AutoCAD.Geometry;
+using BH.Engine.Geometry;
 
 namespace BH.UI.Civil.Engine
 {
@@ -47,31 +49,335 @@ namespace BH.UI.Civil.Engine
         }
 
         /*************** Arc ********************/
+        public static ACD.Arc ToCivil3D(this BHG.Arc arc)
+        {
+            var center = arc.CoordinateSystem.Origin.ToACGPoint3d();
+            var normal = arc.CoordinateSystem.Z.ToCivil3D().GetNormal();
+            double radius = arc.Radius;
 
+            var startPt = Query.StartPoint(arc).ToACGPoint3d();
+            var endPt   = Query.EndPoint(arc).ToACGPoint3d();
+
+            var vStart = startPt - center;
+            var vEnd   = endPt   - center;
+
+            double startAngle = AngleFromNormalBasis(normal, vStart);
+            double endAngle   = AngleFromNormalBasis(normal, vEnd);
+
+            // Determine original BHoM direction
+            bool isCCW = arc.EndAngle > arc.StartAngle;
+
+            if (isCCW)
+            {
+                if (endAngle < startAngle)
+                    endAngle += 2 * Math.PI;
+            }
+            else
+            {
+                if (endAngle > startAngle)
+                    startAngle += 2 * Math.PI;
+            }
+
+            return new ACD.Arc(center, normal, radius, startAngle, endAngle);
+        }
+
+        private static double AngleFromNormalBasis(
+            ACG.Vector3d normal,
+            ACG.Vector3d vector)
+        {
+            // Ensure unit normal
+            normal = normal.GetNormal();
+
+            // AutoCAD-provided safe perpendicular
+            ACG.Vector3d xAxis = normal.GetPerpendicularVector().GetNormal();
+            ACG.Vector3d yAxis = normal.CrossProduct(xAxis).GetNormal();
+
+            double x = vector.DotProduct(xAxis);
+            double y = vector.DotProduct(yAxis);
+
+            return Math.Atan2(y, x);
+        }
 
         /*************** Circle ********************/
-
+        public static ACD.Circle ToCivil3D(this BHG.Circle circle)
+        {
+            var center = circle.Centre.ToACGPoint3d();
+            var normal = new ACG.Vector3d(circle.Normal.X, circle.Normal.Y, circle.Normal.Z);
+            
+            return new ACD.Circle(center, normal, circle.Radius);
+        }
 
         /*************** Ellipse ********************/
+        public static ACD.Ellipse ToCivil3D(this BHG.Ellipse ellipse)
+        {
+            var center = ellipse.Centre.ToACGPoint3d();
+            
+            // Scale axis directions by their respective radii to get the major/minor axis vectors
+            var majorAxis = new ACG.Vector3d(
+                ellipse.Axis1.X * ellipse.Radius1,
+                ellipse.Axis1.Y * ellipse.Radius1,
+                ellipse.Axis1.Z * ellipse.Radius1
+            );
+            
+            var minorAxis = new ACG.Vector3d(
+                ellipse.Axis2.X * ellipse.Radius2,
+                ellipse.Axis2.Y * ellipse.Radius2,
+                ellipse.Axis2.Z * ellipse.Radius2
+            );
+            
+            double radiusRatio = ellipse.Radius2 / ellipse.Radius1;
+            
+            return new ACD.Ellipse(center, majorAxis, minorAxis, radiusRatio, 0.0, 2.0 * Math.PI);
+        }
 
-
-        /*************** Ellipsical Arc ********************/
 
 
         /*************** LWPolyline (2d) & 3DPolyline ********************/
+        public static ACD.Polyline3d ToPolyline3D(this BHG.Polyline polyline)
+        {
+            if (polyline == null || polyline.ControlPoints == null || polyline.ControlPoints.Count < 2)
+                return null;
 
+            try
+            {
+                // Convert control points to ACG.Point3d
+                var points = new ACG.Point3dCollection();
+                foreach (var pt in polyline.ControlPoints)
+                {
+                    points.Add(pt.ToACGPoint3d());
+                }
+
+                // Create Polyline3d
+                var polyline3d = new ACD.Polyline3d(ACD.Poly3dType.SimplePoly, points, false);
+
+                return polyline3d;
+            }
+            catch (Exception ex)
+            {
+                BH.Engine.Base.Compute.RecordWarning($"Failed to convert BHoM Polyline to ACD.Polyline3d: {ex.Message}");
+                return null;
+            }
+        }
+
+        public static ACD.Polyline ToLWPolyline(this BHG.Polyline polyline)
+        {
+            if (polyline == null || polyline.ControlPoints == null || polyline.ControlPoints.Count < 2)
+                return null;
+
+            try
+            {
+                // Create LWPolyline (2D)
+                var lwPolyline = new ACD.Polyline();
+
+                // Add vertices (2D projection)
+                for (int i = 0; i < polyline.ControlPoints.Count; i++)
+                {
+                    var pt = polyline.ControlPoints[i];
+                    lwPolyline.AddVertexAt(i, new ACG.Point2d(pt.X, pt.Y), 0, 0, 0);
+                }
+
+                return lwPolyline;
+            }
+            catch (Exception ex)
+            {
+                BH.Engine.Base.Compute.RecordWarning($"Failed to convert BHoM Polyline to ACD.LWPolyline: {ex.Message}");
+                return null;
+            }
+        }
+
+        public static ACD.Polyline3d ToPolyline3D(this BHG.PolyCurve polyCurve)
+        {
+            if (polyCurve == null || polyCurve.Curves == null || polyCurve.Curves.Count == 0)
+                return null;
+
+            try
+            {
+                var points = new ACG.Point3dCollection();
+
+                // Extract points from all curve segments
+                foreach (var curve in polyCurve.Curves)
+                {
+                    if (curve is BHG.Line line)
+                    {
+                        points.Add(line.Start.ToACGPoint3d());
+                    }
+                    else if (curve is BHG.Arc arc)
+                    {
+                        var startPt = ArcStartPoint(arc);
+                        points.Add(startPt.ToACGPoint3d());
+                    }
+                    else if (curve is BHG.Polyline polyline)
+                    {
+                        foreach (var pt in polyline.ControlPoints)
+                        {
+                            points.Add(pt.ToACGPoint3d());
+                        }
+                    }
+                }
+
+                // Add the last point if needed
+                if (polyCurve.Curves.Count > 0)
+                {
+                    var lastCurve = polyCurve.Curves.Last();
+                    BHG.Point endPt = null;
+
+                    if (lastCurve is BHG.Line line)
+                        endPt = line.End;
+                    else if (lastCurve is BHG.Arc arc)
+                        endPt = ArcEndPoint(arc);
+                    else if (lastCurve is BHG.Polyline polyline)
+                        endPt = polyline.ControlPoints.Last();
+
+                    if (endPt != null)
+                        points.Add(endPt.ToACGPoint3d());
+                }
+
+                return new ACD.Polyline3d(ACD.Poly3dType.SimplePoly, points, false);
+            }
+            catch (Exception ex)
+            {
+                BH.Engine.Base.Compute.RecordWarning($"Failed to convert BHoM PolyCurve to ACD.Polyline3d: {ex.Message}");
+                return null;
+            }
+        }
+
+        public static ACD.Polyline ToLWPolyline(this BHG.PolyCurve polyCurve)
+        {
+            if (polyCurve == null || polyCurve.Curves == null || polyCurve.Curves.Count == 0)
+                return null;
+
+            try
+            {
+                var lwPolyline = new ACD.Polyline();
+                int vertexIndex = 0;
+
+                // Process each curve segment
+                for (int i = 0; i < polyCurve.Curves.Count; i++)
+                {
+                    var curve = polyCurve.Curves[i];
+
+                    if (curve is BHG.Line line)
+                    {
+                        // Add start point for all segments
+                        var pt2d = new ACG.Point2d(line.Start.X, line.Start.Y);
+                        lwPolyline.AddVertexAt(vertexIndex++, pt2d, 0, 0, 0);
+
+                        // Add end point for last segment
+                        if (i == polyCurve.Curves.Count - 1)
+                        {
+                            var endPt2d = new ACG.Point2d(line.End.X, line.End.Y);
+                            lwPolyline.AddVertexAt(vertexIndex++, endPt2d, 0, 0, 0);
+                        }
+                    }
+                    else if (curve is BHG.Arc arc)
+                    {
+                        // Add start point
+                        var startPt = ArcStartPoint(arc);
+                        var pt2d = new ACG.Point2d(startPt.X, startPt.Y);
+                        double bulge = ArcToBulge(arc);
+                        lwPolyline.AddVertexAt(vertexIndex++, pt2d, bulge, 0, 0);
+
+                        // Add end point for last segment
+                        if (i == polyCurve.Curves.Count - 1)
+                        {
+                            var endPt = ArcEndPoint(arc);
+                            var endPt2d = new ACG.Point2d(endPt.X, endPt.Y);
+                            lwPolyline.AddVertexAt(vertexIndex++, endPt2d, 0, 0, 0);
+                        }
+                    }
+                    else if (curve is BHG.Polyline polyline)
+                    {
+                        foreach (var pt in polyline.ControlPoints)
+                        {
+                            var pt2d = new ACG.Point2d(pt.X, pt.Y);
+                            lwPolyline.AddVertexAt(vertexIndex++, pt2d, 0, 0, 0);
+                        }
+                    }
+                }
+
+                return lwPolyline;
+            }
+            catch (Exception ex)
+            {
+                BH.Engine.Base.Compute.RecordWarning($"Failed to convert BHoM PolyCurve to ACD.LWPolyline: {ex.Message}");
+                return null;
+            }
+        }
 
         /*************** Spline ********************/
+        public static ACD.Spline ToCivil3D(this BHG.NurbsCurve curve)
+        {
+            if (curve == null || curve.ControlPoints == null || curve.ControlPoints.Count < 2)
+                return null;
+
+            try
+            {
+                // Create empty spline
+                var spline = new ACD.Spline();
+
+                // Set control points
+                for (int i = 0; i < curve.ControlPoints.Count; i++)
+                {
+                    spline.SetControlPointAt(i, curve.ControlPoints[i].ToACGPoint3d());
+                }
+
+                // Set weights if available
+                if (curve.Weights != null && curve.Weights.Count == curve.ControlPoints.Count)
+                {
+                    for (int i = 0; i < curve.Weights.Count; i++)
+                    {
+                        spline.SetWeightAt(i, curve.Weights[i]);
+                    }
+                }
+
+                // Insert knots if available
+                // BHoM knots are in compressed format (cp + degree - 1), need to expand to full format (cp + degree + 1)
+                if (curve.Knots != null && curve.Knots.Count > 0)
+                {
+                    List<double> knotsToInsert = curve.Knots.ToList();
+
+                    // Infer degree from knot count: degree = (knots.Count - controlPoints.Count) + 1
+                    int degree = (knotsToInsert.Count - curve.ControlPoints.Count) + 1;
+
+                    // If knots are in compressed format (cp + degree - 1), expand to full format
+                    int expectedCompressed = curve.ControlPoints.Count + degree - 1;
+                    if (knotsToInsert.Count == expectedCompressed && knotsToInsert.Count > 0)
+                    {
+                        // Add first and last knots to convert compressed -> full format
+                        double firstKnot = knotsToInsert[0];
+                        double lastKnot = knotsToInsert[knotsToInsert.Count - 1];
+                        
+                        knotsToInsert.Insert(0, firstKnot);
+                        knotsToInsert.Add(lastKnot);
+                    }
+
+                    // Insert the knots
+                    foreach (var knot in knotsToInsert)
+                    {
+                        try
+                        {
+                            spline.InsertKnot(knot);
+                        }
+                        catch
+                        {
+                            // Skip knots that cannot be inserted (e.g., duplicates)
+                        }
+                    }
+                }
+
+                return spline;
+            }
+            catch (Exception ex)
+            {
+                BH.Engine.Base.Compute.RecordWarning($"Failed to convert BHoM NurbsCurve to ACD.Spline: {ex.Message}");
+                return null;
+            }
+        }
 
 
         /////////////////////
         // From Civils 3d //
         ///////////////////        
-        /// 
-        /// 
-        /// 
-        //
-
         /*************** Line ********************/
         public static BHG.Line FromCivil3D(this ACD.Line line)
         {
@@ -173,146 +479,151 @@ namespace BH.UI.Civil.Engine
             return new BHG.PolyCurve { Curves = segments };
         }
 
-        private static BHG.Arc BulgeToArc(ACG.Point3d start, ACG.Point3d end, double bulge)
+
+        public static BHG.PolyCurve FromCivil3D(this ACD.Polyline2d polyline2d)
         {
-            double chord = start.DistanceTo(end);
-            if (System.Math.Abs(bulge) < 1e-10 || chord < 1e-10)
-                return null;
+            var segments = new List<BHG.ICurve>();
+            var vertices = new List<ACD.Vertex2d>();
 
-            // Included angle (signed). bulge = tan(theta/4)  [2](https://lee-mac.com/bulgeconversion.html)
-            double theta = 4.0 * System.Math.Atan(bulge);
-            double half = System.Math.Abs(theta) / 2.0;
+            foreach (ACD.ObjectId id in polyline2d)
+            {
+                var v = id.GetObject(ACD.OpenMode.ForRead) as ACD.Vertex2d;
+                if (v != null)
+                    vertices.Add(v);
+            }
 
-            double sinHalf = System.Math.Sin(half);
-            if (System.Math.Abs(sinHalf) < 1e-10)
-                return null;
+            int count = vertices.Count;
 
-            // Positive radius
-            double radius = chord / (2.0 * sinHalf);
+            for (int i = 0; i < count; i++)
+            {
+                int next = (i + 1) % count;
 
-            // Midpoint of chord
-            ACG.Point3d mid = new ACG.Point3d(
-                (start.X + end.X) / 2.0,
-                (start.Y + end.Y) / 2.0,
-                (start.Z + end.Z) / 2.0
-            );
+                if (!polyline2d.Closed && i == count - 1)
+                    break;
 
-            // Perpendicular unit (left of chord, in XY)
-            ACG.Vector3d chordVec = end - start;
-            ACG.Vector3d perpDir = new ACG.Vector3d(-chordVec.Y, chordVec.X, 0.0);
-            if (perpDir.Length < 1e-10)
-                perpDir = new ACG.Vector3d(1, 0, 0);
-            perpDir = perpDir.GetNormal();
+                var vStart = vertices[i];
+                var vEnd   = vertices[next];
 
-            // **Apothem** (distance from chord midpoint to center), not sagitta
-            double halfChord = chord / 2.0;
-            double apothem = System.Math.Sqrt(System.Math.Max(0.0, radius * radius - halfChord * halfChord));
+                ACG.Point3d start = new ACG.Point3d(vStart.Position.X, vStart.Position.Y, 0);
+                ACG.Point3d end   = new ACG.Point3d(vEnd.Position.X,   vEnd.Position.Y,   0);
+                double bulge      = vStart.Bulge;
 
-            // Center: choose side based on bulge sign (CW vs CCW) [2](https://lee-mac.com/bulgeconversion.html)
-            ACG.Point3d center = mid + perpDir * (System.Math.Sign(bulge) * apothem);
+                AddSegment(segments, start, end, bulge);
+            }
 
-            // Local axes
-            ACG.Vector3d centerToStart = (start - center).GetNormal();
-            BHG.Vector xAxis = centerToStart.FromCivil3D();
-
-            // Flip handedness for negative bulge so positive sweep goes the "right" way
-            BHG.Vector zAxis = new BHG.Vector { X = 0, Y = 0, Z = (bulge >= 0.0) ? 1.0 : -1.0 };
-            BHG.Vector yAxis = BH.Engine.Geometry.Query.CrossProduct(zAxis, xAxis);
-            yAxis = BH.Engine.Geometry.Modify.Normalise(yAxis);
-
-            var system = BH.Engine.Geometry.Create.CartesianCoordinateSystem(
-                center.FromCivil3D(),
-                xAxis,
-                yAxis
-            );
-
-            // Use magnitude only; DO NOT reflex-convert (the flipped system handles CW)
-            double sweep = System.Math.Abs(theta);
-
-            return BH.Engine.Geometry.Create.Arc(system, radius, 0.0, sweep);
+            return new BHG.PolyCurve { Curves = segments };
         }
 
+        public static BHG.PolyCurve FromCivil3D(this ACD.Polyline3d polyline3d)
+        {
+            var segments = new List<BHG.ICurve>();
+            var vertices = new List<ACD.PolylineVertex3d>();
+
+            // Collect vertices
+            foreach (ACD.ObjectId id in polyline3d)
+            {
+                var v = id.GetObject(ACD.OpenMode.ForRead) as ACD.PolylineVertex3d;
+                if (v != null)
+                    vertices.Add(v);
+            }
+
+            int count = vertices.Count;
+
+            for (int i = 0; i < count; i++)
+            {
+                int next = (i + 1) % count;
+
+                if (!polyline3d.Closed && i == count - 1)
+                    break;
+
+                ACG.Point3d start = vertices[i].Position;
+                ACG.Point3d end   = vertices[next].Position;
+
+                // Polyline3d only supports straight segments
+                segments.Add(new BHG.Line
+                {
+                    Start = start.FromCivil3D(),
+                    End   = end.FromCivil3D()
+                });
+            }
+
+            return new BHG.PolyCurve { Curves = segments };
+        }
 
 
         /*************** Spline ********************/
 
-        // public static BHG.NurbsCurve FromCivil3D(this ACD.Spline acSpline)
-        // {
-        //     if (acSpline == null)
-        //         return null;
+        public static BHG.NurbsCurve FromCivil3D(this ACD.Spline acSpline)
+        {
+            if (acSpline == null)
+                return null;
 
-        //     try
-        //     {
+            try
+            {
+                ACD.NurbsData nurbsData = acSpline.NurbsData; 
 
-        //     ACG.Curve3d ac = acSpline.GetCurveData();
+                ACG.Point3dCollection cp = nurbsData.GetControlPoints();
+                DoubleCollection kn     = nurbsData.GetKnots();          
+                DoubleCollection we     = nurbsData.GetWeights();        
 
-        //     // NURBS definition data bundle (control points, knots, weights, etc.)
-        //     ACG.NurbCurve3dData def = ac.DefinitionData;
+                if (cp == null || cp.Count < 2 || kn == null || kn.Count == 0)
+                    return null;
 
-        //     // -----------------------------
-        //     // Control points
-        //     // -----------------------------
-        //     var controlPoints = new List<BHG.Point>();
+                // --- Control points
+                var controlPoints = new List<BHG.Point>(cp.Count);
+                foreach (ACG.Point3d p in cp)
+                    controlPoints.Add(p.FromCivil3D());
 
-        //     foreach (ACG.Point3d p in def.ControlPoints)
-        //     {
-        //         controlPoints.Add(p.FromCivil3D());
-        //     }
+                // --- Weights
+                List<double> weights = (we != null && we.Count > 0)
+                    ? we.Cast<double>().ToList()
+                    : Enumerable.Repeat(1.0, controlPoints.Count).ToList();
 
-        //     if (controlPoints.Count < 2)
-        //         return null;
+                if (weights.Count != controlPoints.Count)
+                    return null;
 
-        //     // -----------------------------
-        //     // Knots
-        //     // -----------------------------
-        //     var knots = new List<double>();
+                // --- Knots (AutoCAD full -> BHoM compressed)
+                List<double> knots = kn.Cast<double>().ToList();
 
-        //     foreach (double k in def.Knots)
-        //     {
-        //         knots.Add(k);
-        //     }
+                int degree = nurbsData.Degree; // degree is explicit in AutoCAD NurbsData (used only for conversion logic)
 
-        //     if (knots.Count == 0)
-        //         return null;
+                // AutoCAD "full" knot vector commonly: cp + degree + 1
+                int expectedAcadFull = controlPoints.Count + degree + 1;
 
-        //     // -----------------------------
-        //     // Weights
-        //     // -----------------------------
-        //     var weights = new List<double>();
+                // BHoM example/primer style "compressed": cp + degree - 1 [6](https://burohappold.sharepoint.com/sites/TechnicalTraining/Shared%20Documents/Buildings-Structures%20Training%20Program/#34 02_List_Management-25022025/PDF - The Grasshopper Primer (EN).pdf?web=1)
+                int expectedBhom = controlPoints.Count + degree - 1;
 
-        //     foreach (double w in def.Weights)
-        //     {
-        //         weights.Add(w);
-        //     }
+                if (knots.Count == expectedAcadFull && knots.Count >= 2)
+                {
+                    // Drop one at each end to convert full -> compressed
+                    knots.RemoveAt(0);
+                    knots.RemoveAt(knots.Count - 1);
+                }
+                // else: already in compressed form (or unusual case) - leave as-is
 
-        //     // If spline is non‑rational, Civil 3D returns zero weights.
-        //     // BHoM expects one weight per control point.
-        //     if (weights.Count == 0)
-        //     {
-        //         for (int i = 0; i < controlPoints.Count; i++)
-        //             weights.Add(1.0);
-        //     }
+                // Optional but useful: normalize knot domain to 0..1 (BHoM examples use 0..1) [5](https://burohappold-my.sharepoint.com/personal/joe_walton_burohappold_com/_layouts/15/Doc.aspx?action=edit&mobileredirect=true&wdorigin=Sharepoint&DefaultItemOpen=1&sourcedoc={49b87c87-ce4b-45be-9e29-2a42b749e12f}&wd=target(/0_NonProject/Automation.one/)&wdpartid={9557023a-96d9-1c09-12e8-4af93a182135}{1}&wdsectionfileid={80ba111e-bb4d-4979-bd51-101470e69015})
+                double k0 = knots.First();
+                double k1 = knots.Last();
+                double span = k1 - k0;
+                if (span > 0)
+                    knots = knots.Select(k => (k - k0) / span).ToList();
 
-        //     // Final sanity check
-        //     if (weights.Count != controlPoints.Count)
-        //         return null;
+                // Final sanity: BHoM infers degree from counts (per class docs) [5](https://burohappold-my.sharepoint.com/personal/joe_walton_burohappold_com/_layouts/15/Doc.aspx?action=edit&mobileredirect=true&wdorigin=Sharepoint&DefaultItemOpen=1&sourcedoc={49b87c87-ce4b-45be-9e29-2a42b749e12f}&wd=target(/0_NonProject/Automation.one/)&wdpartid={9557023a-96d9-1c09-12e8-4af93a182135}{1}&wdsectionfileid={80ba111e-bb4d-4979-bd51-101470e69015})
+                // degree_bhom = (knots.Count - controlPoints.Count) + 1
 
-        //     // -----------------------------
-        //     // Construct BHoM NurbsCurve
-        //     // -----------------------------
-        //     return new BHG.NurbsCurve
-        //     {
-        //         ControlPoints = controlPoints,
-        //         Knots         = knots,
-        //         Weights       = weights
-        //     };
-        //     }
-        //     catch
-        //     {
-        //         BH.Engine.Base.Compute.RecordWarning("Failed to extract NURBS data from Spline entity.");
-        //         return null;
-        //     }
-        // }
+                return new BHG.NurbsCurve
+                {
+                    ControlPoints = controlPoints,
+                    Knots         = knots,
+                    Weights       = weights
+                };
+            }
+            catch (Exception ex)
+            {
+                BH.Engine.Base.Compute.RecordWarning($"Failed to map spline NurbsData to BHoM NurbsCurve: {ex.Message}");
+                return null;
+            }
+        }
 
 
 
@@ -757,102 +1068,6 @@ namespace BH.UI.Civil.Engine
             return new BHG.PolyCurve { Curves = bhCurves };
         }
 
-
-        private static bool IsZeroLength(BHG.ICurve c, double tol)
-        {
-            if (!TryGetStartEnd(c, out var s, out var e))
-                return true;
-
-            return DistSq(s, e) <= tol * tol;
-        }
-
-        private static bool IsSameAsPrevious(BHG.ICurve a, BHG.ICurve b, double tol)
-        {
-            if (a == null || b == null)
-                return false;
-
-            if (a.GetType() != b.GetType())
-                return false;
-
-            if (!TryGetStartEnd(a, out var a0, out var a1))
-                return false;
-
-            if (!TryGetStartEnd(b, out var b0, out var b1))
-                return false;
-
-            return
-                DistSq(a0, b0) <= tol * tol &&
-                DistSq(a1, b1) <= tol * tol;
-        }
-
-        private static double DistSq(BHG.Point a, BHG.Point b)
-        {
-            double dx = a.X - b.X;
-            double dy = a.Y - b.Y;
-            double dz = a.Z - b.Z;
-            return dx * dx + dy * dy + dz * dz;
-        }
-
-        private static BHG.Point ArcPointAtAngle(BHG.Arc arc, double angle)
-        {
-            var cs = arc.CoordinateSystem;
-
-            // Local x/y directions of the arc plane
-            var x = cs.X;
-            var y = cs.Y;
-
-            double cos = Math.Cos(angle);
-            double sin = Math.Sin(angle);
-
-            return new BHG.Point
-            {
-                X = cs.Origin.X + arc.Radius * (cos * x.X + sin * y.X),
-                Y = cs.Origin.Y + arc.Radius * (cos * x.Y + sin * y.Y),
-                Z = cs.Origin.Z + arc.Radius * (cos * x.Z + sin * y.Z)
-            };
-        }
-        private static bool TryGetStartEnd(
-            BHG.ICurve c,
-            out BHG.Point start,
-            out BHG.Point end)
-        {
-            start = null;
-            end = null;
-
-            switch (c)
-            {
-                case BHG.Line l:
-                    start = l.Start;
-                    end = l.End;
-                    return true;
-
-                case BHG.Arc a:
-                    start = ArcPointAtAngle(a, a.StartAngle);
-                    end   = ArcPointAtAngle(a, a.EndAngle);
-                    return true;
-
-                case BHG.Circle ci:
-                    // Closed curve – ignore for dedupe
-                    return false;
-
-                case BHG.NurbsCurve n when n.ControlPoints?.Count >= 2:
-                    start = n.ControlPoints[0];
-                    end = n.ControlPoints[n.ControlPoints.Count - 1];
-                    return true;
-
-                case BHG.Polyline pl when pl.ControlPoints?.Count >= 2:
-                    start = pl.ControlPoints[0];
-                    end = pl.ControlPoints[pl.ControlPoints.Count - 1];
-                    return true;
-
-                case BHG.PolyCurve pc when pc.Curves?.Count >= 1:
-                    return TryGetStartEnd(pc.Curves.First(), out start, out _) &&
-                        TryGetStartEnd(pc.Curves.Last(), out _, out end);
-
-                default:
-                    return false;
-            }
-        }
 
         /***********************ACG Curve Types Not Implemented****************************/
         // Ray3d, Ray2d

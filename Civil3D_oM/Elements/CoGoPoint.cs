@@ -35,17 +35,10 @@ namespace BH.oM.Civils.Elements
         /***************************************************/
         /**** Public Properties                         ****/
         /***************************************************/
-        public virtual double Easting { get; set; } = 0;
-        public virtual double Elevation { get; set; } = 0;
-        public virtual string FullDescription { get; set; } = "";
-        public virtual double GridEasting { get; set; } = 0;
-        public virtual double GridNorthing { get; set; } = 0;
-        public virtual double Latitude { get; set; } = 0;
-        public virtual Point Location { get; set; } = new Point();
-        public virtual double Longitude { get; set; } = 0;
-        public virtual double Northing { get; set; } = 0;
+        public virtual Point Point { get; set; } = new Point();
         public virtual string PointName { get; set; } = "";
-        public virtual double PointNumber { get; set; } = 0;
+        public virtual uint PointNumber { get; set; } = 0;
+        public virtual string FullDescription { get; set; } = "";
         public virtual string RawDescription { get; set; } = "";
 
         /***************************************************/

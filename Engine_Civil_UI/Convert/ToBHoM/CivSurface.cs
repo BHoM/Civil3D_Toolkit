@@ -73,6 +73,7 @@ namespace BH.UI.Civil.Engine
             
             return new BHC.CivSurface
             {
+                Name = acSurface.Name,
                 Mesh = mesh   // BHG.Mesh
             };
 

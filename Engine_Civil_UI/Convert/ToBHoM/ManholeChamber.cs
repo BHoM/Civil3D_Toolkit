@@ -42,23 +42,25 @@ namespace BH.UI.Civil.Engine
         {
             return new BHC.ManholeChamber
             {
+                
+                Name = acStructure.Name,
                 CentrePoint = acStructure.Location.FromCivil3D(),
-                InternalLength = acStructure.InnerDiameterOrWidth,
-                //InternalWidth = acStructure.InnerLength,
-                InternalDepth = acStructure.Height,
-                //ToDo: Find appropriate data for WallThickness
-                WallThickness = acStructure.FloorThickness,
-                //ToDo: Find appropriate data for SurroundThickness 
-                //SurroundThickness = acStructure.HeadwallBaseWidth,
-                ChamberOrientation = acStructure.Rotation,
-                ChamberShape = acStructure.BoundingShape.ToBHoM(),
-                //ToDo: Decide whether to condense into one frame diameter property or keep separate
-                CoverLength = acStructure.FrameDiameter,
-                CoverWidth = acStructure.FrameDiameter,
-                CoverDepth = acStructure.FrameHeight,
-                //ToDo: Investigate whether it is possible to separate cover orientation and chamber orientation in Civil3D
-                CoverOrientation = acStructure.Rotation,
-                //BeddingDepth = acStructure.HeadwallBaseThickness
+                // InternalLength = acStructure.InnerDiameterOrWidth,
+                // //InternalWidth = acStructure.InnerLength,
+                // InternalDepth = acStructure.Height,
+                // //ToDo: Find appropriate data for WallThickness
+                // WallThickness = acStructure.FloorThickness,
+                // //ToDo: Find appropriate data for SurroundThickness 
+                // //SurroundThickness = acStructure.HeadwallBaseWidth,
+                // ChamberOrientation = acStructure.Rotation,
+                // ChamberShape = acStructure.BoundingShape.ToBHoM(),
+                // //ToDo: Decide whether to condense into one frame diameter property or keep separate
+                // CoverLength = acStructure.FrameDiameter,
+                // CoverWidth = acStructure.FrameDiameter,
+                // CoverDepth = acStructure.FrameHeight,
+                // //ToDo: Investigate whether it is possible to separate cover orientation and chamber orientation in Civil3D
+                // CoverOrientation = acStructure.Rotation,
+                // //BeddingDepth = acStructure.HeadwallBaseThickness
             };
         }
 

@@ -36,6 +36,7 @@ namespace BH.oM.Civils.Elements
         public string Text { get; set; } = "";
         public Point Position { get; set; } = new Point();
         public double Rotation { get; set; } = 0;
+        public BoundingBox BoundingBox { get; set; } 
     }
 
 }

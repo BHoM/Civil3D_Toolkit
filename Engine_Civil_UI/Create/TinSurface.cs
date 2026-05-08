@@ -47,7 +47,7 @@ namespace BH.UI.Civil.Engine
 {
     public static partial class Create
     {
-        public static bool InCivil3D(this BHC.CivSurface s, Civil3DRuntimeContext context)
+        public static bool InCivil3D(this BHC.CivSurface s, Civil3DRuntimeContext context, string layer = "0")
         {
             {
                 CivilDocument civDoc = context.CivilDocument;
@@ -116,6 +116,11 @@ namespace BH.UI.Civil.Engine
                 // ----------------------------------------------------------
                 c3dSurface.BreaklinesDefinition.AddStandardBreaklines(breaklineIds, 5.0, 0.25, 0.25, 0.087);
                 c3dSurface.Rebuild();
+
+                // ----------------------------------------------------------
+                // 6) Assign to layer
+                // ----------------------------------------------------------
+                c3dSurface.Layer = layer;
             }
 
             return true;

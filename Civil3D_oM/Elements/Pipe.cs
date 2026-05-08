@@ -36,7 +36,7 @@ namespace BH.oM.Civils.Elements
         /**** Public Properties                         ****/
         /***************************************************/
 
-        public virtual ICurve CentreLine { get; set; } = new Polyline();
+        public virtual ICurve CentreLine { get; set; } = new PolyCurve();
 
         public virtual double Diameter { get; set; } = 0;
 
@@ -44,7 +44,7 @@ namespace BH.oM.Civils.Elements
 
         public virtual FlowDirection FlowDirection { get; set; } = FlowDirection.Undefined;
 
-        public virtual PipeNetwork PipeNetwork { get; set; } = null;
+        public virtual string PipeNetworkName { get; set; } = "";
 
         /***************************************************/
     }

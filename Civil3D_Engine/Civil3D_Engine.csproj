@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-<TargetFramework>net472</TargetFramework>
+    <TargetFramework>net472</TargetFramework>
     <OutputType>Library</OutputType>
     <RootNamespace>BH.Engine.Adapters.Civil3D</RootNamespace>
     <OutputPath>..\Build\</OutputPath>
@@ -47,6 +47,11 @@
     </Reference>
     <Reference Include="Geometry_Engine">
       <HintPath>$(ProgramData)\BHoM\Assemblies\Geometry_Engine.dll</HintPath>
+      <Private>False</Private>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="Engine_Civil_UI">
+      <HintPath>$(ProgramData)\BHoM\Assemblies\Engine_Civil_UI.dll</HintPath>
       <Private>False</Private>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
