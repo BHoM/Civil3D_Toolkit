@@ -40,6 +40,10 @@ namespace BH.oM.Civils.Elements
 
         public virtual double Diameter { get; set; } = 0;
 
+        public virtual double Height { get; set; } = 0;
+
+        public virtual double Width { get; set; } = 0;
+
         public virtual double Thickness { get; set; } = 0;
 
         public virtual FlowDirection FlowDirection { get; set; } = FlowDirection.Undefined;

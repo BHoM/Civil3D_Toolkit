@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using BH.UI.Civil.Adapter;
+
 
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
@@ -11,9 +11,9 @@ using Autodesk.AutoCAD.Geometry;
 // BHoM base (adjust namespaces if your build differs)
 using BH.oM.Base;
 
-namespace BH.UI.Civil.Adapter // adjust to your engine namespace
+namespace BH.UI.Civil.Adapter
 {
-    public static class Debugger
+    public class Debugger
     {
         public static readonly string DebugLogPath =
             System.IO.Path.Combine(System.IO.Path.GetTempPath(), "CivilUIAdapter_Debug.txt");
