@@ -38,26 +38,26 @@ namespace BH.UI.Civil.Engine
         /**** Public Methods                            ****/
         /***************************************************/
 
-        public static BHC.PressureNetworkAppurtenance ToBHoM(this ADC.PressureAppurtenance acPresAppurt)
-        {
-            return new BHC.PressureNetworkAppurtenance
-            {
+        //public static BHC.PressureNetworkAppurtenance ToBHoM(this ADC.PressureAppurtenance acPresAppurt)
+        //{
+        //    return new BHC.PressureNetworkAppurtenance
+        //    {
                 
-                Name = acPresAppurt.Name,
-                CentrePoint = acPresAppurt.Position.FromCivil3D(),
-                AppurtenanceType = acPresAppurt.PartDescription
-            };
-        }
-        public static BHC.PressureNetworkFitting ToBHoM(this ADC.PressureFitting acPresFit)
-        {
-            return new BHC.PressureNetworkFitting
-            {
+        //        Name = acPresAppurt.Name,
+        //        CentrePoint = acPresAppurt.Position.FromCivil3D(),
+        //        AppurtenanceType = acPresAppurt.PartDescription
+        //    };
+        //}
+        //public static BHC.PressureNetworkFitting ToBHoM(this ADC.PressureFitting acPresFit)
+        //{
+        //    return new BHC.PressureNetworkFitting
+        //    {
                 
-                Name = acPresFit.Name,
-                CentrePoint = acPresFit.Position.FromCivil3D(),
-                FittingType = acPresFit.PartDescription
-            };
-        }
+        //        Name = acPresFit.Name,
+        //        CentrePoint = acPresFit.Position.FromCivil3D(),
+        //        FittingType = acPresFit.PartDescription
+        //    };
+        //}
         /***************************************************/
     }
 }

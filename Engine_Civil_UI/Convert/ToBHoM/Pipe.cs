@@ -64,25 +64,25 @@ namespace BH.UI.Civil.Engine
         }
 
 
-        public static BHC.Pipe ToBHoM(this PressurePipe acPipe, Transaction tr)
-        {
-            ObjectId networkId = acPipe.NetworkId;
-            PressurePipeNetwork network = tr.GetObject(networkId, OpenMode.ForRead) as PressurePipeNetwork;
-            string networkName = network?.Name;
+        //public static BHC.Pipe ToBHoM(this PressurePipe acPipe, Transaction tr)
+        //{
+        //    ObjectId networkId = acPipe.NetworkId;
+        //    PressurePipeNetwork network = tr.GetObject(networkId, OpenMode.ForRead) as PressurePipeNetwork;
+        //    string networkName = network?.Name;
 
-            // BHG.ICurve centreLine = ExtractPipeCentreLine(acPipe);
+        //    // BHG.ICurve centreLine = ExtractPipeCentreLine(acPipe);
 
-            return new BHC.Pipe
-            {
+        //    return new BHC.Pipe
+        //    {
                 
-                Name = acPipe.Name,
-                // CentreLine = centreLine,
-                Diameter = acPipe.InnerDiameter,
-                Thickness = acPipe.WallThickness,
-                PipeNetworkName = networkName
-            };
+        //        Name = acPipe.Name,
+        //        // CentreLine = centreLine,
+        //        Diameter = acPipe.InnerDiameter,
+        //        Thickness = acPipe.WallThickness,
+        //        PipeNetworkName = networkName
+        //    };
 
-        }        
+        //}        
 
         /***************************************************/
         /**** Private Methods                           ****/

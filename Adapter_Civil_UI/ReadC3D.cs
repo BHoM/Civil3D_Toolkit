@@ -133,11 +133,11 @@ namespace BH.UI.Civil.Adapter
             if (requestedType == typeof(BHC.ManholeChamber))
                 return ReadPipeNetworkStructures(civdoc, tr);
 
-            if (requestedType == typeof(BHC.PressureNetworkFitting))
-                return ReadPressurePipeNetworkFitting(civdoc, tr);
+            //if (requestedType == typeof(BHC.PressureNetworkFitting))
+            //    return ReadPressurePipeNetworkFitting(civdoc, tr);
 
-            if (requestedType == typeof(BHC.PressureNetworkAppurtenance))
-                return ReadPressurePipeNetworkAppurtenance(civdoc, tr);
+            //if (requestedType == typeof(BHC.PressureNetworkAppurtenance))
+            //    return ReadPressurePipeNetworkAppurtenance(civdoc, tr);
 
             if (requestedType == typeof(BHC.CivSurface))
                 return ReadTinSurface(civdoc, tr);
@@ -510,27 +510,27 @@ namespace BH.UI.Civil.Adapter
             // --------------------------------------------------
             // Pressure Pipe Networks (no structures)
             // --------------------------------------------------
-            foreach (ObjectId id in civdoc.GetPressurePipeNetworkIds())
-            {
-                ADC.PressurePipeNetwork network =
-                    tr.GetObject(id, OpenMode.ForRead) as ADC.PressurePipeNetwork;
+            //    foreach (ObjectId id in civdoc.GetPressurePipeNetworkIds())
+            //    {
+            //        ADC.PressurePipeNetwork network =
+            //            tr.GetObject(id, OpenMode.ForRead) as ADC.PressurePipeNetwork;
 
-                if (network == null)
-                    continue;
+            //        if (network == null)
+            //            continue;
 
-                foreach (ObjectId pipeId in network.GetPipeIds())
-                {
-                    ADC.PressurePipe pipe =
-                        tr.GetObject(pipeId, OpenMode.ForRead) as ADC.PressurePipe;
+            //        foreach (ObjectId pipeId in network.GetPipeIds())
+            //        {
+            //            ADC.PressurePipe pipe =
+            //                tr.GetObject(pipeId, OpenMode.ForRead) as ADC.PressurePipe;
 
-                    if (pipe == null)
-                        continue;
+            //            if (pipe == null)
+            //                continue;
 
-                    BHC.Pipe bhPipe = pipe.ToBHoM(tr);
+            //            BHC.Pipe bhPipe = pipe.ToBHoM(tr);
 
-                    pipeList.Add(bhPipe);
-                }
-            }
+            //            pipeList.Add(bhPipe);
+            //        }
+            //    }
 
             return pipeList;
         }
@@ -632,39 +632,39 @@ namespace BH.UI.Civil.Adapter
             return manholeChamberList;
         }
 
-        private List<BHC.PressureNetworkFitting> ReadPressurePipeNetworkFitting(CivilDocument civdoc, Transaction tr)
-        {
-            List<BHC.PressureNetworkFitting> fittingList = new List<BHC.PressureNetworkFitting>();
+        //private List<BHC.PressureNetworkFitting> ReadPressurePipeNetworkFitting(CivilDocument civdoc, Transaction tr)
+        //{
+        //    List<BHC.PressureNetworkFitting> fittingList = new List<BHC.PressureNetworkFitting>();
 
-            foreach (ObjectId id in civdoc.GetPressurePipeNetworkIds())
-            {
-                ADC.PressurePipeNetwork network = tr.GetObject(id, OpenMode.ForRead) as ADC.PressurePipeNetwork;
-                foreach (ObjectId fitId in network.GetFittingIds())
-                {
-                    ADC.PressureFitting pressureFitting = tr.GetObject(fitId, OpenMode.ForRead) as ADC.PressureFitting;
-                    BHC.PressureNetworkFitting bhpressureFitting = pressureFitting.ToBHoM();
-                    fittingList.Add(bhpressureFitting);
-                }
-            }
-            return fittingList;
-        }
+        //    foreach (ObjectId id in civdoc.GetPressurePipeNetworkIds())
+        //    {
+        //        ADC.PressurePipeNetwork network = tr.GetObject(id, OpenMode.ForRead) as ADC.PressurePipeNetwork;
+        //        foreach (ObjectId fitId in network.GetFittingIds())
+        //        {
+        //            ADC.PressureFitting pressureFitting = tr.GetObject(fitId, OpenMode.ForRead) as ADC.PressureFitting;
+        //            BHC.PressureNetworkFitting bhpressureFitting = pressureFitting.ToBHoM();
+        //            fittingList.Add(bhpressureFitting);
+        //        }
+        //    }
+        //    return fittingList;
+        //}
 
-        private List<BHC.PressureNetworkAppurtenance> ReadPressurePipeNetworkAppurtenance(CivilDocument civdoc, Transaction tr)
-        {
-            List<BHC.PressureNetworkAppurtenance> appurtenanceList = new List<BHC.PressureNetworkAppurtenance>();
+        //private List<BHC.PressureNetworkAppurtenance> ReadPressurePipeNetworkAppurtenance(CivilDocument civdoc, Transaction tr)
+        //{
+        //    List<BHC.PressureNetworkAppurtenance> appurtenanceList = new List<BHC.PressureNetworkAppurtenance>();
 
-            foreach (ObjectId id in civdoc.GetPressurePipeNetworkIds())
-            {
-                ADC.PressurePipeNetwork network = tr.GetObject(id, OpenMode.ForRead) as ADC.PressurePipeNetwork;
-                foreach (ObjectId fitId in network.GetAppurtenanceIds())
-                {
-                    ADC.PressureAppurtenance pressureAppurtenance = tr.GetObject(fitId, OpenMode.ForRead) as ADC.PressureAppurtenance;
-                    BHC.PressureNetworkAppurtenance bhpressureAppurtenance = pressureAppurtenance.ToBHoM();
-                    appurtenanceList.Add(bhpressureAppurtenance);
-                }
-            }
-            return appurtenanceList;
-        }
+        //    foreach (ObjectId id in civdoc.GetPressurePipeNetworkIds())
+        //    {
+        //        ADC.PressurePipeNetwork network = tr.GetObject(id, OpenMode.ForRead) as ADC.PressurePipeNetwork;
+        //        foreach (ObjectId fitId in network.GetAppurtenanceIds())
+        //        {
+        //            ADC.PressureAppurtenance pressureAppurtenance = tr.GetObject(fitId, OpenMode.ForRead) as ADC.PressureAppurtenance;
+        //            BHC.PressureNetworkAppurtenance bhpressureAppurtenance = pressureAppurtenance.ToBHoM();
+        //            appurtenanceList.Add(bhpressureAppurtenance);
+        //        }
+        //    }
+        //    return appurtenanceList;
+        //}
 
         private List<BHC.CivSurface> ReadTinSurface(CivilDocument civdoc, Transaction tr)
         {   
