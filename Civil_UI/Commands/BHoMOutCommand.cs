@@ -84,14 +84,16 @@ namespace BH.UI.Civil.Commands
         /**** Private Methods                           ****/
         /***************************************************/
 
-        //Resolves a fixed BHoM output folder, named after the active drawing, so the
-        //command never needs a path provided or the drawing to stay open to find it again.
+        //Writes into a "BHoMOut" subfolder next to the drawing file, so the output always
+        //sits alongside it and the command never needs a path provided.
         private string OutputFilePath(Document doc)
         {
-            string folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "BHoM", "Civil3DOut");
+            string drawingPath = doc?.Name;
+            string drawingDir = string.IsNullOrWhiteSpace(drawingPath) ? Directory.GetCurrentDirectory() : Path.GetDirectoryName(drawingPath);
+            string folder = Path.Combine(drawingDir, "BHoMOut");
             Directory.CreateDirectory(folder);
 
-            string drawingName = string.IsNullOrWhiteSpace(doc?.Name) ? "Civil3DOut" : Path.GetFileNameWithoutExtension(doc.Name);
+            string drawingName = string.IsNullOrWhiteSpace(drawingPath) ? "Civil3DOut" : Path.GetFileNameWithoutExtension(drawingPath);
             return Path.Combine(folder, drawingName + ".json");
         }
 
