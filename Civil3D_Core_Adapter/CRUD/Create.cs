@@ -230,7 +230,7 @@ namespace BH.Civil3D.Adapter.Core
                 for (int i = 0; i < input.Count; i++)
                 {
                     var cp = input[i];
-                    var p = cp.Point;
+                    var p = cp.Location;
 
                     if (p == null)
                     {
@@ -296,10 +296,10 @@ namespace BH.Civil3D.Adapter.Core
                         // Apply properties + layer
                         // bhPoint.ToCivil3D(c3dPoint);
                         
-                        if (!string.IsNullOrWhiteSpace(bhPoint.PointName))
+                        if (!string.IsNullOrWhiteSpace(bhPoint.Name))
                         {
                             // Only assign if you're absolutely sure you're not duplicating
-                            c3dPoint.PointName = bhPoint.PointName;
+                            c3dPoint.PointName = bhPoint.Name;
                         }
 
                         c3dPoint.Layer = layer;
@@ -498,22 +498,18 @@ namespace BH.Civil3D.Adapter.Core
 
         public static void ApplyPointNumberIfValid(
             ADC.CogoPoint c3dPoint,
-            uint bhPointNumber,
+            int bhPointNumber,
             bool useNextPointNumSetting
         )
         {
             if (useNextPointNumSetting)
                 return;
 
-            // Civil 3D requires PointNumber >= 1
+            // Civil 3D requires PointNumber >= 1; 0 or less keeps the number Civil 3D assigned
             if (bhPointNumber < 1)
                 return;
 
-            // UInt32.MaxValue (4294967295) is explicitly invalid
-            if (bhPointNumber == uint.MaxValue)
-                return;
-
-            c3dPoint.PointNumber = bhPointNumber;
+            c3dPoint.PointNumber = (uint)bhPointNumber;
         }
 
 

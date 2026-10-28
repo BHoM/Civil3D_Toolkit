@@ -45,9 +45,9 @@ namespace BH.Civil3D.Engine.Core
         {
             BHC.CoGoPoint pt = new BHC.CoGoPoint
             {
-                Point = new BHG.Point { X = cogoPoint.Easting, Y = cogoPoint.Northing, Z = cogoPoint.Elevation },
-                PointName = cogoPoint.PointName,
-                PointNumber = cogoPoint.PointNumber,
+                Location = new BHG.Point { X = cogoPoint.Easting, Y = cogoPoint.Northing, Z = cogoPoint.Elevation },
+                Name = cogoPoint.PointName,
+                PointNumber = (int)cogoPoint.PointNumber,
                 FullDescription = cogoPoint.FullDescription,
                 RawDescription = cogoPoint.RawDescription
             };
@@ -57,10 +57,14 @@ namespace BH.Civil3D.Engine.Core
 
         public static void ToCivil3D(this BHC.CoGoPoint bhPoint, ADC.CogoPoint c3dPoint)
         {
-            c3dPoint.Easting = bhPoint.Point.X;
-            c3dPoint.Northing = bhPoint.Point.Y;
-            c3dPoint.Elevation = bhPoint.Point.Z;
-            c3dPoint.PointName = bhPoint.PointName;
+            c3dPoint.Easting = bhPoint.Location.X;
+            c3dPoint.Northing = bhPoint.Location.Y;
+            c3dPoint.Elevation = bhPoint.Location.Z;
+            c3dPoint.PointName = bhPoint.Name;
+
+            // A number of 0 or less keeps the number Civil 3D assigned.
+            if (bhPoint.PointNumber > 0)
+                c3dPoint.PointNumber = (uint)bhPoint.PointNumber;
         }
 
         /***************************************************/
