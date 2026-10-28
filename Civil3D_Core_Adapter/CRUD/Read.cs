@@ -1,6 +1,6 @@
 /*
  * This file is part of the Buildings and Habitats object Model (BHoM)
- * Copyright (c) 2015 - 2024, the respective contributors. All rights reserved.
+ * Copyright (c) 2015 - 2026, the respective contributors. All rights reserved.
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
@@ -20,89 +20,287 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
 
+using BH.Civil3D.Engine.Core;
+using BH.oM.Adapter;
+using BH.oM.Base;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BH.oM.Base;
-using BH.oM.Dimensional;
 using BHC = BH.oM.Adapters.Civil3D.Elements;
 using BHG = BH.oM.Geometry;
-using BH.Civil3D.Engine.Core;
-//using BH.oM.Geometry;
-using BH.Engine;
-using BH.oM.Adapters.Civil3D.Fragments;
-using BH.Engine.Base;
-
-using BH.oM.Data.Requests;
-
-using Autodesk.Civil.ApplicationServices;
-using Autodesk.Civil.Runtime;
-using ADC = Autodesk.Civil.DatabaseServices;
-using AAD = Autodesk.AutoCAD.DatabaseServices;
-using ACG = Autodesk.AutoCAD.Geometry;
-using BCF = BH.oM.Adapters.Civil3D.Fragments;
-
-//using Autodesk.AutoCAD.Runtime;
 
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.EditorInput;
-using Autodesk.AutoCAD.Internal.DatabaseServices;
-using Autodesk.AutoCAD.Geometry;
-
-using BH.oM.Adapter;
+using Autodesk.Civil.ApplicationServices;
+using ADC = Autodesk.Civil.DatabaseServices;
 
 namespace BH.Civil3D.Adapter.Core
 {
     public partial class Civil3DListenerAdapter
     {
-
         /***************************************************/
         /**** Adapter Methods                           ****/
         /***************************************************/
 
-        //General method called by the adapter when reading in data
-
-        protected override IEnumerable<IBHoMObject> Read(FilterRequest request, ActionConfig actionConfig = null)
+        protected override IEnumerable<IBHoMObject> IRead(Type type, IList ids, ActionConfig actionConfig = null)
         {
-            try
+            List<IBHoMObject> result = new List<IBHoMObject>();
+
+            if (type == null)
             {
-                if (request == null)
+                BH.Engine.Base.Compute.RecordError("Cannot pull from Civil 3D without a type.");
+                return result;
+            }
+
+            Document doc = Application.DocumentManager.MdiActiveDocument;
+            if (doc == null)
+            {
+                BH.Engine.Base.Compute.RecordError("No drawing is open in Civil 3D.");
+                return result;
+            }
+
+            Database db = doc.Database;
+            CivilDocument civdoc = CivilApplication.ActiveDocument;
+            double toSI = db.LengthToSI(civdoc);
+
+            List<ReaderEntry> readers = m_Readers.Where(x => x.Produces.Any(p => type.IsAssignableFrom(p))).ToList();
+            if (readers.Count == 0)
+            {
+                BH.Engine.Base.Compute.RecordWarning($"Pulling {type.Name} from Civil 3D is not supported.");
+                return result;
+            }
+
+            if (civdoc == null && readers.Any(x => x.NeedsCivil))
+            {
+                BH.Engine.Base.Compute.RecordWarning("This drawing is not a Civil 3D drawing; Civil 3D objects cannot be read.");
+                readers = readers.Where(x => !x.NeedsCivil).ToList();
+            }
+
+            using (Transaction tr = db.TransactionManager.StartTransaction())
+            {
+                BlockTable bt = (BlockTable)tr.GetObject(db.BlockTableId, OpenMode.ForRead);
+                BlockTableRecord ms = (BlockTableRecord)tr.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForRead);
+
+                List<Type> modelSpaceTypes = readers.SelectMany(x => x.ModelSpaceEntities).Distinct().ToList();
+                if (modelSpaceTypes.Count > 0)
+                    result.AddRange(ReadEntities(ms.Cast<ObjectId>(), modelSpaceTypes, type, tr, toSI));
+
+                if (readers.Any(x => x.Produces.Contains(typeof(BHC.BlockDefinition))))
+                    result.AddRange(ReadBlockDefinitions(bt, db, tr, toSI));
+
+                if (civdoc != null)
                 {
-                    BH.Engine.Base.Compute.RecordError("Cannot pull from Civil 3D: the request is null.");
-                    return new List<BH.oM.Base.IBHoMObject>();
+                    if (readers.Any(x => x.Produces.Contains(typeof(BHC.CoGoPoint))))
+                        result.AddRange(ReadEntities(civdoc.CogoPoints.Cast<ObjectId>(), new List<Type> { typeof(ADC.CogoPoint) }, type, tr, toSI));
+
+                    if (readers.Any(x => x.Produces.Contains(typeof(BHC.Alignment))))
+                        result.AddRange(ReadEntities(civdoc.GetAlignmentIds().Cast<ObjectId>(), new List<Type> { typeof(ADC.Alignment) }, type, tr, toSI));
+
+                    if (readers.Any(x => x.Produces.Contains(typeof(BHC.Parcel))))
+                        result.AddRange(ReadEntities(ParcelIds(civdoc, tr), new List<Type> { typeof(ADC.Parcel) }, type, tr, toSI));
                 }
 
-                Type requestedType = request.Type;
-
-                if (requestedType == null)
-                    return new List<BH.oM.Base.IBHoMObject>();
-
-
-                CivilDocument civdoc = CivilApplication.ActiveDocument;
-
-                var doc = Application.DocumentManager.MdiActiveDocument;
-                var db = doc.Database;
-                
-                var reader = new BH.Civil3D.Adapter.Core.C3DReader();
-
-                return reader.ReadByType(requestedType, db, civdoc);
-
-            }
-            
-            catch (Exception ex)
-            {
-                BH.Engine.Base.Compute.RecordError("Read(FilterRequest) failed: " + ex.Message);
-                return new List<IBHoMObject>();
+                tr.Commit();
             }
 
+            return result;
         }
 
-        
+
+        /***************************************************/
+        /**** Private Methods                           ****/
+        /***************************************************/
+
+        //Converts the drawing objects of the given classes, keeps results of the requested type, scales them to SI units
+        //and attaches their drawing identifiers. Geometry is wrapped, because IRead must return IBHoMObjects.
+        private List<IBHoMObject> ReadEntities(IEnumerable<ObjectId> ids, List<Type> entityTypes, Type type, Transaction tr, double toSI)
+        {
+            List<IBHoMObject> result = new List<IBHoMObject>();
+
+            foreach (ObjectId id in ids)
+            {
+                Entity entity = tr.GetObject(id, OpenMode.ForRead) as Entity;
+                if (entity == null || !entityTypes.Any(x => x.IsInstanceOfType(entity)))
+                    continue;
+
+                try
+                {
+                    object converted = entity is ADC.Alignment ? ((ADC.Alignment)entity).FromCivil3D() : entity.IFromCivil3D(tr);
+                    if (converted == null || !type.IsAssignableFrom(converted.GetType()))
+                        continue;
+
+                    if (converted is BHG.IGeometry)
+                    {
+                        result.Add(new ObjectWrapper { WrappedObject = ((BHG.IGeometry)converted).ScaleGeometry(toSI) });
+                        continue;
+                    }
+
+                    IBHoMObject obj = converted as IBHoMObject;
+                    if (obj == null)
+                        continue;
+
+                    ToSI(obj as dynamic, toSI);
+                    obj.SetIdentifiers(entity);
+                    result.Add(obj);
+                }
+                catch (Exception e)
+                {
+                    BH.Engine.Base.Compute.RecordWarning($"Could not read {entity.GetType().Name} {entity.Handle}: {e.Message}");
+                }
+            }
+
+            return result;
+        }
+
+        /***************************************************/
+
+        private List<IBHoMObject> ReadBlockDefinitions(BlockTable bt, Database db, Transaction tr, double toSI)
+        {
+            List<IBHoMObject> result = new List<IBHoMObject>();
+            Dictionary<ObjectId, BHC.BlockDefinition> cache = new Dictionary<ObjectId, BHC.BlockDefinition>();
+
+            foreach (ObjectId id in bt)
+            {
+                BlockTableRecord btr = (BlockTableRecord)tr.GetObject(id, OpenMode.ForRead);
+                if (btr.IsLayout || btr.IsAnonymous || btr.IsFromExternalReference)
+                    continue;
+
+                try
+                {
+                    BHC.BlockDefinition definition = btr.FromCivil3D(tr, db, cache);
+                    ToSI(definition, toSI);
+                    result.Add(definition);
+                }
+                catch (Exception e)
+                {
+                    BH.Engine.Base.Compute.RecordWarning($"Could not read block definition {btr.Name}: {e.Message}");
+                }
+            }
+
+            return result;
+        }
+
+        /***************************************************/
+
+        //Parcels belong to sites, so they are found through the drawing's sites.
+        private static List<ObjectId> ParcelIds(CivilDocument civdoc, Transaction tr)
+        {
+            List<ObjectId> ids = new List<ObjectId>();
+            foreach (ObjectId siteId in civdoc.GetSiteIds())
+            {
+                ADC.Site site = tr.GetObject(siteId, OpenMode.ForRead) as ADC.Site;
+                if (site != null)
+                    ids.AddRange(site.GetParcelIds().Cast<ObjectId>());
+            }
+
+            return ids;
+        }
+
+
+        /***************************************************/
+        /**** Private Methods - Units                   ****/
+        /***************************************************/
+
+        //Each method scales the geometric properties and [Length] values of a freshly read object from drawing units to metres.
+        private static void ToSI(IBHoMObject obj, double f)
+        {
+        }
+
+        /***************************************************/
+
+        private static void ToSI(BHC.CoGoPoint obj, double f)
+        {
+            obj.Location = obj.Location?.ScaleGeometry(f) as BHG.Point;
+        }
+
+        /***************************************************/
+
+        private static void ToSI(BHC.FeatureLine obj, double f)
+        {
+            obj.Curve = obj.Curve?.ScaleGeometry(f) as BHG.ICurve;
+        }
+
+        /***************************************************/
+
+        private static void ToSI(BHC.Alignment obj, double f)
+        {
+            obj.Curve = obj.Curve?.ScaleGeometry(f) as BHG.ICurve;
+            obj.ReferencePoint = obj.ReferencePoint?.ScaleGeometry(f) as BHG.Point;
+            obj.StartingStation *= f;
+            obj.ReferencePointStation *= f;
+        }
+
+        /***************************************************/
+
+        private static void ToSI(BHC.Parcel obj, double f)
+        {
+            obj.Boundary = obj.Boundary?.ScaleGeometry(f) as BHG.ICurve;
+            obj.AreaLocation = obj.AreaLocation?.ScaleGeometry(f) as BHG.Point;
+        }
+
+        /***************************************************/
+
+        private static void ToSI(BHC.TextNote obj, double f)
+        {
+            obj.Orientation = ScaleOrigin(obj.Orientation, f);
+            obj.Height *= f;
+        }
+
+        /***************************************************/
+
+        private static void ToSI(BHC.Block obj, double f)
+        {
+            obj.Orientation = ScaleOrigin(obj.Orientation, f);
+        }
+
+        /***************************************************/
+
+        private static void ToSI(BHC.BlockDefinition obj, double f)
+        {
+            obj.BasePoint = obj.BasePoint?.ScaleGeometry(f) as BHG.Point;
+            obj.Geometry = obj.Geometry.Select(x => x?.ScaleGeometry(f)).ToList();
+            obj.NestedBlocks.ForEach(x => ToSI(x, f));
+        }
+
+        /***************************************************/
+
+        //Scales only the origin: the axes of an orientation are unit vectors.
+        private static BHG.CoordinateSystem.Cartesian ScaleOrigin(BHG.CoordinateSystem.Cartesian orientation, double f)
+        {
+            if (orientation == null || f == 1.0)
+                return orientation;
+
+            return BH.Engine.Geometry.Create.CartesianCoordinateSystem(orientation.Origin.ScaleGeometry(f) as BHG.Point, orientation.X, orientation.Y);
+        }
+
+
+        /***************************************************/
+        /**** Private Fields                            ****/
+        /***************************************************/
+
+        //What each kind of pull produces, which drawing objects in model space it reads, and whether it needs Civil 3D.
+        private class ReaderEntry
+        {
+            public List<Type> Produces;
+            public List<Type> ModelSpaceEntities;
+            public bool NeedsCivil;
+        }
+
+        private static readonly List<ReaderEntry> m_Readers = new List<ReaderEntry>
+        {
+            new ReaderEntry { Produces = new List<Type> { typeof(BHG.Point) }, ModelSpaceEntities = new List<Type> { typeof(DBPoint) } },
+            new ReaderEntry { Produces = new List<Type> { typeof(BHG.Line), typeof(BHG.Arc), typeof(BHG.Circle), typeof(BHG.Ellipse), typeof(BHG.Polyline), typeof(BHG.PolyCurve), typeof(BHG.NurbsCurve) },
+                              ModelSpaceEntities = new List<Type> { typeof(Line), typeof(Arc), typeof(Circle), typeof(Ellipse), typeof(Polyline), typeof(Polyline2d), typeof(Polyline3d), typeof(Spline) } },
+            new ReaderEntry { Produces = new List<Type> { typeof(BHC.TextNote) }, ModelSpaceEntities = new List<Type> { typeof(MText), typeof(DBText) } },
+            new ReaderEntry { Produces = new List<Type> { typeof(BHC.Block) }, ModelSpaceEntities = new List<Type> { typeof(BlockReference) } },
+            new ReaderEntry { Produces = new List<Type> { typeof(BHC.BlockDefinition) }, ModelSpaceEntities = new List<Type>() },
+            new ReaderEntry { Produces = new List<Type> { typeof(BHC.CoGoPoint) }, ModelSpaceEntities = new List<Type>(), NeedsCivil = true },
+            new ReaderEntry { Produces = new List<Type> { typeof(BHC.FeatureLine) }, ModelSpaceEntities = new List<Type> { typeof(ADC.FeatureLine) }, NeedsCivil = true },
+            new ReaderEntry { Produces = new List<Type> { typeof(BHC.Alignment) }, ModelSpaceEntities = new List<Type>(), NeedsCivil = true },
+            new ReaderEntry { Produces = new List<Type> { typeof(BHC.Parcel) }, ModelSpaceEntities = new List<Type>(), NeedsCivil = true },
+        };
+
+        /***************************************************/
     }
 }
-
-
