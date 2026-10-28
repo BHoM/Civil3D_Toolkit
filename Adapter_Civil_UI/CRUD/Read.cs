@@ -70,25 +70,14 @@ namespace BH.UI.Civil.Adapter
         {
             try
             {
-
-                Debugger.Log("=== Read(FilterRequest) ENTER ===");
-                
-                // Prove which DLL is actually running
-                Debugger.Log("Assembly: " + typeof(CivilUIAdapter).Assembly.Location);
-
-
                 if (request == null)
-                
                 {
-                    Debugger.Log("Request is NULL");
+                    BH.Engine.Base.Compute.RecordError("Cannot pull from Civil 3D: the request is null.");
                     return new List<BH.oM.Base.IBHoMObject>();
                 }
 
-
                 Type requestedType = request.Type;
-                Debugger.Log("RequestedType: " + (requestedType == null ? "NULL" : requestedType.FullName));
 
-                
                 if (requestedType == null)
                     return new List<BH.oM.Base.IBHoMObject>();
 
@@ -106,13 +95,8 @@ namespace BH.UI.Civil.Adapter
             
             catch (Exception ex)
             {
-                Debugger.Log("EXCEPTION in Read(FilterRequest): " + ex);
                 BH.Engine.Base.Compute.RecordError("Read(FilterRequest) failed: " + ex.Message);
                 return new List<IBHoMObject>();
-            }
-            finally
-            {
-                Debugger.Log("=== Read(FilterRequest) EXIT ===");
             }
 
         }

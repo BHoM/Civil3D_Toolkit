@@ -56,12 +56,11 @@ namespace BH.UI.Civil.Adapter
         {
             if (objects == null)
             {
-                DebugLog.Write("Objects is NULL -> exit");
+                BH.Engine.Base.Compute.RecordError("Cannot push to Civil 3D: the list of objects is null.");
                 return true;
             }
 
             int count = objects.Count();
-            DebugLog.Write($"Object count = {count}");
 
             if (count == 0)
                 return true;
@@ -69,7 +68,6 @@ namespace BH.UI.Civil.Adapter
             try
             {
                 Document acDoc = Application.DocumentManager.MdiActiveDocument;
-                DebugLog.Write($"Active Document = {acDoc?.Name}");
 
                 CivilDocument civilDoc = CivilApplication.ActiveDocument;
                 Database db = acDoc.Database;
@@ -93,7 +91,7 @@ namespace BH.UI.Civil.Adapter
             }
             catch (System.Exception ex)
             {
-                DebugLog.Write($"EXCEPTION: {ex}");
+                BH.Engine.Base.Compute.RecordError($"Failed to push objects to Civil 3D: {ex.Message}");
             }
 
             return true;
@@ -111,8 +109,6 @@ namespace BH.UI.Civil.Adapter
 
             if (!geomCustomObjects.Any())
                 return;
-
-            DebugLog.Write($"DISPATCH -> CreateCollection(CustomObject.Geometry) count={geomCustomObjects.Count}");
 
             foreach (var co in geomCustomObjects)
             {
@@ -156,36 +152,36 @@ namespace BH.UI.Civil.Adapter
         }
 
         private bool CreateCollection(IEnumerable<BH.oM.Geometry.Point> points, BHACC3d.Civil3DRuntimeContext context, string layer = "0")
-            => ProcessEntityCollection(points, context, layer, p => p.ToCivil3D(), "Point conversion failed.");
+            => ProcessEntityCollection(points, context, layer, p => p.ToCivil3D(), "Could not convert a Point to a Civil 3D entity, so it was not created.");
 
         private bool CreateCollection(IEnumerable<BH.oM.Geometry.Line> lines, BHACC3d.Civil3DRuntimeContext context, string layer = "0")
-            => ProcessEntityCollection(lines, context, layer, l => l.ToCivil3D(), "Line conversion failed.");
+            => ProcessEntityCollection(lines, context, layer, l => l.ToCivil3D(), "Could not convert a Line to a Civil 3D entity, so it was not created.");
 
         private bool CreateCollection(IEnumerable<BH.oM.Geometry.Arc> arcs, BHACC3d.Civil3DRuntimeContext context, string layer = "0")
-            => ProcessEntityCollection(arcs, context, layer, a => a.ToCivil3D(), "Arc conversion failed.");
+            => ProcessEntityCollection(arcs, context, layer, a => a.ToCivil3D(), "Could not convert an Arc to a Civil 3D entity, so it was not created.");
 
         private bool CreateCollection(IEnumerable<BH.oM.Geometry.Circle> circles, BHACC3d.Civil3DRuntimeContext context, string layer = "0")
-            => ProcessEntityCollection(circles, context, layer, c => c.ToCivil3D(), "Circle conversion failed.");
+            => ProcessEntityCollection(circles, context, layer, c => c.ToCivil3D(), "Could not convert a Circle to a Civil 3D entity, so it was not created.");
 
         private bool CreateCollection(IEnumerable<BH.oM.Geometry.Ellipse> ellipses, BHACC3d.Civil3DRuntimeContext context, string layer = "0")
-            => ProcessEntityCollection(ellipses, context, layer, e => e.ToCivil3D(), "Ellipse conversion failed.");
+            => ProcessEntityCollection(ellipses, context, layer, e => e.ToCivil3D(), "Could not convert an Ellipse to a Civil 3D entity, so it was not created.");
 
         private bool CreateCollection(IEnumerable<BH.oM.Geometry.Polyline> polylines, BHACC3d.Civil3DRuntimeContext context, string layer = "0")
             => ProcessPolylineCollection(polylines, context, layer, 
                 p => p.ControlPoints != null && p.ControlPoints.Any(pt => Math.Abs(pt.Z) > 1e-3) 
                     ? (object)p.ToPolyline3D() 
                     : (object)p.ToLWPolyline(), 
-                "Polyline conversion failed.");
+                "Could not convert a Polyline to a Civil 3D entity, so it was not created.");
 
         private bool CreateCollection(IEnumerable<BH.oM.Geometry.PolyCurve> polyCurves, BHACC3d.Civil3DRuntimeContext context, string layer = "0")
             => ProcessPolylineCollection(polyCurves, context, layer,
                 pc => HasNonZeroZ(pc)
                     ? (object)pc.ToPolyline3D()
                     : (object)pc.ToLWPolyline(),
-                "PolyCurve conversion failed.");
+                "Could not convert a PolyCurve to a Civil 3D entity, so it was not created.");
 
         private bool CreateCollection(IEnumerable<BH.oM.Geometry.NurbsCurve> splines, BHACC3d.Civil3DRuntimeContext context, string layer = "0")
-            => ProcessEntityCollection(splines, context, layer, s => s.ToCivil3D(), "Spline conversion failed.");
+            => ProcessEntityCollection(splines, context, layer, s => s.ToCivil3D(), "Could not convert a NurbsCurve to a Civil 3D spline, so it was not created.");
         
         private bool CreateCollection(
             IEnumerable<BH.oM.Civils.Elements.CoGoPoint> cogos,
@@ -198,35 +194,32 @@ namespace BH.UI.Civil.Adapter
         {
             try
             {
-                DebugLog.Write("CreateCollection(CoGoPoint) -> start");
-
                 if (cogos == null)
                 {
-                    DebugLog.Write("CreateCollection(CoGoPoint) -> cogos is null");
+                    BH.Engine.Base.Compute.RecordError("Cannot create CoGo points: the list of CoGo points is null.");
                     return true;
                 }
 
                 if (context == null)
                 {
-                    DebugLog.Write("CreateCollection(CoGoPoint) -> context is null");
+                    BH.Engine.Base.Compute.RecordError("Cannot create CoGo points: the Civil 3D drawing is not available.");
                     return false;
                 }
 
                 if (context.CivilDocument == null)
                 {
-                    DebugLog.Write("CreateCollection(CoGoPoint) -> context.CivilDocument is null (not a Civil3D doc?)");
+                    BH.Engine.Base.Compute.RecordError("Cannot create CoGo points: the active drawing is not a Civil 3D drawing.");
                     return false;
                 }
 
                 if (context.Transaction == null)
                 {
-                    DebugLog.Write("CreateCollection(CoGoPoint) -> context.Transaction is null");
+                    BH.Engine.Base.Compute.RecordError("Cannot create CoGo points: no transaction is open on the active drawing.");
                     return false;
                 }
 
                 // Materialise once
                 var input = cogos.Where(c => c != null).ToList();
-                DebugLog.Write("CreateCollection(CoGoPoint) -> input count = " + input.Count);
                 if (input.Count == 0)
                     return true;
 
@@ -241,7 +234,7 @@ namespace BH.UI.Civil.Adapter
 
                     if (p == null)
                     {
-                        DebugLog.Write($"CreateCollection(CoGoPoint) -> skip index {i} (Point is null)");
+                        BH.Engine.Base.Compute.RecordWarning($"CoGo point at index {i} was skipped because its location is null.");
                         continue;
                     }
 
@@ -249,7 +242,7 @@ namespace BH.UI.Civil.Adapter
                     if (double.IsNaN(p.X) || double.IsNaN(p.Y) || double.IsNaN(p.Z) ||
                         double.IsInfinity(p.X) || double.IsInfinity(p.Y) || double.IsInfinity(p.Z))
                     {
-                        DebugLog.Write($"CreateCollection(CoGoPoint) -> skip index {i} (invalid coords: {p.X},{p.Y},{p.Z})");
+                        BH.Engine.Base.Compute.RecordWarning($"CoGo point at index {i} was skipped because its location has invalid coordinates ({p.X}, {p.Y}, {p.Z}).");
                         continue;
                     }
 
@@ -257,17 +250,15 @@ namespace BH.UI.Civil.Adapter
                     valid.Add(cp);
                 }
 
-                DebugLog.Write("CreateCollection(CoGoPoint) -> valid count = " + valid.Count);
                 if (valid.Count == 0)
                 {
-                    DebugLog.Write("CreateCollection(CoGoPoint) -> no valid points after filtering");
+                    BH.Engine.Base.Compute.RecordWarning("No CoGo points were created because none had a valid location.");
                     return true;
                 }
 
                 // Ensure layer once (not per point)
                 EnsureLayerPresent(context, layer);
 
-                DebugLog.Write("CreateCollection(CoGoPoint) -> calling CogoPoints.Add");
                 ObjectIdCollection ids = context.CivilDocument.CogoPoints.Add(
                     locations,
                     desc ?? string.Empty,
@@ -275,11 +266,9 @@ namespace BH.UI.Civil.Adapter
                     matchOnParams,
                     useNextPointNumSetting);
 
-                DebugLog.Write("CreateCollection(CoGoPoint) -> CogoPoints.Add returned ids = " + (ids?.Count ?? 0));
-
                 if (ids == null || ids.Count == 0)
                 {
-                    DebugLog.Write("CreateCollection(CoGoPoint) -> no points created (ids null/empty)");
+                    BH.Engine.Base.Compute.RecordError("Civil 3D did not create any CoGo points.");
                     return false;
                 }
 
@@ -300,7 +289,7 @@ namespace BH.UI.Civil.Adapter
 
                         if (c3dPoint == null)
                         {
-                            DebugLog.Write("CreateCollection(CoGoPoint) -> GetObject returned non-CogoPoint for id: " + id);
+                            BH.Engine.Base.Compute.RecordWarning("A created CoGo point could not be opened for editing, so its name and layer were not set.");
                             continue;
                         }
 
@@ -317,22 +306,20 @@ namespace BH.UI.Civil.Adapter
                     }
                     catch (System.Exception exPoint)
                     {
-                        DebugLog.Write("CreateCollection(CoGoPoint) -> per-point exception: " + exPoint);
+                        BH.Engine.Base.Compute.RecordError($"Could not set the name or layer of a CoGo point: {exPoint.Message}");
                     }
                 }
 
                 if (ids.Count != valid.Count)
                 {
-                    DebugLog.Write("CreateCollection(CoGoPoint) -> warning: created " + ids.Count +
-                                " points from " + valid.Count + " valid inputs.");
+                    BH.Engine.Base.Compute.RecordWarning($"Civil 3D created {ids.Count} CoGo points from {valid.Count} valid inputs.");
                 }
 
-                DebugLog.Write("CreateCollection(CoGoPoint) -> done");
                 return true;
             }
             catch (System.Exception ex)
             {
-                DebugLog.Write("CreateCollection(CoGoPoint) -> EXCEPTION: " + ex);
+                BH.Engine.Base.Compute.RecordError($"Failed to create CoGo points: {ex.Message}");
                 return false;
             }
         }
@@ -351,7 +338,7 @@ namespace BH.UI.Civil.Adapter
                 var acEntity = converter(item);
                 if (acEntity == null)
                 {
-                    DebugLog.Write(errorMessage);
+                    BH.Engine.Base.Compute.RecordError(errorMessage);
                     continue;
                 }
 
@@ -375,7 +362,7 @@ namespace BH.UI.Civil.Adapter
                 var acPolyline = converter(item);
                 if (acPolyline == null)
                 {
-                    DebugLog.Write(errorMessage);
+                    BH.Engine.Base.Compute.RecordError(errorMessage);
                     continue;
                 }
 
@@ -529,30 +516,6 @@ namespace BH.UI.Civil.Adapter
             c3dPoint.PointNumber = bhPointNumber;
         }
 
-        internal static class DebugLog
-        {
-            private static readonly string CreateDebugLogPath =
-                System.IO.Path.Combine(
-                    System.IO.Path.GetTempPath(),
-                    "CivilUIAdapter_Create.log");
-
-            internal static void Write(string msg)
-            {
-                try
-                {
-                    System.IO.File.AppendAllText(
-                        CreateDebugLogPath,
-                        $"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} {msg}{Environment.NewLine}");
-                }
-                catch { /* ignore */ }
-
-                try
-                {
-                    BH.Engine.Base.Compute.RecordNote(msg);
-                }
-                catch { /* ignore */ }
-            }
-        }
 
 
 

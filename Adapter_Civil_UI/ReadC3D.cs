@@ -285,7 +285,7 @@ namespace BH.UI.Civil.Adapter
 
                 else
                 {
-                    Debugger.Log($"Curve Type not supported: {curveEnt.GetType().Name}");
+                    BH.Engine.Base.Compute.RecordWarning($"Curves of type {curveEnt.GetType().Name} are not supported and were skipped.");
                 }
 
                 if (bh != null)
