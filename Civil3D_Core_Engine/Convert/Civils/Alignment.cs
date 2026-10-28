@@ -20,14 +20,10 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using BHC = BH.oM.Adapters.Civil3D.Elements;
-
-using ACG = Autodesk.AutoCAD.Geometry;
+using BHG = BH.oM.Geometry;
 
 using ADC = Autodesk.Civil.DatabaseServices;
 
@@ -46,9 +42,7 @@ namespace BH.Civil3D.Engine.Core
             {
                 AlignmentType = civAlignment.AlignmentType.FromCivil3D(),
                 Description = civAlignment.Description,
-                DesignSpeeds = civAlignment.DesignSpeeds.Select(x => x.Value).ToList(),
-                EndingStation = civAlignment.EndingStation,
-                Length = civAlignment.Length,
+                Curve = AlignmentPolyCurve(civAlignment),
                 Name = civAlignment.Name,
                 ReferencePoint = civAlignment.ReferencePoint.FromCivil3D(),
                 ReferencePointStation = civAlignment.ReferencePointStation,
@@ -56,23 +50,53 @@ namespace BH.Civil3D.Engine.Core
                 StartingStation = civAlignment.StartingStation,
             };
 
-            foreach(ADC.AlignmentEntity aEntity in civAlignment.Entities)
+            return alignment;
+        }
+
+
+        /***************************************************/
+        /**** Private Methods                           ****/
+        /***************************************************/
+
+        //Joins the alignment's lines, arcs and spirals into one PolyCurve. The Entities collection is in
+        //creation order, so the sub-entities are sorted by station to keep the PolyCurve continuous.
+        private static BHG.PolyCurve AlignmentPolyCurve(ADC.Alignment civAlignment)
+        {
+            List<ADC.AlignmentSubEntity> subEntities = new List<ADC.AlignmentSubEntity>();
+            foreach (ADC.AlignmentEntity entity in civAlignment.Entities)
             {
-                switch(aEntity.EntityType)
+                for (int i = 0; i < entity.SubEntityCount; i++)
+                    subEntities.Add(entity[i]);
+            }
+
+            List<BHG.ICurve> segments = new List<BHG.ICurve>();
+            bool spiralApproximated = false;
+
+            foreach (ADC.AlignmentSubEntity subEntity in subEntities.OrderBy(x => x.StartStation))
+            {
+                BHG.Point start = subEntity.StartPoint.FromCivil3D();
+                BHG.Point end = subEntity.EndPoint.FromCivil3D();
+
+                if (subEntity.SubEntityType == ADC.AlignmentSubEntityType.Arc)
                 {
-                    case ADC.AlignmentEntityType.Line:
-                        alignment.AlignmentCurves.Add(FromCivil3D(aEntity as dynamic));
-                        break;
-                    case ADC.AlignmentEntityType.Arc:
-                        alignment.AlignmentCurves.Add(FromCivil3D(aEntity as dynamic));
-                        break;
-                    default:
-                        alignment.AlignmentCurves.Add(null);
-                        break;
+                    double easting = 0, northing = 0;
+                    civAlignment.PointLocation((subEntity.StartStation + subEntity.EndStation) / 2, 0, ref easting, ref northing);
+                    BHG.Point mid = new BHG.Point { X = easting, Y = northing };
+                    segments.Add(BH.Engine.Geometry.Create.Arc(start, mid, end));
+                }
+                else
+                {
+                    if (subEntity.SubEntityType != ADC.AlignmentSubEntityType.Line)
+                        spiralApproximated = true;
+
+                    segments.Add(new BHG.Line { Start = start, End = end });
                 }
             }
 
-            return alignment;
+            if (spiralApproximated)
+                BH.Engine.Base.Compute.RecordWarning("Alignment spiral segments are approximated as straight lines.");
+
+            return new BHG.PolyCurve { Curves = segments };
         }
 
         /***************************************************/

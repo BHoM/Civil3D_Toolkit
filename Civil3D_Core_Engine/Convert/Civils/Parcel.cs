@@ -20,14 +20,10 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using BHC = BH.oM.Adapters.Civil3D.Elements;
+using BHG = BH.oM.Geometry;
 
-using ACG = Autodesk.AutoCAD.Geometry;
+using ACD = Autodesk.AutoCAD.DatabaseServices;
 
 using ADC = Autodesk.Civil.DatabaseServices;
 
@@ -44,13 +40,28 @@ namespace BH.Civil3D.Engine.Core
         {
             return new BHC.Parcel
             {
-                Area = civParcel.Area,
                 AreaLocation = civParcel.AreaLocation.FromCivil3D(),
-                Centroid = civParcel.Centroid.FromCivil3D(),
+                Boundary = ParcelBoundary(civParcel),
                 Description = civParcel.Description,
                 Name = civParcel.Name,
                 Number = civParcel.Number,
             };
+        }
+
+
+        /***************************************************/
+        /**** Private Methods                           ****/
+        /***************************************************/
+
+        private static BHG.ICurve ParcelBoundary(ADC.Parcel civParcel)
+        {
+            ACD.Curve baseCurve = civParcel.BaseCurve;
+            BHG.ICurve boundary = baseCurve.FromCivil3D() as BHG.ICurve;
+
+            if (boundary == null)
+                BH.Engine.Base.Compute.RecordWarning($"The boundary of parcel {civParcel.Name} could not be converted, so it was left empty.");
+
+            return boundary;
         }
 
         /***************************************************/

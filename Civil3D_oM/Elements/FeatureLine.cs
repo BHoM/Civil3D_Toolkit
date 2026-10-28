@@ -1,6 +1,6 @@
 /*
  * This file is part of the Buildings and Habitats object Model (BHoM)
- * Copyright (c) 2015 - 2024, the respective contributors. All rights reserved.
+ * Copyright (c) 2015 - 2026, the respective contributors. All rights reserved.
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
@@ -20,26 +20,25 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using BH.oM.Base;
 using BH.oM.Geometry;
-
+using System.ComponentModel;
 
 namespace BH.oM.Adapters.Civil3D.Elements
 {
-    /***************************************************/
-    /**** Public Properties                         ****/
-    /***************************************************/
+    [Description("A 3D linear feature used for grading, such as a kerb line or a ridge.")]
     public class FeatureLine : BHoMObject
     {
+        /***************************************************/
+        /**** Public Properties                         ****/
+        /***************************************************/
+
+        [Description("User description of the feature line.")]
         public virtual string Description { get; set; } = "";
+
+        [Description("3D path of the feature line, in metres, including any elevation points.")]
         public virtual ICurve Curve { get; set; } = null;
+
         /***************************************************/
     }
 }
-
-
