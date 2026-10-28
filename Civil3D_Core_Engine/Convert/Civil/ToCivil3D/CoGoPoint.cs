@@ -42,14 +42,37 @@ namespace BH.Civil3D.Engine.Core
 
         public static void ToCivil3D(this BHC.CoGoPoint bhPoint, ADC.CogoPoint c3dPoint)
         {
-            c3dPoint.Easting = bhPoint.Location.X;
-            c3dPoint.Northing = bhPoint.Location.Y;
-            c3dPoint.Elevation = bhPoint.Location.Z;
-            c3dPoint.PointName = bhPoint.Name;
+            if (bhPoint == null || c3dPoint == null)
+            {
+                BH.Engine.Base.Compute.RecordError("Cannot apply a null CoGo point, or apply one to a null Civil 3D point.");
+                return;
+            }
 
-            // A number of 0 or less keeps the number Civil 3D assigned.
+            if (bhPoint.Location != null)
+            {
+                c3dPoint.Easting = bhPoint.Location.X;
+                c3dPoint.Northing = bhPoint.Location.Y;
+                c3dPoint.Elevation = bhPoint.Location.Z;
+            }
+
+            if (!string.IsNullOrWhiteSpace(bhPoint.Name))
+                c3dPoint.PointName = bhPoint.Name;
+
+            if (!string.IsNullOrEmpty(bhPoint.RawDescription))
+                c3dPoint.RawDescription = bhPoint.RawDescription;
+
+            // A number of 0 or less keeps the number Civil 3D assigned. A number already in use cannot be applied, so the point keeps its own.
             if (bhPoint.PointNumber > 0)
-                c3dPoint.PointNumber = (uint)bhPoint.PointNumber;
+            {
+                try
+                {
+                    c3dPoint.PointNumber = (uint)bhPoint.PointNumber;
+                }
+                catch (Exception e)
+                {
+                    BH.Engine.Base.Compute.RecordWarning($"Point number {bhPoint.PointNumber} could not be used ({e.Message}), so Civil 3D's number {c3dPoint.PointNumber} was kept.");
+                }
+            }
         }
 
         /***************************************************/

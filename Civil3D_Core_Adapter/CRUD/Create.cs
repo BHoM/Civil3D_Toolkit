@@ -1,6 +1,6 @@
 /*
  * This file is part of the Buildings and Habitats object Model (BHoM)
- * Copyright (c) 2015 - 2024, the respective contributors. All rights reserved.
+ * Copyright (c) 2015 - 2026, the respective contributors. All rights reserved.
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
@@ -20,466 +20,209 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
 
+using BH.Civil3D.Engine.Core;
+using BH.Engine.Base;
+using BH.oM.Adapter;
+using BH.oM.Adapters.Civil3D.Fragments;
+using BH.oM.Base;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using BHC = BH.oM.Adapters.Civil3D.Elements;
+using BHG = BH.oM.Geometry;
 
-using Autodesk.AutoCAD.Runtime;
 using Autodesk.AutoCAD.ApplicationServices;
-using AAD = Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Geometry;
-
-using Autodesk.Civil.ApplicationServices;
-using Autodesk.Civil.Runtime;
-using ADC = Autodesk.Civil.DatabaseServices;
-using BHACC3d = BH.Civil3D.Adapter.Core;
-using BH.Civil3D.Engine.Core;
-
 using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.EditorInput;
-
-using BH.Engine.Geometry;
-
-using BH.oM.Adapter;
+using Autodesk.Civil.ApplicationServices;
+using ACG = Autodesk.AutoCAD.Geometry;
+using ADC = Autodesk.Civil.DatabaseServices;
 
 namespace BH.Civil3D.Adapter.Core
 {
     public partial class Civil3DListenerAdapter
     {
+        /***************************************************/
+        /**** Adapter Methods                           ****/
+        /***************************************************/
 
-        /***************************************************/
-        /****           Adapter Methods                 ****/
-        /***************************************************/
         protected override bool ICreate<T>(IEnumerable<T> objects, ActionConfig actionConfig = null)
         {
             if (objects == null)
             {
-                BH.Engine.Base.Compute.RecordError("Cannot push to Civil 3D: the list of objects is null.");
-                return true;
+                BH.Engine.Base.Compute.RecordError("Cannot push a null list of objects to Civil 3D.");
+                return false;
             }
 
-            int count = objects.Count();
-
-            if (count == 0)
+            List<T> items = objects.ToList();
+            if (items.Count == 0)
                 return true;
 
-            try
+            Document doc = Application.DocumentManager.MdiActiveDocument;
+            if (doc == null)
             {
-                Document acDoc = Application.DocumentManager.MdiActiveDocument;
+                BH.Engine.Base.Compute.RecordError("No drawing is open in Civil 3D.");
+                return false;
+            }
 
-                CivilDocument civilDoc = CivilApplication.ActiveDocument;
-                Database db = acDoc.Database;
+            Database db = doc.Database;
+            CivilDocument civdoc = CivilApplication.ActiveDocument;
+            double fromSI = 1.0 / db.LengthToSI(civdoc);
+            int created = 0;
 
-                using (acDoc.LockDocument())
-                using (Transaction tr = db.TransactionManager.StartTransaction())
+            using (Transaction tr = db.TransactionManager.StartTransaction())
+            {
+                BlockTable bt = (BlockTable)tr.GetObject(db.BlockTableId, OpenMode.ForRead);
+                BlockTableRecord ms = (BlockTableRecord)tr.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForWrite);
+                LayerTable lt = (LayerTable)tr.GetObject(db.LayerTableId, OpenMode.ForRead);
+
+                foreach (T item in items)
                 {
-                    BlockTable bt = (BlockTable)tr.GetObject(db.BlockTableId, OpenMode.ForRead);
-                    BlockTableRecord ms = (BlockTableRecord)tr.GetObject(bt[BlockTableRecord.ModelSpace],OpenMode.ForWrite);
-                    var context =new BHACC3d.Civil3DRuntimeContext(acDoc, civilDoc, db, tr, bt, ms);
+                    object obj = item is ObjectWrapper wrapper ? wrapper.WrappedObject : item;
 
-                    // ---- UNWRAP OBJECTWRAPPERS ----
-                    var unwrapped = objects.Select(o => (o is BH.oM.Adapter.ObjectWrapper ow ? ow.WrappedObject : (object)o)).ToList();
+                    try
+                    {
+                        Entity entity = ToEntity(FromSI(obj, fromSI), bt, tr, civdoc);
+                        if (entity == null)
+                            continue;
 
-                    // ---- DISPATCH ON UNWRAPPED TYPES ----
-                    ProcessCustomObjectGeometry(unwrapped, context);
-                    CreateCollection(unwrapped.OfType<BH.oM.Adapters.Civil3D.Elements.CoGoPoint>(), context);
-                    
-                    tr.Commit();
+                        if (entity.ObjectId.IsNull)
+                        {
+                            ms.AppendEntity(entity);
+                            tr.AddNewlyCreatedDBObject(entity, true);
+                        }
+
+                        entity.LayerId = LayerId(item as IBHoMObject, lt, db);
+                        created++;
+                    }
+                    catch (Exception e)
+                    {
+                        BH.Engine.Base.Compute.RecordError($"Could not push {obj?.GetType().Name}: {e.Message}");
+                    }
                 }
-            }
-            catch (System.Exception ex)
-            {
-                BH.Engine.Base.Compute.RecordError($"Failed to push objects to Civil 3D: {ex.Message}");
+
+                if (created > 0)
+                    tr.Commit();
             }
 
-            return true;
+            return created == items.Count;
         }
+
 
         /***************************************************/
         /**** Private Methods                           ****/
         /***************************************************/
-        private void ProcessCustomObjectGeometry(IEnumerable<object> unwrapped, BHACC3d.Civil3DRuntimeContext context)
+
+        private static Entity ToEntity(object obj, BlockTable bt, Transaction tr, CivilDocument civdoc)
         {
-            var geomCustomObjects = unwrapped
-                .OfType<BH.oM.Base.CustomObject>()
-                .Where(co => co?.CustomData?.ContainsKey("Geometry") ?? false)
-                .ToList();
-
-            if (!geomCustomObjects.Any())
-                return;
-
-            foreach (var co in geomCustomObjects)
+            switch (obj)
             {
-                var geometry = ExtractGeometry(co).Cast<object>().ToList();
-                if (geometry.Any())
-                {
-                    GeometryMappingFunction(geometry, context, GetCadLayerName(co));
-                }
-            }
-        }
-        private void GeometryMappingFunction(IEnumerable<object> unwrapped, BHACC3d.Civil3DRuntimeContext context, string cadLayerName)
-        {
-            DispatchGeometry<BH.oM.Geometry.Point>(unwrapped, context, cadLayerName, CreateCollection);
-            DispatchGeometry<BH.oM.Geometry.Line>(unwrapped, context, cadLayerName, CreateCollection);
-            DispatchGeometry<BH.oM.Geometry.Arc>(unwrapped, context, cadLayerName, CreateCollection);
-            DispatchGeometry<BH.oM.Geometry.Circle>(unwrapped, context, cadLayerName, CreateCollection);
-            DispatchGeometry<BH.oM.Geometry.Ellipse>(unwrapped, context, cadLayerName, CreateCollection);
-            DispatchGeometry<BH.oM.Geometry.Polyline>(unwrapped, context, cadLayerName, CreateCollection);
-            DispatchGeometry<BH.oM.Geometry.PolyCurve>(unwrapped, context, cadLayerName, CreateCollection);
-            DispatchGeometry<BH.oM.Geometry.NurbsCurve>(unwrapped, context, cadLayerName, CreateCollection);
-        }
-        private void DispatchGeometry<T>(IEnumerable<object> unwrapped, BHACC3d.Civil3DRuntimeContext context, string cadLayerName, Func<List<T>, BHACC3d.Civil3DRuntimeContext, string, bool> handler) where T : class
-        {
-            var items = unwrapped.OfType<T>().ToList();
-            if (items.Any())
-                _ = handler(items, context, cadLayerName);
-        }
-
-        private void DispatchCollection<T>(IEnumerable<object> unwrapped, BHACC3d.Civil3DRuntimeContext context, Func<List<T>, BHACC3d.Civil3DRuntimeContext, bool> handler) where T : class
-        {
-            var items = unwrapped.OfType<T>().ToList();
-            if (items.Any())
-                _ = handler(items, context);
-        }
-
-        private void DispatchCollection<T>(IEnumerable<object> unwrapped, BHACC3d.Civil3DRuntimeContext context, string layer, Func<List<T>, BHACC3d.Civil3DRuntimeContext, string, bool> handler) where T : class
-        {
-            var items = unwrapped.OfType<T>().ToList();
-            if (items.Any())
-                _ = handler(items, context, layer);
-        }
-
-        private bool CreateCollection(IEnumerable<BH.oM.Geometry.Point> points, BHACC3d.Civil3DRuntimeContext context, string layer = "0")
-            => ProcessEntityCollection(points, context, layer, p => p.ToCivil3DDBPoint(), "Could not convert a Point to a Civil 3D entity, so it was not created.");
-
-        private bool CreateCollection(IEnumerable<BH.oM.Geometry.Line> lines, BHACC3d.Civil3DRuntimeContext context, string layer = "0")
-            => ProcessEntityCollection(lines, context, layer, l => l.ToCivil3D(), "Could not convert a Line to a Civil 3D entity, so it was not created.");
-
-        private bool CreateCollection(IEnumerable<BH.oM.Geometry.Arc> arcs, BHACC3d.Civil3DRuntimeContext context, string layer = "0")
-            => ProcessEntityCollection(arcs, context, layer, a => a.ToCivil3D(), "Could not convert an Arc to a Civil 3D entity, so it was not created.");
-
-        private bool CreateCollection(IEnumerable<BH.oM.Geometry.Circle> circles, BHACC3d.Civil3DRuntimeContext context, string layer = "0")
-            => ProcessEntityCollection(circles, context, layer, c => c.ToCivil3D(), "Could not convert a Circle to a Civil 3D entity, so it was not created.");
-
-        private bool CreateCollection(IEnumerable<BH.oM.Geometry.Ellipse> ellipses, BHACC3d.Civil3DRuntimeContext context, string layer = "0")
-            => ProcessEntityCollection(ellipses, context, layer, e => e.ToCivil3D(), "Could not convert an Ellipse to a Civil 3D entity, so it was not created.");
-
-        private bool CreateCollection(IEnumerable<BH.oM.Geometry.Polyline> polylines, BHACC3d.Civil3DRuntimeContext context, string layer = "0")
-            => ProcessPolylineCollection(polylines, context, layer, 
-                p => p.ToCivil3D(), 
-                "Could not convert a Polyline to a Civil 3D entity, so it was not created.");
-
-        private bool CreateCollection(IEnumerable<BH.oM.Geometry.PolyCurve> polyCurves, BHACC3d.Civil3DRuntimeContext context, string layer = "0")
-            => ProcessPolylineCollection(polyCurves, context, layer,
-                pc => pc.ToCivil3D(),
-                "Could not convert a PolyCurve to a Civil 3D entity, so it was not created.");
-
-        private bool CreateCollection(IEnumerable<BH.oM.Geometry.NurbsCurve> splines, BHACC3d.Civil3DRuntimeContext context, string layer = "0")
-            => ProcessEntityCollection(splines, context, layer, s => s.ToCivil3D(), "Could not convert a NurbsCurve to a Civil 3D spline, so it was not created.");
-        
-        private bool CreateCollection(
-            IEnumerable<BH.oM.Adapters.Civil3D.Elements.CoGoPoint> cogos,
-            BHACC3d.Civil3DRuntimeContext context,
-            string layer = "0",
-            string desc = "",
-            bool useDescriptionKey = true,
-            bool matchOnParams = false,
-            bool useNextPointNumSetting = true)
-        {
-            try
-            {
-                if (cogos == null)
-                {
-                    BH.Engine.Base.Compute.RecordError("Cannot create CoGo points: the list of CoGo points is null.");
-                    return true;
-                }
-
-                if (context == null)
-                {
-                    BH.Engine.Base.Compute.RecordError("Cannot create CoGo points: the Civil 3D drawing is not available.");
-                    return false;
-                }
-
-                if (context.CivilDocument == null)
-                {
-                    BH.Engine.Base.Compute.RecordError("Cannot create CoGo points: the active drawing is not a Civil 3D drawing.");
-                    return false;
-                }
-
-                if (context.Transaction == null)
-                {
-                    BH.Engine.Base.Compute.RecordError("Cannot create CoGo points: no transaction is open on the active drawing.");
-                    return false;
-                }
-
-                // Materialise once
-                var input = cogos.Where(c => c != null).ToList();
-                if (input.Count == 0)
-                    return true;
-
-                // Validate points before building locations
-                var valid = new List<BH.oM.Adapters.Civil3D.Elements.CoGoPoint>();
-                var locations = new Autodesk.AutoCAD.Geometry.Point3dCollection();
-
-                for (int i = 0; i < input.Count; i++)
-                {
-                    var cp = input[i];
-                    var p = cp.Location;
-
-                    if (p == null)
-                    {
-                        BH.Engine.Base.Compute.RecordWarning($"CoGo point at index {i} was skipped because its location is null.");
-                        continue;
-                    }
-
-                    // Guard against NaN/Infinity (these can crash Point3d / Add)
-                    if (double.IsNaN(p.X) || double.IsNaN(p.Y) || double.IsNaN(p.Z) ||
-                        double.IsInfinity(p.X) || double.IsInfinity(p.Y) || double.IsInfinity(p.Z))
-                    {
-                        BH.Engine.Base.Compute.RecordWarning($"CoGo point at index {i} was skipped because its location has invalid coordinates ({p.X}, {p.Y}, {p.Z}).");
-                        continue;
-                    }
-
-                    locations.Add(new Autodesk.AutoCAD.Geometry.Point3d(p.X, p.Y, p.Z));
-                    valid.Add(cp);
-                }
-
-                if (valid.Count == 0)
-                {
-                    BH.Engine.Base.Compute.RecordWarning("No CoGo points were created because none had a valid location.");
-                    return true;
-                }
-
-                // Ensure layer once (not per point)
-                EnsureLayerPresent(context, layer);
-
-                ObjectIdCollection ids = context.CivilDocument.CogoPoints.Add(
-                    locations,
-                    desc ?? string.Empty,
-                    useDescriptionKey,
-                    matchOnParams,
-                    useNextPointNumSetting);
-
-                if (ids == null || ids.Count == 0)
-                {
-                    BH.Engine.Base.Compute.RecordError("Civil 3D did not create any CoGo points.");
-                    return false;
-                }
-
-                // Assumption: ids returned in same order as locations
-                int idx = 0;
-                foreach (Autodesk.AutoCAD.DatabaseServices.ObjectId id in ids)
-                {
-                    if (idx >= valid.Count)
-                        break;
-
-                    var bhPoint = valid[idx];
-                    idx++;
-
-                    try
-                    {
-                        var dbObj = context.Transaction.GetObject(id, Autodesk.AutoCAD.DatabaseServices.OpenMode.ForWrite, false);
-                        var c3dPoint = dbObj as ADC.CogoPoint;
-
-                        if (c3dPoint == null)
-                        {
-                            BH.Engine.Base.Compute.RecordWarning("A created CoGo point could not be opened for editing, so its name and layer were not set.");
-                            continue;
-                        }
-
-                        // Apply properties + layer
-                        // bhPoint.ToCivil3D(c3dPoint);
-                        
-                        if (!string.IsNullOrWhiteSpace(bhPoint.Name))
-                        {
-                            // Only assign if you're absolutely sure you're not duplicating
-                            c3dPoint.PointName = bhPoint.Name;
-                        }
-
-                        c3dPoint.Layer = layer;
-                    }
-                    catch (System.Exception exPoint)
-                    {
-                        BH.Engine.Base.Compute.RecordError($"Could not set the name or layer of a CoGo point: {exPoint.Message}");
-                    }
-                }
-
-                if (ids.Count != valid.Count)
-                {
-                    BH.Engine.Base.Compute.RecordWarning($"Civil 3D created {ids.Count} CoGo points from {valid.Count} valid inputs.");
-                }
-
-                return true;
-            }
-            catch (System.Exception ex)
-            {
-                BH.Engine.Base.Compute.RecordError($"Failed to create CoGo points: {ex.Message}");
-                return false;
+                case BHG.Point point:
+                    return point.ToCivil3DDBPoint();
+                case BHG.Line line:
+                    return line.ToCivil3D();
+                case BHG.Arc arc:
+                    return arc.ToCivil3D();
+                case BHG.Circle circle:
+                    return circle.ToCivil3D();
+                case BHG.Ellipse ellipse:
+                    return ellipse.ToCivil3D();
+                case BHG.Polyline polyline:
+                    return polyline.ToCivil3D();
+                case BHG.PolyCurve polyCurve:
+                    return polyCurve.ToCivil3D();
+                case BHG.NurbsCurve nurbsCurve:
+                    return nurbsCurve.ToCivil3D();
+                case BHC.TextNote textNote:
+                    return textNote.ToCivil3D();
+                case BHC.Block block:
+                    return block.ToCivil3D(bt, tr);
+                case BHC.CoGoPoint coGoPoint:
+                    return CreateCoGoPoint(coGoPoint, civdoc, tr);
+                default:
+                    BH.Engine.Base.Compute.RecordError($"Pushing {obj?.GetType().Name} to Civil 3D is not supported.");
+                    return null;
             }
         }
 
         /***************************************************/
-        /**** Private Helpers                           ****/
-        /***************************************************/
 
-        private bool ProcessEntityCollection<T, TEntity>(IEnumerable<T> items, BHACC3d.Civil3DRuntimeContext context, string layer, Func<T, TEntity> converter, string errorMessage) where TEntity : Entity
+        //CoGo points are created through the Civil 3D point collection, so they are already in the drawing when returned.
+        private static Entity CreateCoGoPoint(BHC.CoGoPoint point, CivilDocument civdoc, Transaction tr)
         {
-            foreach (var item in items)
+            if (civdoc == null)
             {
-                if (item == null)
-                    continue;
-
-                var acEntity = converter(item);
-                if (acEntity == null)
-                {
-                    BH.Engine.Base.Compute.RecordError(errorMessage);
-                    continue;
-                }
-
-                acEntity.SetDatabaseDefaults();
-                EnsureLayerPresent(context, layer);
-                acEntity.Layer = layer;
-                context.BlockTableRecord.AppendEntity(acEntity);
-                context.Transaction.AddNewlyCreatedDBObject(acEntity, true);
-            }
-
-            return true;
-        }
-
-        private bool ProcessPolylineCollection<T>(IEnumerable<T> items, BHACC3d.Civil3DRuntimeContext context, string layer, Func<T, object> converter, string errorMessage) where T : class
-        {
-            foreach (var item in items)
-            {
-                if (item == null)
-                    continue;
-
-                var acPolyline = converter(item);
-                if (acPolyline == null)
-                {
-                    BH.Engine.Base.Compute.RecordError(errorMessage);
-                    continue;
-                }
-
-                if (acPolyline is AAD.Polyline3d poly3d)
-                {
-                    poly3d.SetDatabaseDefaults();
-                    EnsureLayerPresent(context, layer);
-                    poly3d.Layer = layer;
-                    context.BlockTableRecord.AppendEntity(poly3d);
-                    context.Transaction.AddNewlyCreatedDBObject(poly3d, true);
-                }
-                else if (acPolyline is AAD.Polyline polyLW)
-                {
-                    polyLW.SetDatabaseDefaults();
-                    EnsureLayerPresent(context, layer);
-                    polyLW.Layer = layer;
-                    context.BlockTableRecord.AppendEntity(polyLW);
-                    context.Transaction.AddNewlyCreatedDBObject(polyLW, true);
-                }
-            }
-
-            return true;
-        }
-
-
-        // Helper: extract geometry (single or enumerable)
-        private IEnumerable<BH.oM.Geometry.IGeometry> ExtractGeometry(BH.oM.Base.CustomObject co)
-        {
-            if (co == null || co.CustomData == null)
-                yield break;
-
-            object geomObj;
-            if (!co.CustomData.TryGetValue("Geometry", out geomObj) || geomObj == null)
-                yield break;
-
-            // Single geometry
-            var single = geomObj as BH.oM.Geometry.IGeometry;
-            if (single != null)
-            {
-                yield return single;
-                yield break;
-            }
-
-            // Collection of geometry
-            var enumerable = geomObj as IEnumerable<BH.oM.Geometry.IGeometry>;
-            if (enumerable != null)
-            {
-                foreach (var g in enumerable)
-                {
-                    var geom = g as BH.oM.Geometry.IGeometry;
-                    if (geom != null)
-                        yield return geom;
-                }
-            }
-        }
-
-
-        private string GetCadLayerName(BH.oM.Base.CustomObject co)
-        {
-            if (co == null || co.Fragments == null)
+                BH.Engine.Base.Compute.RecordError("CoGo points can only be pushed to a Civil 3D drawing.");
                 return null;
+            }
 
-            var identifiers = co.Fragments.OfType<BH.oM.Adapters.Civil3D.Fragments.DrawingIdentifiers>().FirstOrDefault();
+            if (point.Location == null)
+            {
+                BH.Engine.Base.Compute.RecordError("Cannot push a CoGo point without a Location.");
+                return null;
+            }
 
+            ACG.Point3dCollection locations = new ACG.Point3dCollection { point.Location.ToCivil3D() };
+            ObjectIdCollection ids = civdoc.CogoPoints.Add(locations, point.RawDescription ?? "", true, false, true);
+            if (ids == null || ids.Count == 0)
+            {
+                BH.Engine.Base.Compute.RecordError("Civil 3D did not create the CoGo point.");
+                return null;
+            }
+
+            ADC.CogoPoint c3dPoint = (ADC.CogoPoint)tr.GetObject(ids[0], OpenMode.ForWrite);
+            point.ToCivil3D(c3dPoint);
+            return c3dPoint;
+        }
+
+        /***************************************************/
+
+        //Uses the layer recorded on the object when it was pulled, if that layer exists; otherwise the current layer. Layers are never created.
+        private static ObjectId LayerId(IBHoMObject obj, LayerTable lt, Database db)
+        {
+            DrawingIdentifiers identifiers = obj?.Fragments.OfType<DrawingIdentifiers>().FirstOrDefault();
             if (identifiers == null || string.IsNullOrWhiteSpace(identifiers.Layer))
-                return null;
+                return db.Clayer;
 
-            return identifiers.Layer;
+            if (lt.Has(identifiers.Layer))
+                return lt[identifiers.Layer];
+
+            BH.Engine.Base.Compute.RecordWarning($"Layer '{identifiers.Layer}' does not exist; using the current layer.");
+            return db.Clayer;
         }
 
-        private static bool EnsureLayerPresent(
-            BHACC3d.Civil3DRuntimeContext context,
-            string layerName
-        )
+
+        /***************************************************/
+        /**** Private Methods - Units                   ****/
+        /***************************************************/
+
+        //Returns the object scaled from metres to drawing units. BHoM objects are shallow-cloned so the input is never changed.
+        private static object FromSI(object obj, double f)
         {
-            if (string.IsNullOrWhiteSpace(layerName))
-                return false;
+            if (f == 1.0)
+                return obj;
 
-            Database db = context.Database;
-            Transaction tr = context.Transaction;
-
-            LayerTable lt =
-                (LayerTable)tr.GetObject(db.LayerTableId, OpenMode.ForRead);
-
-            // Layer already exists
-            if (lt.Has(layerName))
-                return true;
-
-            // Create new layer using database defaults
-            LayerTableRecord layer = new LayerTableRecord
+            switch (obj)
             {
-                Name = layerName
-            };
-
-            lt.UpgradeOpen();
-            lt.Add(layer);
-            tr.AddNewlyCreatedDBObject(layer, true);
-
-            return true;
+                case BHG.IGeometry geometry:
+                    return geometry.ScaleGeometry(f);
+                case BHC.TextNote textNote:
+                    BHC.TextNote text = textNote.ShallowClone();
+                    text.Orientation = ScaleOrigin(text.Orientation, f);
+                    text.Height *= f;
+                    return text;
+                case BHC.Block block:
+                    BHC.Block instance = block.ShallowClone();
+                    instance.Orientation = ScaleOrigin(instance.Orientation, f);
+                    return instance;
+                case BHC.CoGoPoint coGoPoint:
+                    BHC.CoGoPoint point = coGoPoint.ShallowClone();
+                    point.Location = point.Location?.ScaleGeometry(f) as BHG.Point;
+                    return point;
+                default:
+                    return obj;
+            }
         }
 
-        public static void ApplyPointNumberIfValid(
-            ADC.CogoPoint c3dPoint,
-            int bhPointNumber,
-            bool useNextPointNumSetting
-        )
-        {
-            if (useNextPointNumSetting)
-                return;
-
-            // Civil 3D requires PointNumber >= 1; 0 or less keeps the number Civil 3D assigned
-            if (bhPointNumber < 1)
-                return;
-
-            c3dPoint.PointNumber = (uint)bhPointNumber;
-        }
-
-
-
-
+        /***************************************************/
     }
 }
-
-
