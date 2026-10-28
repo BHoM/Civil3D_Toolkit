@@ -43,17 +43,30 @@ namespace BH.Adapter.Civil3D
 
         public override IEnumerable<object> Pull(IRequest request, PullType pullType = PullType.AdapterDefault, ActionConfig actionConfig = null)
         {
+            if (!IsActive())
+                return new List<object>();
+
+            FilterRequest filterRequest = request as FilterRequest;
+            if (filterRequest == null)
+            {
+                Engine.Base.Compute.RecordError("Civil 3D only supports FilterRequest.");
+                return new List<object>();
+            }
+
+            if (filterRequest.Type == null)
+            {
+                Engine.Base.Compute.RecordError("The FilterRequest has no Type. Set the type of object to pull from Civil 3D.");
+                return new List<object>();
+            }
+
             //Reset the wait event
             m_waitEvent.Reset();
 
             if (!CheckConnection())
                 return new List<object>();
 
-            if (!(request is FilterRequest))
-                return new List<object>();
-
             //Send data through the socket link
-            m_linkIn.SendData(new List<object>() { PackageType.Pull, request as FilterRequest, actionConfig, Civil3DSettings });
+            m_linkIn.SendData(new List<object>() { PackageType.Pull, filterRequest, actionConfig, Civil3DSettings });
 
             //Wait until the return message has been recieved
             if (!m_waitEvent.WaitOne(TimeSpan.FromMinutes(m_waitTime)))
@@ -67,6 +80,13 @@ namespace BH.Adapter.Civil3D
 
             //Raise returned events
             RaiseEvents();
+
+            //A single string returned is an error message from Civil 3D
+            if (returnObjs.Count == 1 && returnObjs[0] is string)
+            {
+                Engine.Base.Compute.RecordError(returnObjs[0] as string);
+                return new List<object>();
+            }
 
             //Return the package
             return returnObjs;

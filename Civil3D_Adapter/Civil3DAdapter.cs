@@ -1,6 +1,6 @@
 /*
  * This file is part of the Buildings and Habitats object Model (BHoM)
- * Copyright (c) 2015 - 2024, the respective contributors. All rights reserved.
+ * Copyright (c) 2015 - 2026, the respective contributors. All rights reserved.
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
@@ -21,14 +21,12 @@
  */
 
 using BH.Adapter.Socket;
-using BH.oM.Base;
-using BH.oM.Data.Requests;
-using BH.oM.Base.Debugging;
 using BH.oM.Adapters.Civil3D;
+using BH.oM.Base.Attributes;
+using BH.oM.Base.Debugging;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
+using System.ComponentModel;
 using System.Threading;
 
 namespace BH.Adapter.Civil3D
@@ -46,8 +44,14 @@ namespace BH.Adapter.Civil3D
         /**** Constructors                              ****/
         /***************************************************/
 
+        [Description("Adapter for Autodesk Civil 3D. Connects to the BHoM listener running inside Civil 3D over TCP sockets.")]
+        [Input("civil3dSettings", "Connection settings. Leave empty to use the default ports (14230 in, 14231 out).")]
+        [Input("active", "Set to true to open the connection. While false, the adapter does nothing.")]
+        [Output("adapter", "Adapter to Civil 3D.")]
         public Civil3DAdapter(Civil3DConfig civil3dSettings = null, bool active = false)
         {
+            m_AdapterSettings.WrapNonBHoMObjects = true;
+
             if (!active)
                 return;
 
@@ -65,10 +69,6 @@ namespace BH.Adapter.Civil3D
             m_waitTime = Civil3DSettings.MaxMinutesToWait;
         }
 
-
-        /***************************************************/
-        /**** Public methods                            ****/
-        /***************************************************/
 
         /***************************************************/
         /**** Private  Fields                           ****/
@@ -93,10 +93,22 @@ namespace BH.Adapter.Civil3D
             m_returnPackage = package.Data;
 
             //Store the events
-            //m_returnEvents = package.Events; //ToDo: Work out if we need this
+            m_returnEvents = package.Events ?? new List<Event>();
 
             //Set the wait event to allow methods to continue
             m_waitEvent.Set();
+        }
+
+        /***************************************************/
+
+        //The constructor only opens the sockets when active is true, so Push and Pull check this first.
+        private bool IsActive()
+        {
+            if (m_linkIn != null)
+                return true;
+
+            Engine.Base.Compute.RecordWarning("The Civil 3D adapter is not active. Set active to true to connect to Civil 3D.");
+            return false;
         }
 
         /***************************************************/
@@ -110,7 +122,7 @@ namespace BH.Adapter.Civil3D
             m_waitEvent.Reset();
 
             if (!returned)
-                Engine.Base.Compute.RecordError("Failed to connect to Civil3D");
+                Engine.Base.Compute.RecordError("Failed to connect to Civil 3D. Check that Civil 3D is open with the BHoM listener loaded.");
 
             return returned;
         }
@@ -119,7 +131,7 @@ namespace BH.Adapter.Civil3D
 
         private void TimeOutError()
         {
-            Engine.Base.Compute.RecordError("The connection with Civil3D timed out. If working on a big model, try to increase the max wait time");
+            Engine.Base.Compute.RecordError("The connection with Civil 3D timed out. If working on a big drawing, try increasing the maximum wait time.");
         }
 
         /***************************************************/
@@ -129,12 +141,10 @@ namespace BH.Adapter.Civil3D
             if (m_returnEvents == null)
                 return;
 
-            Engine.Base.Query.CurrentEvents().AddRange(m_returnEvents);
-            Engine.Base.Query.AllEvents().AddRange(m_returnEvents);
-
-            m_returnEvents = new List<Event>();
+            m_returnEvents.ForEach(x => Engine.Base.Compute.RecordEvent(x));
+            m_returnEvents.Clear();
         }
+
+        /***************************************************/
     }
 }
-
-

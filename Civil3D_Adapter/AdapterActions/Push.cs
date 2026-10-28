@@ -43,6 +43,9 @@ namespace BH.Adapter.Civil3D
             if (pushType == PushType.AdapterDefault)
                 pushType = m_AdapterSettings.DefaultPushType;
 
+            if (!IsActive())
+                return new List<object>();
+
             // Process the objects (verify they are valid; DeepClone them, wrap them, etc).
             IEnumerable<IBHoMObject> objectsToPush = ProcessObjectsForPush(objects, actionConfig); // Note: default Push only supports IBHoMObjects.
 
@@ -63,7 +66,7 @@ namespace BH.Adapter.Civil3D
                 return new List<object>();
 
             //Send data through the socket link
-            m_linkIn.SendData(new List<object>() { PackageType.Push, objects.ToList(), actionConfig, Civil3DSettings }, tag);
+            m_linkIn.SendData(new List<object>() { PackageType.Push, objectsToPush.ToList(), actionConfig, Civil3DSettings }, tag);
 
             //Wait until the return message has been recieved
             if (!m_waitEvent.WaitOne(TimeSpan.FromMinutes(m_waitTime)))
@@ -76,6 +79,13 @@ namespace BH.Adapter.Civil3D
             m_returnPackage.Clear();
 
             RaiseEvents();
+
+            //A single string returned is an error message from Civil 3D
+            if (returnObjs.Count == 1 && returnObjs[0] is string)
+            {
+                Engine.Base.Compute.RecordError(returnObjs[0] as string);
+                return new List<object>();
+            }
 
             //Return the package
             return returnObjs;
