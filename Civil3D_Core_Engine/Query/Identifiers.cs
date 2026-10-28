@@ -1,6 +1,6 @@
 /*
  * This file is part of the Buildings and Habitats object Model (BHoM)
- * Copyright (c) 2015 - 2024, the respective contributors. All rights reserved.
+ * Copyright (c) 2015 - 2026, the respective contributors. All rights reserved.
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
@@ -20,30 +20,34 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using BH.oM.Adapters.Civil3D.Fragments;
+using BH.oM.Base.Attributes;
+using System.ComponentModel;
 
-using BH.oM.Base;
+using Autodesk.AutoCAD.DatabaseServices;
 
-namespace BH.oM.Adapters.Civil3D.Fragments
+namespace BH.Civil3D.Engine.Core
 {
-    public class CADDataFragment : IFragment
-    {       
-        public string CADLayerName { get; set; }
-        public string CADObjectHandle { get; set; }
+    public static partial class Query
+    {
+        /***************************************************/
+        /**** Public Methods                            ****/
+        /***************************************************/
+
+        [Description("Gets the handle, layer and class name of a drawing object.")]
+        [Input("entity", "Drawing object to get the identifiers of.")]
+        [Output("identifiers", "Handle, layer and class name of the drawing object.")]
+        public static DrawingIdentifiers Identifiers(this Entity entity)
+        {
+            if (entity == null)
+            {
+                BH.Engine.Base.Compute.RecordError("Cannot get the identifiers of a null drawing object.");
+                return null;
+            }
+
+            return new DrawingIdentifiers(entity.Handle.ToString(), entity.Layer, entity.GetRXClass().Name);
+        }
+
+        /***************************************************/
     }
-
-    // public class CadTextFragment : IFragment
-    // {
-    //     public double TextHeight { get; set; }
-    //     public double Width { get; set; }
-    //     public string TextStyle { get; set; }
-    //     public AttachmentPoint Attachment { get; set; }  // This is the AutoCAD enum for text attachment, which is a combination of horizontal and vertical alignment. It may need to be converted to BHoM's own alignment system if necessary.
-    //     public bool Annotative { get; set; }
-    // }
-
 }
-

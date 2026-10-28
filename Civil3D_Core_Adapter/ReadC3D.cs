@@ -160,7 +160,7 @@ namespace BH.Civil3D.Adapter.Core
 
                     if (note != null)
                     {
-                        AttachCADDataFragment(mtext, note);
+                        note.SetIdentifiers(mtext);
                         textNotes.Add(note);                           
                     }
                 }
@@ -194,7 +194,7 @@ namespace BH.Civil3D.Adapter.Core
                 if (bho == null)
                     continue;
 
-                AttachCADDataFragment(pointEnt, bho);
+                bho.SetIdentifiers(pointEnt);
                 points.Add(bho);
             }
             
@@ -293,7 +293,7 @@ namespace BH.Civil3D.Adapter.Core
                     var bho = WrapGeometry(bh);
                     if (bho != null)
                     {
-                        AttachCADDataFragment(curveEnt, bho);
+                        bho.SetIdentifiers(curveEnt);
                         curves.Add(bho);
                     }
                 }
@@ -321,7 +321,7 @@ namespace BH.Civil3D.Adapter.Core
                 if (bho == null)
                     continue;
 
-                AttachCADDataFragment(br, bho);
+                bho.SetIdentifiers(br);
                 blocks.Add(bho);
             }
             return blocks;
@@ -363,8 +363,12 @@ namespace BH.Civil3D.Adapter.Core
             foreach (ObjectId id in blockIDs)
             {
                 ADC.FeatureLine l = (tr.GetObject(id, OpenMode.ForRead) as ADC.FeatureLine);
-                if (l != null)
-                    featureLines.Add(l.FromCivil3D());
+                if (l == null)
+                    continue;
+
+                BHC.FeatureLine featureLine = l.FromCivil3D();
+                featureLine.SetIdentifiers(l);
+                featureLines.Add(featureLine);
             }
 
             return featureLines;
@@ -377,7 +381,12 @@ namespace BH.Civil3D.Adapter.Core
                 foreach (ObjectId id in civdoc.GetAlignmentIds())
                 {
                     ADC.Alignment alignment = id.GetObject(OpenMode.ForRead) as ADC.Alignment;
-                    alignments.Add(alignment.FromCivil3D());
+                    if (alignment == null)
+                        continue;
+
+                    BHC.Alignment bhAlignment = alignment.FromCivil3D();
+                    bhAlignment.SetIdentifiers(alignment);
+                    alignments.Add(bhAlignment);
                 }
             return alignments;
         }
@@ -394,8 +403,12 @@ namespace BH.Civil3D.Adapter.Core
             foreach (ObjectId id in parcelIDs)
             {
                 ADC.Parcel p = (tr.GetObject(id, OpenMode.ForRead) as ADC.Parcel);
-                if (p != null)
-                    parcels.Add(p.FromCivil3D());
+                if (p == null)
+                    continue;
+
+                BHC.Parcel parcel = p.FromCivil3D();
+                parcel.SetIdentifiers(p);
+                parcels.Add(parcel);
             }
             return parcels;
         }
@@ -407,7 +420,12 @@ namespace BH.Civil3D.Adapter.Core
             foreach (ObjectId id in civdoc.GetAllPointIds())
             {
                 ADC.CogoPoint pnt = id.GetObject(OpenMode.ForRead) as ADC.CogoPoint;
-                pnts.Add(pnt.FromCivil3D());
+                if (pnt == null)
+                    continue;
+
+                BHC.CoGoPoint bhPoint = pnt.FromCivil3D();
+                bhPoint.SetIdentifiers(pnt);
+                pnts.Add(bhPoint);
             }
             return pnts;
         }
@@ -422,23 +440,6 @@ namespace BH.Civil3D.Adapter.Core
         // Helper methods
         /***************************************************/
     
-        private static void AttachCADDataFragment(AAD.Entity entity, IBHoMObject bhObj)
-        {
-            if (entity == null || bhObj == null)
-                return;
-
-            var layerName = entity.Layer;
-            var handle = entity.Handle.ToString();
-
-            if (!string.IsNullOrWhiteSpace(layerName))
-            {
-                bhObj.Fragments.Add(new BCF.CADDataFragment
-                {
-                    CADLayerName = layerName,
-                    CADObjectHandle = handle
-                });
-            }
-        }
 
 
         

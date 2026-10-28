@@ -55,8 +55,8 @@ namespace BH.Civil3D.Engine.Core
             var normal = arc.CoordinateSystem.Z.ToCivil3D().GetNormal();
             double radius = arc.Radius;
 
-            var startPt = Query.StartPoint(arc).ToACGPoint3d();
-            var endPt   = Query.EndPoint(arc).ToACGPoint3d();
+            var startPt = BH.Engine.Geometry.Query.StartPoint(arc).ToACGPoint3d();
+            var endPt   = BH.Engine.Geometry.Query.EndPoint(arc).ToACGPoint3d();
 
             var vStart = startPt - center;
             var vEnd   = endPt   - center;

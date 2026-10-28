@@ -453,16 +453,12 @@ namespace BH.Civil3D.Adapter.Core
             if (co == null || co.Fragments == null)
                 return null;
 
-            var cadFrag = co.Fragments.OfType<BH.oM.Adapters.Civil3D.Fragments.CADDataFragment>().FirstOrDefault();
+            var identifiers = co.Fragments.OfType<BH.oM.Adapters.Civil3D.Fragments.DrawingIdentifiers>().FirstOrDefault();
 
-            if (cadFrag == null)
+            if (identifiers == null || string.IsNullOrWhiteSpace(identifiers.Layer))
                 return null;
 
-            // Use CADLayerName if present, otherwise Layer
-            if (!string.IsNullOrWhiteSpace(cadFrag.CADLayerName))
-                return cadFrag.CADLayerName;
-
-            return null;
+            return identifiers.Layer;
         }
 
         private static bool EnsureLayerPresent(
