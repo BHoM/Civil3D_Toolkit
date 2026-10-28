@@ -36,6 +36,9 @@ using BH.oM.Data.Requests;
 using BHC = BH.oM.Adapters.Civil3D.Elements;
 using BHG = BH.oM.Geometry;
 
+//Limits AutoCAD's command scan to this class, so it does not reflect over BHoM types before the assembly resolver is registered
+[assembly: CommandClass(typeof(BH.Civil3D.Adapter.Core.BHoMOutCommand))]
+
 namespace BH.Civil3D.Adapter.Core
 {
     //Standalone AutoCAD command that extracts every BHoM data type supported by the
