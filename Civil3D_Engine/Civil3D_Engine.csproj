@@ -21,23 +21,23 @@
   </Target>
   <ItemGroup>
     <Reference Include="accoremgd">
-      <HintPath>..\libs\accoremgd.dll</HintPath>
+      <HintPath>..\libs\2026\accoremgd.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="acdbmgd">
-      <HintPath>..\libs\acdbmgd.dll</HintPath>
+      <HintPath>..\libs\2026\acdbmgd.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="acmgd">
-      <HintPath>..\libs\acmgd.dll</HintPath>
+      <HintPath>..\libs\2026\acmgd.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="AecBaseMgd">
-      <HintPath>..\libs\AecBaseMgd.dll</HintPath>
+      <HintPath>..\libs\2026\AecBaseMgd.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="AeccDbMgd">
-      <HintPath>..\libs\AeccDbMgd.dll</HintPath>
+      <HintPath>..\libs\2026\AeccDbMgd.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="BHoM">
