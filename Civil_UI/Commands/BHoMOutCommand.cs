@@ -110,8 +110,7 @@ namespace BH.UI.Civil.Commands
             typeof(BHG.ICurve),
             typeof(BHC.BlockInstance),
             typeof(BHC.BlockDefinition),
-            typeof(BHC.CoGoPoint),
-            typeof(BHC.CivSurface)
+            typeof(BHC.CoGoPoint)
         };
 
         /***************************************************/

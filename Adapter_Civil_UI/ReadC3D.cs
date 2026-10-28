@@ -127,9 +127,6 @@ namespace BH.UI.Civil.Adapter
             if (requestedType == typeof(BHC.CoGoPoint))
                 return ReadCoGoPoints(civdoc);
 
-            if (requestedType == typeof(BHC.CivSurface))
-                return ReadTinSurface(civdoc, tr);
-
             return Enumerable.Empty<IBHoMObject>();
         }
 
@@ -464,20 +461,6 @@ namespace BH.UI.Civil.Adapter
             return pnts;
         }
 
-        private List<BHC.CivSurface> ReadTinSurface(CivilDocument civdoc, Transaction tr)
-        {   
-            var tinSurfaceList = new List<BHC.CivSurface>();
-
-            foreach (ObjectId id in civdoc.GetSurfaceIds())
-            {
-                var tinSurface = tr.GetObject(id, OpenMode.ForRead) as ADC.TinSurface;
-                if (tinSurface != null)
-                {
-                    tinSurfaceList.Add(tinSurface.ToBHoM()); // returns BHC.CivSurface
-                }
-            }
-            return tinSurfaceList;
-        }
 
 
 
