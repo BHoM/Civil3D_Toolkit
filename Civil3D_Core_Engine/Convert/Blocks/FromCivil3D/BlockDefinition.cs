@@ -137,7 +137,7 @@ namespace BH.Civil3D.Engine.Core
                 // Geometry (entities inside definition)
                 if (dbo is Entity ent)
                 {
-                    IGeometry g = ent.FromCivil3D();
+                    IGeometry g = ent.IFromCivil3D(tr) as IGeometry;
 
                     if (g != null)
                         bhDef.Geometry.Add(g);

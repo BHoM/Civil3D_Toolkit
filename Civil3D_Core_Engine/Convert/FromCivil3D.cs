@@ -1,6 +1,6 @@
 /*
  * This file is part of the Buildings and Habitats object Model (BHoM)
- * Copyright (c) 2015 - 2024, the respective contributors. All rights reserved.
+ * Copyright (c) 2015 - 2026, the respective contributors. All rights reserved.
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
@@ -20,77 +20,70 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BHG = BH.oM.Geometry;
+using BH.oM.Base.Attributes;
+using System.ComponentModel;
+
 using ACD = Autodesk.AutoCAD.DatabaseServices;
-using ACG = Autodesk.AutoCAD.Geometry;
+using ADC = Autodesk.Civil.DatabaseServices;
 
 namespace BH.Civil3D.Engine.Core
 {
     public static partial class Convert
     {
-
         /***************************************************/
         /**** Public Methods                            ****/
         /***************************************************/
-        ///////////////////
-        // To Civils 3d //
-        /////////////////
-        /*************** Line  ********************/
 
-
-
-        /////////////////////
-        // From Civils 3d //
-        ///////////////////        
-
-        public static BHG.IGeometry FromCivil3D(this ACD.Entity ent)
+        [Description("Converts a drawing object to the matching BHoM object: geometry for points and curves, TextNote for text, Block for block references, and the Civil 3D element for CoGo points, feature lines and parcels. Returns null for any other type.")]
+        [Input("entity", "Drawing object to convert.")]
+        [Input("transaction", "Open transaction, used to look up block definitions. Only needed for block references.")]
+        [Output("object", "The converted BHoM object, or null if the type is not supported.")]
+        public static object IFromCivil3D(this ACD.Entity entity, ACD.Transaction transaction)
         {
-            if (ent == null)
-                return null;
-
-            // Point
-            var dbPoint = ent as ACD.DBPoint;
-            if (dbPoint != null)
-                return dbPoint.FromCivil3D();
-
-            // Line
-            var line = ent as ACD.Line;
-            if (line != null)
-                return line.FromCivil3D();
-
-            // Arc
-            var arc = ent as ACD.Arc;
-            if (arc != null)
-                return arc.FromCivil3D();
-
-            // Circle
-            var circle = ent as ACD.Circle;
-            if (circle != null)
-                return circle.FromCivil3D();
-
-            // Ellipse
-            var ellipse = ent as ACD.Ellipse;
-            if (ellipse != null)
-                return ellipse.FromCivil3D();
-
-            // Polyline (2D)
-            var pl = ent as ACD.Polyline;
-            if (pl != null)
-                return pl.FromCivil3D();
-
-            // // Polyline3d
-            // var pl3d = ent as ACD.Polyline3d;
-            // if (pl3d != null)
-            //     return pl3d.FromCivil3D();
-
-            // Add more entity types here as needed
-
-            return null;
+            switch (entity)
+            {
+                case null:
+                    return null;
+                case ADC.CogoPoint cogoPoint:
+                    return cogoPoint.FromCivil3D();
+                case ADC.FeatureLine featureLine:
+                    return featureLine.FromCivil3D();
+                case ADC.Parcel parcel:
+                    return parcel.FromCivil3D();
+                case ACD.DBPoint point:
+                    return point.FromCivil3D();
+                case ACD.Line line:
+                    return line.FromCivil3D();
+                case ACD.Arc arc:
+                    return arc.FromCivil3D();
+                case ACD.Circle circle:
+                    return circle.FromCivil3D();
+                case ACD.Ellipse ellipse:
+                    return ellipse.FromCivil3D();
+                case ACD.Polyline polyline:
+                    return polyline.FromCivil3D();
+                case ACD.Polyline2d polyline2d:
+                    return polyline2d.FromCivil3D();
+                case ACD.Polyline3d polyline3d:
+                    return polyline3d.FromCivil3D();
+                case ACD.Spline spline:
+                    return spline.FromCivil3D();
+                case ACD.MText mtext:
+                    return mtext.FromCivil3D();
+                case ACD.DBText text:
+                    return text.FromCivil3D();
+                case ACD.BlockReference blockReference:
+                    if (transaction == null)
+                    {
+                        BH.Engine.Base.Compute.RecordError("A transaction is needed to convert a block reference.");
+                        return null;
+                    }
+                    return blockReference.FromCivil3D(transaction);
+                default:
+                    return null;
+            }
         }
+
+        /***************************************************/
     }
 }

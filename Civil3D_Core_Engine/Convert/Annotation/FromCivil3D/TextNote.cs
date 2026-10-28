@@ -49,6 +49,25 @@ namespace BH.Civil3D.Engine.Core
             };
         }
 
+
+        /***************************************************/
+
+        public static BHCE.TextNote FromCivil3D(this ACD.DBText text)
+        {
+            if (text == null)
+                return null;
+
+            //Single-line text stores its rotation in its OCS, which AutoCAD derives from the normal
+            ACG.Vector3d x = ACG.Vector3d.XAxis.TransformBy(ACG.Matrix3d.PlaneToWorld(text.Normal)).RotateBy(text.Rotation, text.Normal);
+            ACG.Vector3d y = text.Normal.CrossProduct(x);
+
+            return new BHCE.TextNote
+            {
+                Text = text.TextString,
+                Orientation = BH.Engine.Geometry.Create.CartesianCoordinateSystem(text.Position.FromCivil3D(), x.FromCivil3D(), y.FromCivil3D()),
+                Height = text.Height,
+            };
+        }
         /***************************************************/
     }
 }

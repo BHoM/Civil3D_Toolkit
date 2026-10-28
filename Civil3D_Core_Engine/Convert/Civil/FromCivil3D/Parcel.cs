@@ -56,7 +56,7 @@ namespace BH.Civil3D.Engine.Core
         private static BHG.ICurve ParcelBoundary(ADC.Parcel civParcel)
         {
             ACD.Curve baseCurve = civParcel.BaseCurve;
-            BHG.ICurve boundary = baseCurve.FromCivil3D() as BHG.ICurve;
+            BHG.ICurve boundary = baseCurve.IFromCivil3D(null) as BHG.ICurve;
 
             if (boundary == null)
                 BH.Engine.Base.Compute.RecordWarning($"The boundary of parcel {civParcel.Name} could not be converted, so it was left empty.");
