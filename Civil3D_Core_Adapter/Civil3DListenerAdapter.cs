@@ -1,6 +1,6 @@
 /*
  * This file is part of the Buildings and Habitats object Model (BHoM)
- * Copyright (c) 2015 - 2024, the respective contributors. All rights reserved.
+ * Copyright (c) 2015 - 2026, the respective contributors. All rights reserved.
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
@@ -20,37 +20,25 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using BH.Adapter;
-using BH.oM.Base;
 using BH.oM.Adapter;
-using BH.oM.Data.Requests;
-
-
-using Autodesk.AutoCAD.ApplicationServices;
-
 
 namespace BH.Civil3D.Adapter.Core
 {
+    //Adapter that runs inside Civil 3D; the listener passes it the packages sent by the BHoM client adapter.
     public partial class Civil3DListenerAdapter : BHoMAdapter
     {
-
         /***************************************************/
         /**** Constructors                              ****/
         /***************************************************/
 
         public Civil3DListenerAdapter()
         {
-            m_AdapterSettings.DefaultPushType = oM.Adapter.PushType.CreateOnly;
+            m_AdapterSettings.DefaultPushType = PushType.CreateOnly;
+            m_AdapterSettings.UseAdapterId = false;
+            m_AdapterSettings.WrapNonBHoMObjects = true;
         }
 
-
+        /***************************************************/
     }
 }
-
-
