@@ -465,7 +465,7 @@ namespace BH.Civil3D.Engine.Core
                     continue;
 
                 // ---- Guard 1: skip zero‑length curves ----
-                if (IsZeroLength(converted, tol))
+                if (converted.ILength() <= tol)
                     continue;
 
                 // ---- Guard 2: skip consecutive geometric duplicates ----
@@ -479,6 +479,18 @@ namespace BH.Civil3D.Engine.Core
             return new BHG.PolyCurve { Curves = bhCurves };
         }
 
+
+        /***************************************************/
+        /**** Private Methods                           ****/
+        /***************************************************/
+
+        private static bool IsSameAsPrevious(BHG.ICurve previous, BHG.ICurve current, double tol)
+        {
+            if (previous == null || current == null || previous.GetType() != current.GetType())
+                return false;
+
+            return previous.IStartPoint().Distance(current.IStartPoint()) <= tol && previous.IEndPoint().Distance(current.IEndPoint()) <= tol;
+        }
         /***************************************************/
     }
 }

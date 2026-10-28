@@ -27,6 +27,7 @@ using System.Text;
 using System.Threading.Tasks;
 using BHC = BH.oM.Adapters.Civil3D.Elements;
 using BHG = BH.oM.Geometry;
+using BH.Engine.Geometry;
 
 using ACG = Autodesk.AutoCAD.Geometry;
 
@@ -85,7 +86,7 @@ namespace BH.Civil3D.Engine.Core
                 else
                 {
                     // Arc segment via bulge conversion
-                    BHG.Arc arc = BH.Civil3D.Engine.Core.Convert.BulgeToArc(start, end, bulge);
+                    BHG.Arc arc = start.BulgeToArc(end, bulge);
                     segments.Add(arc);
                 }
             }
@@ -113,113 +114,82 @@ namespace BH.Civil3D.Engine.Core
         }
 
 
+
         /***************************************************/
-        /**** Helper Methods  ****/
+        /**** Private Methods                           ****/
         /***************************************************/
-     
+
         private static BHG.PolyCurve ApplyElevationPoints(BHG.PolyCurve polyCurve, List<BHG.Point> elevationPoints)
         {
-            // For each elevation point, find the closest location on the polycurve
-            // and split segments at that location, updating Z values
-            
-            var newSegments = new List<BHG.ICurve>();
-            var startPt = (polyCurve.Curves.Count > 0 && polyCurve.Curves[0] is BHG.Line line) ? line.Start : new BHG.Point { X = 0, Y = 0, Z = 0 };
-            var sortedElevPoints = elevationPoints.OrderBy(p => Math.Sqrt((p.X - startPt.X) * (p.X - startPt.X) + (p.Y - startPt.Y) * (p.Y - startPt.Y))).ToList();
-            
-            foreach (var segment in polyCurve.Curves)
-            {
-                var newSegs = SplitSegmentAtElevationPoints(segment, sortedElevPoints);
-                newSegments.AddRange(newSegs);
-            }
+            List<BHG.ICurve> segments = new List<BHG.ICurve>();
+            foreach (BHG.ICurve segment in polyCurve.Curves)
+                segments.AddRange(SplitSegmentAtElevationPoints(segment, elevationPoints));
 
-            return new BHG.PolyCurve { Curves = newSegments };
+            return new BHG.PolyCurve { Curves = segments };
         }
 
+        /***************************************************/
+
+        //Splits a straight segment at every elevation point that lies on it in plan, in order along the segment, taking each
+        //split point's Z from its elevation point. Arcs are returned unchanged.
         private static List<BHG.ICurve> SplitSegmentAtElevationPoints(BHG.ICurve segment, List<BHG.Point> elevationPoints)
         {
-            var result = new List<BHG.ICurve> { segment };
+            BHG.Line line = segment as BHG.Line;
+            if (line == null)
+                return new List<BHG.ICurve> { segment };
 
-            // For each elevation point, check if it projects onto this segment
-            foreach (var elevPt in elevationPoints)
+            List<(double Parameter, BHG.Point Point)> splits = new List<(double, BHG.Point)>();
+            foreach (BHG.Point elevationPoint in elevationPoints)
             {
-                var updated = new List<BHG.ICurve>();
-                
-                foreach (var seg in result)
-                {
-                    // Check if elevation point is on or near this segment
-                    var projPt = ProjectPointOnSegment(elevPt, seg);
-                    
-                    if (projPt != null && IsPointOnSegment(projPt, seg))
-                    {
-                        // Split segment, updating Z from elevation point
-                        var split = SplitSegment(seg, projPt, elevPt.Z);
-                        updated.AddRange(split);
-                    }
-                    else
-                    {
-                        updated.Add(seg);
-                    }
-                }
-                
-                result = updated;
+                double parameter;
+                if (TryParameterInPlan(line, elevationPoint, out parameter))
+                    splits.Add((parameter, elevationPoint));
             }
 
+            if (splits.Count == 0)
+                return new List<BHG.ICurve> { segment };
+
+            List<BHG.ICurve> result = new List<BHG.ICurve>();
+            BHG.Point start = line.Start;
+            foreach ((double Parameter, BHG.Point Point) split in splits.OrderBy(x => x.Parameter))
+            {
+                BHG.Point onLine = line.Start + (line.End - line.Start) * split.Parameter;
+                BHG.Point end = new BHG.Point { X = onLine.X, Y = onLine.Y, Z = split.Point.Z };
+                result.Add(new BHG.Line { Start = start, End = end });
+                start = end;
+            }
+
+            result.Add(new BHG.Line { Start = start, End = line.End });
             return result;
         }
 
-        private static BHG.Point ProjectPointOnSegment(BHG.Point point, BHG.ICurve segment)
+        /***************************************************/
+
+        //Gets where a point falls along a line in plan, as a parameter between 0 and 1. Fails if the point is off the line in plan,
+        //or at one of its ends (which are already vertices).
+        private static bool TryParameterInPlan(BHG.Line line, BHG.Point point, out double parameter)
         {
-            if (segment is BHG.Line line)
-            {
-                var start = line.Start;
-                var end = line.End;
-                var v = end - start;
-                var w = new BHG.Vector { X = point.X - start.X, Y = point.Y - start.Y, Z = 0 };
-                double t = BH.Engine.Geometry.Query.DotProduct(w, v) / BH.Engine.Geometry.Query.DotProduct(v, v);
-                t = Math.Max(0, Math.Min(1, t));
-                return start + t * v;
-            }
-            return null;
-        }
+            parameter = 0.0;
+            const double tolerance = 1e-3;
 
-        private static bool IsPointOnSegment(BHG.Point projPoint, BHG.ICurve segment)
-        {
-            if (segment is BHG.Line line)
-            {
-                var midPt = new BHG.Point 
-                { 
-                    X = (line.Start.X + line.End.X) / 2, 
-                    Y = (line.Start.Y + line.End.Y) / 2,
-                    Z = (line.Start.Z + line.End.Z) / 2
-                };
-                double dx = projPoint.X - midPt.X;
-                double dy = projPoint.Y - midPt.Y;
-                double dist = Math.Sqrt(dx * dx + dy * dy);
-                return dist < 0.001; // tolerance
-            }
-            return false;
-        }
+            BHG.Vector direction = new BHG.Vector { X = line.End.X - line.Start.X, Y = line.End.Y - line.Start.Y };
+            double length = direction.Length();
+            if (length < tolerance)
+                return false;
 
-        private static List<BHG.ICurve> SplitSegment(BHG.ICurve segment, BHG.Point splitPt, double elevZ)
-        {
-            var result = new List<BHG.ICurve>();
+            BHG.Vector toPoint = new BHG.Vector { X = point.X - line.Start.X, Y = point.Y - line.Start.Y };
+            double along = toPoint.DotProduct(direction) / length;
+            if (along <= tolerance || along >= length - tolerance)
+                return false;
 
-            if (segment is BHG.Line line)
-            {
-                var updateSplitPt = new BHG.Point { X = splitPt.X, Y = splitPt.Y, Z = elevZ };
-                result.Add(new BHG.Line { Start = line.Start, End = updateSplitPt });
-                result.Add(new BHG.Line { Start = updateSplitPt, End = line.End });
-            }
-            else
-            {
-                result.Add(segment); // For arcs, just return as is for now
-            }
+            double offset = System.Math.Abs(toPoint.X * direction.Y - toPoint.Y * direction.X) / length;
+            if (offset > tolerance)
+                return false;
 
-            return result;
+            parameter = along / length;
+            return true;
         }
 
         /***************************************************/
     }
 }
-
-

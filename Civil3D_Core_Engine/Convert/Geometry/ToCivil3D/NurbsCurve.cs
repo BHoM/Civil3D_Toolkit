@@ -92,9 +92,9 @@ namespace BH.Civil3D.Engine.Core
                         {
                             spline.InsertKnot(knot);
                         }
-                        catch
+                        catch (Exception ex)
                         {
-                            // Skip knots that cannot be inserted (e.g., duplicates)
+                            BH.Engine.Base.Compute.RecordWarning($"A knot could not be inserted into the spline and was skipped: {ex.Message}");
                         }
                     }
                 }

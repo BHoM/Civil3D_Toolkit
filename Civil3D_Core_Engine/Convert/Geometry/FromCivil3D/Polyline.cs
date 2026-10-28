@@ -68,7 +68,7 @@ namespace BH.Civil3D.Engine.Core
                 else
                 {
                     // Arc segment
-                    BHG.Arc arc = BulgeToArc(start, end, bulge);
+                    BHG.Arc arc = start.BulgeToArc(end, bulge);
                     segments.Add(arc);
                 }
             }
@@ -149,6 +149,39 @@ namespace BH.Civil3D.Engine.Core
             return new BHG.PolyCurve { Curves = segments };
         }
 
+
+        /***************************************************/
+        /**** Private Methods                           ****/
+        /***************************************************/
+
+        private static void AddSegment(
+            List<BHG.ICurve> segments,
+            ACG.Point3d start,
+            ACG.Point3d end,
+            double bulge)
+        {
+            // duplicate vertices: a zero-length segment would make the whole curve invalid
+            if (start.DistanceTo(end) < ZeroLength)
+                return;
+
+            if (Math.Abs(bulge) < 1e-12)
+            {
+                segments.Add(new BHG.Line
+                {
+                    Start = start.FromCivil3D(),
+                    End   = end.FromCivil3D()
+                });
+            }
+            else
+            {
+                segments.Add(start.BulgeToArc(end, bulge));
+            }
+        }
+
+        /***************************************************/
+
+        // Polyline segments shorter than this (duplicate vertices) are skipped when reading from Civil 3D.
+        private const double ZeroLength = 1e-6;
         /***************************************************/
     }
 }

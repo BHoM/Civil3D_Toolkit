@@ -94,7 +94,7 @@ namespace BH.Civil3D.Engine.Core
                 for (int i = 0; i < segments.Count; i++)
                 {
                     BHG.Point start = segments[i].IStartPoint();
-                    double bulge = segments[i] is BHG.Arc ? ArcToBulge((BHG.Arc)segments[i]) : 0.0;
+                    double bulge = segments[i] is BHG.Arc ? ((BHG.Arc)segments[i]).ArcToBulge() : 0.0;
                     polyline.AddVertexAt(i, start.ToCivil3D2d(), bulge, 0, 0);
                 }
 
