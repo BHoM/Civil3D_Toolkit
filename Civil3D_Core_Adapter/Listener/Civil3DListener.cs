@@ -21,6 +21,7 @@
  */
 
 using Autodesk.AutoCAD.Runtime;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 [assembly: ExtensionApplication(typeof(BH.Civil3D.Adapter.Core.Civil3DListener))]
@@ -35,6 +36,7 @@ namespace BH.Civil3D.Adapter.Core
         /**** Public Methods                            ****/
         /***************************************************/
 
+        [Description("Called by Civil 3D when the plug-in loads: registers the BHoM assembly resolver and starts the listener.")]
         public void Initialize()
         {
             AssemblyResolver.Register();
@@ -43,6 +45,7 @@ namespace BH.Civil3D.Adapter.Core
 
         /***************************************************/
 
+        [Description("Called by Civil 3D when it closes: stops the listener.")]
         public void Terminate()
         {
             Stop();

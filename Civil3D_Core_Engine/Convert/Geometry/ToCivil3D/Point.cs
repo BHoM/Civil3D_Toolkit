@@ -29,6 +29,10 @@ using BHG = BH.oM.Geometry;
 using ACD = Autodesk.AutoCAD.DatabaseServices;
 using ACG = Autodesk.AutoCAD.Geometry;
 
+using BH.oM.Base.Attributes;
+
+using System.ComponentModel;
+
 namespace BH.Civil3D.Engine.Core
 {
     public static partial class Convert
@@ -37,6 +41,9 @@ namespace BH.Civil3D.Engine.Core
         /**** Public Methods                            ****/
         /***************************************************/
 
+        [Description("Converts a BH.oM.Geometry.Point to a Civil 3D DBPoint.")]
+        [Input("pt", "A BH.oM.Geometry.Point to convert.")]
+        [Output("point", "The converted Civil 3D DBPoint.")]
         public static ACD.DBPoint ToCivil3DDBPoint(this BHG.Point pt)
         {
             return new ACD.DBPoint(new ACG.Point3d(pt.X, pt.Y, pt.Z));
@@ -44,6 +51,9 @@ namespace BH.Civil3D.Engine.Core
 
         /***************************************************/
 
+        [Description("Converts BH.oM.Geometry.Point to an AutoCAD Point3d.")]
+        [Input("pt", "BH.oM.Geometry.Point to convert.")]
+        [Output("point3d", "The converted AutoCAD Point3d.")]
         public static ACG.Point3d ToCivil3D(this BHG.Point pt)
         {
             return new ACG.Point3d(pt.X, pt.Y, pt.Z);
@@ -51,6 +61,9 @@ namespace BH.Civil3D.Engine.Core
 
         /***************************************************/
 
+        [Description("Converts a BH.oM.Geometry.Point to an AutoCAD Point2d, dropping its Z.")]
+        [Input("pt", "A BH.oM.Geometry.Point to convert.")]
+        [Output("point2d", "The converted AutoCAD Point2d.")]
         public static ACG.Point2d ToCivil3D2d(this BHG.Point pt)
         {
             return new ACG.Point2d(pt.X, pt.Y);

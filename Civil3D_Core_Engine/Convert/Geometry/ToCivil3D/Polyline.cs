@@ -31,6 +31,10 @@ using ACG = Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Geometry;
 using BH.Engine.Geometry;
 
+using BH.oM.Base.Attributes;
+
+using System.ComponentModel;
+
 namespace BH.Civil3D.Engine.Core
 {
     public static partial class Convert
@@ -39,6 +43,9 @@ namespace BH.Civil3D.Engine.Core
         /**** Public Methods                            ****/
         /***************************************************/
 
+        [Description("Converts a BH.oM.Geometry.Polyline to a Civil 3D curve: a lightweight polyline when it is flat at a constant elevation, otherwise a 3D polyline.")]
+        [Input("polyline", "A BH.oM.Geometry.Polyline to convert.")]
+        [Output("curve", "The converted Civil 3D Curve.")]
         public static ACD.Curve ToCivil3D(this BHG.Polyline polyline)
         {
             if (polyline == null || polyline.ControlPoints == null || polyline.ControlPoints.Count < 2)
@@ -52,6 +59,9 @@ namespace BH.Civil3D.Engine.Core
 
         /***************************************************/
 
+        [Description("Converts a BH.oM.Geometry.PolyCurve to a Civil 3D curve: a lightweight polyline (arcs as bulges) when it is flat at a constant elevation, otherwise a 3D polyline. Returns null if it is not flat and contains arcs.")]
+        [Input("polyCurve", "A BH.oM.Geometry.PolyCurve to convert.")]
+        [Output("curve", "The converted Civil 3D Curve.")]
         public static ACD.Curve ToCivil3D(this BHG.PolyCurve polyCurve)
         {
             if (polyCurve == null || polyCurve.Curves == null || polyCurve.Curves.Count == 0)

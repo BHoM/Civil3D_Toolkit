@@ -31,6 +31,10 @@ using ACG = Autodesk.AutoCAD.Geometry;
 
 using Autodesk.AutoCAD.DatabaseServices;
 
+using BH.oM.Base.Attributes;
+
+using System.ComponentModel;
+
 namespace BH.Civil3D.Engine.Core
 {
     public static partial class Convert
@@ -40,6 +44,9 @@ namespace BH.Civil3D.Engine.Core
         /**** Public Methods                            ****/
         /***************************************************/
 
+        [Description("Converts an AutoCAD Extents3d to BH.oM.Geometry.BoundingBox.")]
+        [Input("extents", "An AutoCAD Extents3d to convert.")]
+        [Output("boundingBox", "The converted BH.oM.Geometry.BoundingBox.")]
         public static BHG.BoundingBox FromCivil3D(this Extents3d extents)
         {
             return new oM.Geometry.BoundingBox

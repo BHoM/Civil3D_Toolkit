@@ -31,6 +31,10 @@ using ACG = Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Geometry;
 using BH.Engine.Geometry;
 
+using BH.oM.Base.Attributes;
+
+using System.ComponentModel;
+
 namespace BH.Civil3D.Engine.Core
 {
     public static partial class Convert
@@ -39,6 +43,9 @@ namespace BH.Civil3D.Engine.Core
         /**** Public Methods                            ****/
         /***************************************************/
 
+        [Description("Converts a Civil 3D lightweight Polyline to a BH.oM.Geometry.PolyCurve of lines and arcs.")]
+        [Input("acadPolyline", "A Civil 3D lightweight Polyline to convert.")]
+        [Output("polyCurve", "The converted BH.oM.Geometry.PolyCurve.")]
         public static BHG.PolyCurve FromCivil3D(this ACD.Polyline acadPolyline)
         {
             List<BHG.ICurve> segments = new List<BHG.ICurve>();
@@ -77,6 +84,9 @@ namespace BH.Civil3D.Engine.Core
 
         /***************************************************/
 
+        [Description("Converts a Civil 3D Polyline2d to a BH.oM.Geometry.PolyCurve of lines and arcs.")]
+        [Input("polyline2d", "A Civil 3D Polyline2d to convert.")]
+        [Output("polyCurve", "The converted BH.oM.Geometry.PolyCurve.")]
         public static BHG.PolyCurve FromCivil3D(this ACD.Polyline2d polyline2d)
         {
             var segments = new List<BHG.ICurve>();
@@ -113,6 +123,9 @@ namespace BH.Civil3D.Engine.Core
 
         /***************************************************/
 
+        [Description("Converts a Civil 3D Polyline3d to a BH.oM.Geometry.PolyCurve of lines.")]
+        [Input("polyline3d", "A Civil 3D Polyline3d to convert.")]
+        [Output("polyCurve", "The converted BH.oM.Geometry.PolyCurve.")]
         public static BHG.PolyCurve FromCivil3D(this ACD.Polyline3d polyline3d)
         {
             var segments = new List<BHG.ICurve>();

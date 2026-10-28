@@ -31,6 +31,10 @@ using ACG = Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Geometry;
 using BH.Engine.Geometry;
 
+using BH.oM.Base.Attributes;
+
+using System.ComponentModel;
+
 namespace BH.Civil3D.Engine.Core
 {
     public static partial class Convert
@@ -39,6 +43,9 @@ namespace BH.Civil3D.Engine.Core
         /**** Public Methods                            ****/
         /***************************************************/
 
+        [Description("Converts a Civil 3D Spline to BH.oM.Geometry.NurbsCurve.")]
+        [Input("acSpline", "A Civil 3D Spline to convert.")]
+        [Output("nurbsCurve", "The converted BH.oM.Geometry.NurbsCurve.")]
         public static BHG.NurbsCurve FromCivil3D(this ACD.Spline acSpline)
         {
             if (acSpline == null)

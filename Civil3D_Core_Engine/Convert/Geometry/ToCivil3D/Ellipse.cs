@@ -31,6 +31,10 @@ using ACG = Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Geometry;
 using BH.Engine.Geometry;
 
+using BH.oM.Base.Attributes;
+
+using System.ComponentModel;
+
 namespace BH.Civil3D.Engine.Core
 {
     public static partial class Convert
@@ -39,6 +43,9 @@ namespace BH.Civil3D.Engine.Core
         /**** Public Methods                            ****/
         /***************************************************/
 
+        [Description("Converts BH.oM.Geometry.Ellipse to a Civil 3D Ellipse.")]
+        [Input("ellipse", "BH.oM.Geometry.Ellipse to convert.")]
+        [Output("ellipse", "The converted Civil 3D Ellipse.")]
         public static ACD.Ellipse ToCivil3D(this BHG.Ellipse ellipse)
         {
             if (ellipse == null)

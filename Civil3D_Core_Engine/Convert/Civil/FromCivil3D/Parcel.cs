@@ -27,6 +27,10 @@ using ACD = Autodesk.AutoCAD.DatabaseServices;
 
 using ADC = Autodesk.Civil.DatabaseServices;
 
+using BH.oM.Base.Attributes;
+
+using System.ComponentModel;
+
 namespace BH.Civil3D.Engine.Core
 {
     public static partial class Convert
@@ -36,6 +40,9 @@ namespace BH.Civil3D.Engine.Core
         /**** Public Methods                            ****/
         /***************************************************/
 
+        [Description("Converts a Civil 3D Parcel to BH.oM.Adapters.Civil3D.Elements.Parcel, with its boundary curve.")]
+        [Input("civParcel", "A Civil 3D Parcel to convert.")]
+        [Output("parcel", "The converted BH.oM.Adapters.Civil3D.Elements.Parcel.")]
         public static BHC.Parcel FromCivil3D(this ADC.Parcel civParcel)
         {
             return new BHC.Parcel

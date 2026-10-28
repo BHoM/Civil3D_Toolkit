@@ -31,6 +31,10 @@ using ACG = Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Geometry;
 using BH.Engine.Geometry;
 
+using BH.oM.Base.Attributes;
+
+using System.ComponentModel;
+
 namespace BH.Civil3D.Engine.Core
 {
     public static partial class Convert
@@ -39,6 +43,9 @@ namespace BH.Civil3D.Engine.Core
         /**** Public Methods                            ****/
         /***************************************************/
 
+        [Description("Converts a Civil 3D Ellipse to a BHoM curve: a BH.oM.Geometry.Ellipse when it is a full ellipse, otherwise a NurbsCurve.")]
+        [Input("acEllipse", "A Civil 3D Ellipse to convert.")]
+        [Output("curve", "The converted curve.")]
         public static BHG.ICurve FromCivil3D(this ACD.Ellipse acEllipse)
         {
             if (acEllipse == null)

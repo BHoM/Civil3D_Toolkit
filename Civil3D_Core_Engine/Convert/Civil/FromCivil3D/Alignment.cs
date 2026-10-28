@@ -27,6 +27,10 @@ using BHG = BH.oM.Geometry;
 
 using ADC = Autodesk.Civil.DatabaseServices;
 
+using BH.oM.Base.Attributes;
+
+using System.ComponentModel;
+
 namespace BH.Civil3D.Engine.Core
 {
     public static partial class Convert
@@ -36,6 +40,9 @@ namespace BH.Civil3D.Engine.Core
         /**** Public Methods                            ****/
         /***************************************************/
 
+        [Description("Converts a Civil 3D Alignment to BH.oM.Adapters.Civil3D.Elements.Alignment, with its plan geometry as one PolyCurve.")]
+        [Input("civAlignment", "A Civil 3D Alignment to convert.")]
+        [Output("alignment", "The converted BH.oM.Adapters.Civil3D.Elements.Alignment.")]
         public static BHC.Alignment FromCivil3D(this ADC.Alignment civAlignment)
         {
             BHC.Alignment alignment = new BHC.Alignment

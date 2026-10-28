@@ -32,6 +32,10 @@ using ACG = Autodesk.AutoCAD.Geometry;
 
 using ADC = Autodesk.Civil.DatabaseServices;
 
+using BH.oM.Base.Attributes;
+
+using System.ComponentModel;
+
 namespace BH.Civil3D.Engine.Core
 {
     public static partial class Convert
@@ -40,6 +44,9 @@ namespace BH.Civil3D.Engine.Core
         /**** Public Methods                            ****/
         /***************************************************/
 
+        [Description("Applies the location, name, raw description and point number of a BH.oM.Adapters.Civil3D.Elements.CoGoPoint to an existing Civil 3D CogoPoint. A point number that is already in use is skipped with a warning.")]
+        [Input("bhPoint", "BH.oM.Adapters.Civil3D.Elements.CoGoPoint to convert.")]
+        [Input("c3dPoint", "Civil 3D point to apply the values to.")]
         public static void ToCivil3D(this BHC.CoGoPoint bhPoint, ADC.CogoPoint c3dPoint)
         {
             if (bhPoint == null || c3dPoint == null)

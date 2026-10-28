@@ -34,6 +34,10 @@ using ADC = Autodesk.Civil.DatabaseServices;
 
 using Autodesk.AutoCAD.DatabaseServices;
 
+using BH.oM.Base.Attributes;
+
+using System.ComponentModel;
+
 namespace BH.Civil3D.Engine.Core
 {
     public static partial class Convert
@@ -42,12 +46,14 @@ namespace BH.Civil3D.Engine.Core
         /***************************************************/
         /**** Public Methods                            ****/
         /***************************************************/
-        /// <summary>
-        /// Convert a CAD BlockTableRecord (block definition) into a BHoM BlockDefinition.
-        /// - Geometry is stored in local block coordinates (definition space)
-        /// - Nested block references are captured as Block objects (recursive)
-        /// - Uses cache to prevent duplication and infinite recursion
-        /// </summary>
+        [Description("Converts a Civil 3D BlockTableRecord to BH.oM.Adapters.Civil3D.Elements.BlockDefinition, with its geometry in definition coordinates and its block references as nested blocks.")]
+        [Input("definitionBtr", "A Civil 3D BlockTableRecord to convert.")]
+        [Input("tr", "Open transaction on the drawing.")]
+        [Input("db", "Drawing database.")]
+        [Input("definitionCache", "Block definitions already converted, reused to avoid duplicates and endless recursion.")]
+        [Input("includeNestedBlocks", "If true, block references inside the definition are returned as nested blocks.")]
+        [Input("skipXrefBlocks", "If true, external reference blocks are returned as empty placeholders.")]
+        [Output("blockDefinition", "The converted BH.oM.Adapters.Civil3D.Elements.BlockDefinition.")]
         public static BHC.BlockDefinition FromCivil3D(
             this BlockTableRecord definitionBtr,
             Transaction tr,

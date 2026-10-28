@@ -34,6 +34,10 @@ using ACG = Autodesk.AutoCAD.Geometry;
 using ADC = Autodesk.Civil.DatabaseServices;
 
 
+using BH.oM.Base.Attributes;
+
+using System.ComponentModel;
+
 namespace BH.Civil3D.Engine.Core
 {
     public static partial class Convert
@@ -43,9 +47,9 @@ namespace BH.Civil3D.Engine.Core
         /**** Public Methods                            ****/
         /***************************************************/
 
-        ///
-        /// From Civil3D FeatureLine to BHoM FeatureLine, including handling of elevation points
-        /// 
+        [Description("Converts a Civil 3D FeatureLine to BH.oM.Adapters.Civil3D.Elements.FeatureLine. Straight segments are split at the feature line's elevation points.")]
+        [Input("civFeatureLine", "A Civil 3D FeatureLine to convert.")]
+        [Output("featureLine", "The converted BH.oM.Adapters.Civil3D.Elements.FeatureLine.")]
         public static BHC.FeatureLine FromCivil3D(this ADC.FeatureLine civFeatureLine)
         {
             var piPoints = new List<BHG.Point>();

@@ -25,6 +25,10 @@ using BHCE = BH.oM.Adapters.Civil3D.Elements;
 using ACD = Autodesk.AutoCAD.DatabaseServices;
 using ACG = Autodesk.AutoCAD.Geometry;
 
+using BH.oM.Base.Attributes;
+
+using System.ComponentModel;
+
 namespace BH.Civil3D.Engine.Core
 {
     public static partial class Convert
@@ -33,6 +37,9 @@ namespace BH.Civil3D.Engine.Core
         /**** Public Methods                            ****/
         /***************************************************/
 
+        [Description("Converts a Civil 3D MText to BH.oM.Adapters.Civil3D.Elements.TextNote.")]
+        [Input("mtext", "A Civil 3D MText to convert.")]
+        [Output("textNote", "The converted BH.oM.Adapters.Civil3D.Elements.TextNote.")]
         public static BHCE.TextNote FromCivil3D(this ACD.MText mtext)
         {
             if (mtext == null)
@@ -52,6 +59,9 @@ namespace BH.Civil3D.Engine.Core
 
         /***************************************************/
 
+        [Description("Converts a Civil 3D DBText to BH.oM.Adapters.Civil3D.Elements.TextNote.")]
+        [Input("text", "A Civil 3D DBText to convert.")]
+        [Output("textNote", "The converted BH.oM.Adapters.Civil3D.Elements.TextNote.")]
         public static BHCE.TextNote FromCivil3D(this ACD.DBText text)
         {
             if (text == null)

@@ -23,6 +23,8 @@
 using BH.Adapter;
 using BH.oM.Adapter;
 
+using System.ComponentModel;
+
 namespace BH.Civil3D.Adapter.Core
 {
     //Adapter that runs inside Civil 3D; the listener passes it the packages sent by the BHoM client adapter.
@@ -32,6 +34,7 @@ namespace BH.Civil3D.Adapter.Core
         /**** Constructors                              ****/
         /***************************************************/
 
+        [Description("Adapter that runs inside Civil 3D and reads and writes the active drawing. It is created by the BHoM listener; use Civil3DAdapter from Grasshopper or Excel.")]
         public Civil3DListenerAdapter()
         {
             m_AdapterSettings.DefaultPushType = PushType.CreateOnly;

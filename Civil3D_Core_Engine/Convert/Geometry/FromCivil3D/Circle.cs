@@ -31,6 +31,10 @@ using ACG = Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Geometry;
 using BH.Engine.Geometry;
 
+using BH.oM.Base.Attributes;
+
+using System.ComponentModel;
+
 namespace BH.Civil3D.Engine.Core
 {
     public static partial class Convert
@@ -39,6 +43,9 @@ namespace BH.Civil3D.Engine.Core
         /**** Public Methods                            ****/
         /***************************************************/
 
+        [Description("Converts a Civil 3D Circle to BH.oM.Geometry.Circle.")]
+        [Input("acCircle", "A Civil 3D Circle to convert.")]
+        [Output("circle", "The converted BH.oM.Geometry.Circle.")]
         public static BHG.Circle FromCivil3D(this ACD.Circle acCircle)
         {
             return new BHG.Circle

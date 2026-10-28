@@ -31,6 +31,10 @@ using ACG = Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Geometry;
 using BH.Engine.Geometry;
 
+using BH.oM.Base.Attributes;
+
+using System.ComponentModel;
+
 namespace BH.Civil3D.Engine.Core
 {
     public static partial class Convert
@@ -39,6 +43,9 @@ namespace BH.Civil3D.Engine.Core
         /**** Public Methods                            ****/
         /***************************************************/
 
+        [Description("Converts an AutoCAD Line3d to BH.oM.Geometry.Line.")]
+        [Input("line", "An AutoCAD Line3d to convert.")]
+        [Output("line", "The converted BH.oM.Geometry.Line.")]
         public static BHG.Line FromCivil3D(this ACG.Line3d line)
         {
             return new BHG.Line
@@ -50,6 +57,9 @@ namespace BH.Civil3D.Engine.Core
 
         /***************************************************/
 
+        [Description("Converts an AutoCAD Line2d to BH.oM.Geometry.Line.")]
+        [Input("line", "An AutoCAD Line2d to convert.")]
+        [Output("line", "The converted BH.oM.Geometry.Line.")]
         public static BHG.Line FromCivil3D(this ACG.Line2d line)
         {
             return new BHG.Line
@@ -61,6 +71,9 @@ namespace BH.Civil3D.Engine.Core
 
         /***************************************************/
 
+        [Description("Converts an AutoCAD LineSegment3d to BH.oM.Geometry.Line.")]
+        [Input("line", "An AutoCAD LineSegment3d to convert.")]
+        [Output("line", "The converted BH.oM.Geometry.Line.")]
         public static BHG.Line FromCivil3D(this ACG.LineSegment3d line)
         {
             return new BHG.Line
@@ -72,6 +85,9 @@ namespace BH.Civil3D.Engine.Core
 
         /***************************************************/
 
+        [Description("Converts an AutoCAD LineSegment2d to BH.oM.Geometry.Line.")]
+        [Input("line", "An AutoCAD LineSegment2d to convert.")]
+        [Output("line", "The converted BH.oM.Geometry.Line.")]
         public static BHG.Line FromCivil3D(this ACG.LineSegment2d line)
         {
             return new BHG.Line
@@ -83,6 +99,9 @@ namespace BH.Civil3D.Engine.Core
 
         /***************************************************/
 
+        [Description("Converts an AutoCAD CircularArc3d to a BH.oM.Geometry.Arc, or to a Circle if it is closed.")]
+        [Input("acCircArc", "An AutoCAD CircularArc3d to convert.")]
+        [Output("curve", "The converted curve.")]
         public static BHG.ICurve FromCivil3D(this ACG.CircularArc3d acCircArc)
         {
             if (acCircArc.IsClosed())
@@ -109,6 +128,9 @@ namespace BH.Civil3D.Engine.Core
 
         /***************************************************/
 
+        [Description("Converts an AutoCAD CircularArc2d to a BH.oM.Geometry.Arc, or to a Circle if it is closed.")]
+        [Input("acCircArc", "An AutoCAD CircularArc2d to convert.")]
+        [Output("curve", "The converted curve.")]
         public static BHG.ICurve FromCivil3D(this ACG.CircularArc2d acCircArc)
         {
             // Lift centre into 3D
@@ -159,6 +181,9 @@ namespace BH.Civil3D.Engine.Core
 
         /***************************************************/
 
+        [Description("Converts an AutoCAD NurbCurve3d to BH.oM.Geometry.NurbsCurve.")]
+        [Input("ac", "An AutoCAD NurbCurve3d to convert.")]
+        [Output("nurbsCurve", "The converted BH.oM.Geometry.NurbsCurve.")]
         public static BHG.NurbsCurve FromCivil3D(this ACG.NurbCurve3d ac)
         {
             if (ac == null)
@@ -250,6 +275,9 @@ namespace BH.Civil3D.Engine.Core
 
         /***************************************************/
 
+        [Description("Converts an AutoCAD NurbCurve2d to BH.oM.Geometry.NurbsCurve.")]
+        [Input("acNurbsCurve", "An AutoCAD NurbCurve2d to convert.")]
+        [Output("nurbsCurve", "The converted BH.oM.Geometry.NurbsCurve.")]
         public static BHG.NurbsCurve FromCivil3D(this ACG.NurbCurve2d acNurbsCurve)
         {
             var pts = new List<BHG.Point>();
@@ -288,6 +316,9 @@ namespace BH.Civil3D.Engine.Core
 
         /***************************************************/
 
+        [Description("Converts an AutoCAD EllipticalArc3d to a BH.oM.Geometry.Ellipse, or to a NurbsCurve if it is not a full ellipse.")]
+        [Input("acEllipse", "An AutoCAD EllipticalArc3d to convert.")]
+        [Output("curve", "The converted curve.")]
         public static BHG.ICurve FromCivil3D(this ACG.EllipticalArc3d acEllipse)
         {
             // Full ellipse -> map to BH.oM.Geometry.Ellipse (per your class definition)
@@ -325,6 +356,9 @@ namespace BH.Civil3D.Engine.Core
 
         /***************************************************/
 
+        [Description("Converts an AutoCAD EllipticalArc2d to a BH.oM.Geometry.Ellipse, or to a NurbsCurve if it is not a full ellipse.")]
+        [Input("acEllipse", "An AutoCAD EllipticalArc2d to convert.")]
+        [Output("curve", "The converted curve.")]
         public static BHG.ICurve FromCivil3D(this ACG.EllipticalArc2d acEllipse)
         {
             // Closed ellipse -> BHoM Ellipse
@@ -378,6 +412,9 @@ namespace BH.Civil3D.Engine.Core
 
         /***************************************************/
 
+        [Description("Converts an AutoCAD PolylineCurve3d to BH.oM.Geometry.Polyline.")]
+        [Input("acPolyLine", "An AutoCAD PolylineCurve3d to convert.")]
+        [Output("polyline", "The converted BH.oM.Geometry.Polyline.")]
         public static BHG.Polyline FromCivil3D(this ACG.PolylineCurve3d acPolyLine)
         {
 
@@ -393,6 +430,9 @@ namespace BH.Civil3D.Engine.Core
 
         /***************************************************/
 
+        [Description("Converts an AutoCAD PolylineCurve2d to BH.oM.Geometry.Polyline.")]
+        [Input("acPolyLine", "An AutoCAD PolylineCurve2d to convert.")]
+        [Output("polyline", "The converted BH.oM.Geometry.Polyline.")]
         public static BHG.Polyline FromCivil3D(this ACG.PolylineCurve2d acPolyLine)
         {
             List<BHG.Point> pts = new List<BHG.Point>();
@@ -414,6 +454,9 @@ namespace BH.Civil3D.Engine.Core
 
         /***************************************************/
 
+        [Description("Converts an AutoCAD CompositeCurve3d to a BH.oM.Geometry.PolyCurve, skipping zero-length and repeated segments.")]
+        [Input("acCurve", "An AutoCAD CompositeCurve3d to convert.")]
+        [Output("curve", "The converted curve.")]
         public static BHG.ICurve FromCivil3D(this ACG.CompositeCurve3d acCurve)
         {
             const double tol = 1e-6;

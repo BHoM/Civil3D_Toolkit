@@ -29,6 +29,10 @@ using BHG = BH.oM.Geometry;
 
 using ACG = Autodesk.AutoCAD.Geometry;
 
+using BH.oM.Base.Attributes;
+
+using System.ComponentModel;
+
 namespace BH.Civil3D.Engine.Core
 {
     public static partial class Convert
@@ -37,6 +41,9 @@ namespace BH.Civil3D.Engine.Core
         /**** Public Methods                            ****/
         /***************************************************/
 
+        [Description("Converts BH.oM.Geometry.Vector to an AutoCAD Vector3d.")]
+        [Input("vec", "BH.oM.Geometry.Vector to convert.")]
+        [Output("vector3d", "The converted AutoCAD Vector3d.")]
         public static ACG.Vector3d ToCivil3D(this BHG.Vector vec)
         {
             return new ACG.Vector3d(vec.X, vec.Y, vec.Z);
@@ -44,7 +51,9 @@ namespace BH.Civil3D.Engine.Core
 
         /***************************************************/
 
-        /// This is a scaling vector only
+        [Description("Converts a BH.oM.Geometry.Vector to AutoCAD scale factors.")]
+        [Input("vec", "A BH.oM.Geometry.Vector to convert.")]
+        [Output("scale3d", "The converted AutoCAD Scale3d.")]
         public static ACG.Scale3d ToCivil3DScale(this BHG.Vector vec)
         {
             return new ACG.Scale3d(vec.X, vec.Y, vec.Z);

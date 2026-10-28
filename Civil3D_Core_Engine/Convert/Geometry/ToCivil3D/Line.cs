@@ -31,6 +31,10 @@ using ACG = Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Geometry;
 using BH.Engine.Geometry;
 
+using BH.oM.Base.Attributes;
+
+using System.ComponentModel;
+
 namespace BH.Civil3D.Engine.Core
 {
     public static partial class Convert
@@ -39,6 +43,9 @@ namespace BH.Civil3D.Engine.Core
         /**** Public Methods                            ****/
         /***************************************************/
 
+        [Description("Converts BH.oM.Geometry.Line to a Civil 3D Line.")]
+        [Input("line", "BH.oM.Geometry.Line to convert.")]
+        [Output("line", "The converted Civil 3D Line.")]
         public static ACD.Line ToCivil3D(this BHG.Line line)
         {
             return new ACD.Line(line.Start.ToCivil3D(), line.End.ToCivil3D());

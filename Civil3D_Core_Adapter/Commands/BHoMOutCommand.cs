@@ -22,6 +22,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 
@@ -51,6 +52,7 @@ namespace BH.Civil3D.Adapter.Core
         /***************************************************/
 
         [CommandMethod("BHoMOut")]
+        [Description("Civil 3D command BHOMOUT: writes every supported object in the active drawing to a JSON file in a BHoMOut folder next to the drawing.")]
         public void BHoMOut()
         {
             Document doc = Application.DocumentManager.MdiActiveDocument;

@@ -31,6 +31,10 @@ using ACG = Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Geometry;
 using BH.Engine.Geometry;
 
+using BH.oM.Base.Attributes;
+
+using System.ComponentModel;
+
 namespace BH.Civil3D.Engine.Core
 {
     public static partial class Convert
@@ -39,6 +43,9 @@ namespace BH.Civil3D.Engine.Core
         /**** Public Methods                            ****/
         /***************************************************/
 
+        [Description("Converts BH.oM.Geometry.Arc to a Civil 3D Arc.")]
+        [Input("arc", "BH.oM.Geometry.Arc to convert.")]
+        [Output("arc", "The converted Civil 3D Arc.")]
         public static ACD.Arc ToCivil3D(this BHG.Arc arc)
         {
             if (arc == null)

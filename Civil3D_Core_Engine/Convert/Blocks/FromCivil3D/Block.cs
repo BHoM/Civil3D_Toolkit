@@ -28,6 +28,10 @@ using ACG = Autodesk.AutoCAD.Geometry;
 
 using Autodesk.AutoCAD.DatabaseServices;
 
+using BH.oM.Base.Attributes;
+
+using System.ComponentModel;
+
 namespace BH.Civil3D.Engine.Core
 {
     public static partial class Convert
@@ -37,6 +41,10 @@ namespace BH.Civil3D.Engine.Core
         /**** Public Methods                            ****/
         /***************************************************/
 
+        [Description("Converts a Civil 3D BlockReference to BH.oM.Adapters.Civil3D.Elements.Block.")]
+        [Input("br", "A Civil 3D BlockReference to convert.")]
+        [Input("tr", "Open transaction on the drawing.")]
+        [Output("block", "The converted BH.oM.Adapters.Civil3D.Elements.Block.")]
         public static BHC.Block FromCivil3D(this BlockReference br, Transaction tr)
         {
             ObjectId defId = br.DynamicBlockTableRecord.IsNull
