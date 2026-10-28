@@ -1,33 +1,24 @@
 <Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-<TargetFramework>net8.0</TargetFramework>
-    <OutputType>Library</OutputType>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyVersion>10.0.0.0</AssemblyVersion>
+    <FileVersion>10.0.0.0</FileVersion>
+    <Description>https://github.com/BHoM/Civil3D_Toolkit</Description>
+    <Authors>BHoM</Authors>
+    <Copyright>Copyright © https://github.com/BHoM</Copyright>
     <RootNamespace>BH.oM.Adapters.Civil3D</RootNamespace>
     <OutputPath>..\Build\</OutputPath>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <AssemblyTitle>Civil3D_oM</AssemblyTitle>
-    <Description>https://github.com/BHoM/Civil3D_Toolkit</Description>
-    <Product>Civil3D_oM</Product>
-    <Copyright>Copyright � https://github.com/BHoM</Copyright>
-    <AssemblyVersion>9.0.0.0</AssemblyVersion>
-    <FileVersion>9.1.0.0</FileVersion>
-    <BHoMProgramData>$(ProgramData)\BHoM\Assemblies</BHoMProgramData>
-    <UserBundle>C:\Users\$(Username)\AppData\Roaming\Autodesk\ApplicationPlugins\BHoM.bundle\Contents\Windows</UserBundle>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
+
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="RD /S /Q &quot;C:\Users\$(Username)\AppData\Roaming\Autodesk\ApplicationPlugins\BHoM.bundle&quot;" />
-    <Exec Command="xcopy &quot;$(TargetDir)$(TargetFileName)&quot; &quot;$(BHoMProgramData)&quot; /Y /R /I" />
-    <Exec Command="if not exist &quot;$(UserBundle)&quot; mkdir &quot;$(UserBundle)&quot;" />
-    <Exec Command="xcopy &quot;$(TargetDir)$(TargetFileName)&quot; &quot;$(UserBundle)&quot; /Y /R /I" />
+    <Exec Command="xcopy &quot;$(TargetDir)$(TargetFileName)&quot; &quot;$(ProgramData)\BHoM\Assemblies&quot; /Y" />
   </Target>
+
   <ItemGroup>
     <Reference Include="BHoM">
       <HintPath>$(ProgramData)\BHoM\Assemblies\BHoM.dll</HintPath>
-      <Private>False</Private>
-      <SpecificVersion>False</SpecificVersion>
-    </Reference>
-    <Reference Include="BHoM_Engine">
-      <HintPath>$(ProgramData)\BHoM\Assemblies\BHoM_Engine.dll</HintPath>
       <Private>False</Private>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
@@ -41,12 +32,10 @@
       <Private>False</Private>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
-    <Reference Include="Analytical_oM">
-      <HintPath>$(ProgramData)\BHoM\Assemblies\Analytical_oM.dll</HintPath>
+    <Reference Include="Quantities_oM">
+      <HintPath>$(ProgramData)\BHoM\Assemblies\Quantities_oM.dll</HintPath>
       <Private>False</Private>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
-    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
   </ItemGroup>
 </Project>

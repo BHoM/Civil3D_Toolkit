@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using BH.oM.Analytical.Elements;
-using BH.oM.Analytical.Graph;
 using BH.oM.Base;
 using BH.oM.Base.Attributes;
 using BH.oM.Civils.Elements;
