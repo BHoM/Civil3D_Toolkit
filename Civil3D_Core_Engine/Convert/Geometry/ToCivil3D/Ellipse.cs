@@ -41,24 +41,18 @@ namespace BH.Civil3D.Engine.Core
 
         public static ACD.Ellipse ToCivil3D(this BHG.Ellipse ellipse)
         {
-            var center = ellipse.Centre.ToCivil3D();
-            
-            // Scale axis directions by their respective radii to get the major/minor axis vectors
-            var majorAxis = new ACG.Vector3d(
-                ellipse.Axis1.X * ellipse.Radius1,
-                ellipse.Axis1.Y * ellipse.Radius1,
-                ellipse.Axis1.Z * ellipse.Radius1
-            );
-            
-            var minorAxis = new ACG.Vector3d(
-                ellipse.Axis2.X * ellipse.Radius2,
-                ellipse.Axis2.Y * ellipse.Radius2,
-                ellipse.Axis2.Z * ellipse.Radius2
-            );
-            
-            double radiusRatio = ellipse.Radius2 / ellipse.Radius1;
-            
-            return new ACD.Ellipse(center, majorAxis, minorAxis, radiusRatio, 0.0, 2.0 * Math.PI);
+            if (ellipse == null)
+                return null;
+
+            bool firstIsMajor = ellipse.Radius1 >= ellipse.Radius2;
+            double majorRadius = firstIsMajor ? ellipse.Radius1 : ellipse.Radius2;
+            double minorRadius = firstIsMajor ? ellipse.Radius2 : ellipse.Radius1;
+            ACG.Vector3d majorDirection = (firstIsMajor ? ellipse.Axis1 : ellipse.Axis2).ToCivil3D().GetNormal();
+
+            ACG.Vector3d unitNormal = ellipse.Axis1.ToCivil3D().CrossProduct(ellipse.Axis2.ToCivil3D()).GetNormal();
+            ACG.Vector3d majorAxis = majorDirection * majorRadius;
+
+            return new ACD.Ellipse(ellipse.Centre.ToCivil3D(), unitNormal, majorAxis, minorRadius / majorRadius, 0.0, 2.0 * Math.PI);
         }
 
         /***************************************************/

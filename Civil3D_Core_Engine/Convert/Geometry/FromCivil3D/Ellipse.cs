@@ -39,20 +39,27 @@ namespace BH.Civil3D.Engine.Core
         /**** Public Methods                            ****/
         /***************************************************/
 
-        public static BHG.Ellipse FromCivil3D(this ACD.Ellipse acEllipse)
+        public static BHG.ICurve FromCivil3D(this ACD.Ellipse acEllipse)
         {
-            // Normalise the major and minor axes
-            var axis1 = acEllipse.MajorAxis.GetNormal();
-            var axis2 = acEllipse.MinorAxis.GetNormal();
+            if (acEllipse == null)
+                return null;
 
-            return new BHG.Ellipse
+            bool isFull = Math.Abs(acEllipse.StartParam) < BHG.Tolerance.Angle && Math.Abs(acEllipse.EndParam - 2 * Math.PI) < BHG.Tolerance.Angle;
+
+            if (isFull)
             {
-                Centre = acEllipse.Center.FromCivil3D(),
-                Axis1 = axis1.FromCivil3D(),
-                Axis2 = axis2.FromCivil3D(),
-                Radius1 = acEllipse.MajorRadius,
-                Radius2 = acEllipse.MinorRadius
-            };
+                return new BHG.Ellipse
+                {
+                    Centre = acEllipse.Center.FromCivil3D(),
+                    Axis1 = acEllipse.MajorAxis.GetNormal().FromCivil3D(),
+                    Radius1 = acEllipse.MajorAxis.Length,
+                    Axis2 = acEllipse.MinorAxis.GetNormal().FromCivil3D(),
+                    Radius2 = acEllipse.MinorAxis.Length,
+                };
+            }
+
+            BH.Engine.Base.Compute.RecordNote("Elliptical arcs are pulled as NURBS curves.");
+            return acEllipse.Spline.FromCivil3D();
         }
 
         /***************************************************/

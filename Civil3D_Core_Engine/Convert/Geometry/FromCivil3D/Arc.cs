@@ -41,28 +41,11 @@ namespace BH.Civil3D.Engine.Core
 
         public static BHG.Arc FromCivil3D(this ACD.Arc acArc)
         {
-            var c = new BHG.Point { X = acArc.Center.X, Y = acArc.Center.Y, Z = acArc.Center.Z };
+            if (acArc == null)
+                return null;
 
-            var n = new BHG.Vector { X = acArc.Normal.X, Y = acArc.Normal.Y, Z = acArc.Normal.Z };
-            n = BH.Engine.Geometry.Modify.Normalise(n);
-
-            var x = BH.Engine.Geometry.Modify.Rotate(
-                BH.Engine.Geometry.Create.Vector(1, 0, 0),
-                acArc.StartAngle,
-                n
-            );
-            x = BH.Engine.Geometry.Modify.Normalise(x);
-
-            var y = BH.Engine.Geometry.Modify.Normalise(
-                BH.Engine.Geometry.Query.CrossProduct(n, x)
-            );
-
-            var cs = BH.Engine.Geometry.Create.CartesianCoordinateSystem(c, x, y);
-
-            double sweep = acArc.EndAngle - acArc.StartAngle;
-            if (sweep < 0) sweep += 2 * Math.PI;
-
-            return BH.Engine.Geometry.Create.Arc(cs, acArc.Radius, 0.0, sweep);
+            ACG.Point3d mid = acArc.GetPointAtParameter((acArc.StartParam + acArc.EndParam) / 2);
+            return BH.Engine.Geometry.Create.Arc(acArc.StartPoint.FromCivil3D(), mid.FromCivil3D(), acArc.EndPoint.FromCivil3D());
         }
 
         /***************************************************/

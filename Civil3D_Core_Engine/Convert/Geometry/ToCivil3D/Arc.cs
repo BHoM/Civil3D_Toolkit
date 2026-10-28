@@ -41,53 +41,21 @@ namespace BH.Civil3D.Engine.Core
 
         public static ACD.Arc ToCivil3D(this BHG.Arc arc)
         {
-            var center = arc.CoordinateSystem.Origin.ToCivil3D();
-            var normal = arc.CoordinateSystem.Z.ToCivil3D().GetNormal();
-            double radius = arc.Radius;
+            if (arc == null)
+                return null;
 
-            var startPt = BH.Engine.Geometry.Query.StartPoint(arc).ToCivil3D();
-            var endPt   = BH.Engine.Geometry.Query.EndPoint(arc).ToCivil3D();
+            //Three points fix the plane, radius and direction, so AutoCAD works out the OCS angles itself
+            ACG.Point3d start = arc.StartPoint().ToCivil3D();
+            ACG.Point3d mid = arc.PointAtParameter(0.5).ToCivil3D();
+            ACG.Point3d end = arc.EndPoint().ToCivil3D();
 
-            var vStart = startPt - center;
-            var vEnd   = endPt   - center;
+            ACG.CircularArc3d geArc = new ACG.CircularArc3d(start, mid, end);
+            ACD.Arc acArc = ACD.Curve.CreateFromGeCurve(geArc) as ACD.Arc;
 
-            double startAngle = AngleFromNormalBasis(normal, vStart);
-            double endAngle   = AngleFromNormalBasis(normal, vEnd);
+            if (acArc == null)
+                BH.Engine.Base.Compute.RecordError("Could not convert an Arc to a Civil 3D arc.");
 
-            // Determine original BHoM direction
-            bool isCCW = arc.EndAngle > arc.StartAngle;
-
-            if (isCCW)
-            {
-                if (endAngle < startAngle)
-                    endAngle += 2 * Math.PI;
-            }
-            else
-            {
-                if (endAngle > startAngle)
-                    startAngle += 2 * Math.PI;
-            }
-
-            return new ACD.Arc(center, normal, radius, startAngle, endAngle);
-        }
-
-        /***************************************************/
-
-        private static double AngleFromNormalBasis(
-            ACG.Vector3d normal,
-            ACG.Vector3d vector)
-        {
-            // Ensure unit normal
-            normal = normal.GetNormal();
-
-            // AutoCAD-provided safe perpendicular
-            ACG.Vector3d xAxis = normal.GetPerpendicularVector().GetNormal();
-            ACG.Vector3d yAxis = normal.CrossProduct(xAxis).GetNormal();
-
-            double x = vector.DotProduct(xAxis);
-            double y = vector.DotProduct(yAxis);
-
-            return Math.Atan2(y, x);
+            return acArc;
         }
 
         /***************************************************/
