@@ -30,9 +30,9 @@ using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.Civil.ApplicationServices;
 
-namespace BH.oM.Adapters.Civil3D
+namespace BH.UI.Civil.Adapter
 {
-    public class Civil3DRuntimeContext
+    internal class Civil3DRuntimeContext
     {
         public CivilDocument CivilDocument { get; }
         public Database Database { get; }
@@ -43,12 +43,6 @@ namespace BH.oM.Adapters.Civil3D
         public BlockTable BlockTable { get; }
         public BlockTableRecord BlockTableRecord { get; }
 
-        // public Civil3DRuntimeContext(CivilDocument civilDoc, Database db, Transaction tr)
-        // {
-        //     CivilDocument = civilDoc;
-        //     Database = db;
-        //     Transaction = tr;
-        // }
         public Civil3DRuntimeContext(Document acDoc, CivilDocument civilDoc, Database db, Transaction tr, BlockTable acBlkTbl, BlockTableRecord acBlkTblRec)
         {
             Document = acDoc;

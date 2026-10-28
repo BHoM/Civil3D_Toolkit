@@ -34,7 +34,7 @@ using Autodesk.AutoCAD.Geometry;
 using Autodesk.Civil.ApplicationServices;
 using Autodesk.Civil.Runtime;
 using ADC = Autodesk.Civil.DatabaseServices;
-using BHACC3d = BH.oM.Adapters.Civil3D;
+using BHACC3d = BH.UI.Civil.Adapter;
 using BH.UI.Civil.Engine;
 
 using Autodesk.AutoCAD.DatabaseServices;
@@ -465,7 +465,7 @@ namespace BH.UI.Civil.Adapter
             return null;
         }
 
-        public static bool EnsureLayerPresent(
+        private static bool EnsureLayerPresent(
             BHACC3d.Civil3DRuntimeContext context,
             string layerName
         )

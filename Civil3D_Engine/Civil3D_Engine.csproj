@@ -20,26 +20,6 @@
     <Exec Command="xcopy &quot;$(TargetDir)$(TargetFileName)&quot; &quot;$(UserBundle)&quot; /Y /R /I" />
   </Target>
   <ItemGroup>
-    <Reference Include="accoremgd">
-      <HintPath>..\libs\2026\accoremgd.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="acdbmgd">
-      <HintPath>..\libs\2026\acdbmgd.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="acmgd">
-      <HintPath>..\libs\2026\acmgd.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="AecBaseMgd">
-      <HintPath>..\libs\2026\AecBaseMgd.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="AeccDbMgd">
-      <HintPath>..\libs\2026\AeccDbMgd.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="BHoM">
       <HintPath>$(ProgramData)\BHoM\Assemblies\BHoM.dll</HintPath>
       <Private>False</Private>
@@ -67,11 +47,6 @@
     </Reference>
     <Reference Include="Geometry_Engine">
       <HintPath>$(ProgramData)\BHoM\Assemblies\Geometry_Engine.dll</HintPath>
-      <Private>False</Private>
-      <SpecificVersion>False</SpecificVersion>
-    </Reference>
-    <Reference Include="Engine_Civil_UI">
-      <HintPath>$(ProgramData)\BHoM\Assemblies\Engine_Civil_UI.dll</HintPath>
       <Private>False</Private>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
