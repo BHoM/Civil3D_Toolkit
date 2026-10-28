@@ -111,8 +111,6 @@ namespace BH.UI.Civil.Commands
             typeof(BHC.BlockInstance),
             typeof(BHC.BlockDefinition),
             typeof(BHC.CoGoPoint),
-            typeof(BHC.Pipe),
-            typeof(BHC.ManholeChamber),
             typeof(BHC.CivSurface)
         };
 

@@ -86,7 +86,6 @@ namespace BH.UI.Civil.Adapter
 
                     // ---- DISPATCH ON UNWRAPPED TYPES ----
                     ProcessCustomObjectGeometry(unwrapped, context);
-                    DispatchCollection<BH.oM.Civils.Elements.Pipe>(unwrapped, context, "0", CreateCollection);
                     DispatchCollection<BH.oM.Civils.Elements.CivSurface>(unwrapped, context, "0", CreateCollection);
                     CreateCollection(unwrapped.OfType<BH.oM.Civils.Elements.CoGoPoint>(), context);
                     
@@ -189,9 +188,6 @@ namespace BH.UI.Civil.Adapter
         private bool CreateCollection(IEnumerable<BH.oM.Geometry.NurbsCurve> splines, BHACC3d.Civil3DRuntimeContext context, string layer = "0")
             => ProcessEntityCollection(splines, context, layer, s => s.ToCivil3D(), "Spline conversion failed.");
         
-        private bool CreateCollection(IEnumerable<BH.oM.Civils.Elements.Pipe> pipes, BHACC3d.Civil3DRuntimeContext context, string layer = "0")
-            => ProcessEntityCollection(pipes, context, layer, p => (p.CentreLine as BH.oM.Geometry.Line)?.ToCivil3D(), "Pipe conversion failed.");
-
         private bool CreateCollection(IEnumerable<BH.oM.Civils.Elements.CivSurface> srfs, BHACC3d.Civil3DRuntimeContext context, string layer = "0")
         {
             foreach (var srf in srfs)
