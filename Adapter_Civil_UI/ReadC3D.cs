@@ -431,24 +431,6 @@ namespace BH.UI.Civil.Adapter
             return parcels;
         }
 
-        private List<BHC.CivProfile> ReadProfiles(Transaction tr, BlockTableRecord btr)
-        {
-            List<BHC.CivProfile> profiles = new List<BHC.CivProfile>();
-
-            var featureIDs =
-            from ObjectId id in btr
-            where id.ObjectClass.IsDerivedFrom(Autodesk.AutoCAD.Runtime.RXClass.GetClass(typeof(ADC.Profile)))
-            select id;
-
-            foreach (ObjectId id in featureIDs)
-            {
-                ADC.Profile p = (tr.GetObject(id, OpenMode.ForRead) as ADC.Profile);
-                if (p != null)
-                    profiles.Add(p.FromCivil3D());
-            }
-            return profiles;
-        }
-
         private List<BHC.CoGoPoint> ReadCoGoPoints(CivilDocument civdoc)
         {
             List<BHC.CoGoPoint> pnts = new List<BHC.CoGoPoint>();
