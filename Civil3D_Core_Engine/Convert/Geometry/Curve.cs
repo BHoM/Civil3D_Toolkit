@@ -594,7 +594,7 @@ namespace BH.Civil3D.Engine.Core
                 // AutoCAD "full" knot vector commonly: cp + degree + 1
                 int expectedAcadFull = controlPoints.Count + degree + 1;
 
-                // BHoM example/primer style "compressed": cp + degree - 1 [6](https://burohappold.sharepoint.com/sites/TechnicalTraining/Shared%20Documents/Buildings-Structures%20Training%20Program/#34 02_List_Management-25022025/PDF - The Grasshopper Primer (EN).pdf?web=1)
+                // BHoM "compressed" knot vector: cp + degree - 1
                 int expectedBhom = controlPoints.Count + degree - 1;
 
                 if (knots.Count == expectedAcadFull && knots.Count >= 2)
@@ -605,14 +605,14 @@ namespace BH.Civil3D.Engine.Core
                 }
                 // else: already in compressed form (or unusual case) - leave as-is
 
-                // Optional but useful: normalize knot domain to 0..1 (BHoM examples use 0..1) [5](https://burohappold-my.sharepoint.com/personal/joe_walton_burohappold_com/_layouts/15/Doc.aspx?action=edit&mobileredirect=true&wdorigin=Sharepoint&DefaultItemOpen=1&sourcedoc={49b87c87-ce4b-45be-9e29-2a42b749e12f}&wd=target(/0_NonProject/Automation.one/)&wdpartid={9557023a-96d9-1c09-12e8-4af93a182135}{1}&wdsectionfileid={80ba111e-bb4d-4979-bd51-101470e69015})
+                // Normalise the knot domain to 0..1, as BHoM uses
                 double k0 = knots.First();
                 double k1 = knots.Last();
                 double span = k1 - k0;
                 if (span > 0)
                     knots = knots.Select(k => (k - k0) / span).ToList();
 
-                // Final sanity: BHoM infers degree from counts (per class docs) [5](https://burohappold-my.sharepoint.com/personal/joe_walton_burohappold_com/_layouts/15/Doc.aspx?action=edit&mobileredirect=true&wdorigin=Sharepoint&DefaultItemOpen=1&sourcedoc={49b87c87-ce4b-45be-9e29-2a42b749e12f}&wd=target(/0_NonProject/Automation.one/)&wdpartid={9557023a-96d9-1c09-12e8-4af93a182135}{1}&wdsectionfileid={80ba111e-bb4d-4979-bd51-101470e69015})
+                // BHoM infers the degree from the counts:
                 // degree_bhom = (knots.Count - controlPoints.Count) + 1
 
                 return new BHG.NurbsCurve
