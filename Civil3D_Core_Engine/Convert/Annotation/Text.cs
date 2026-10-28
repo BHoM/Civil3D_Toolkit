@@ -20,18 +20,10 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using BHG = BH.oM.Geometry;
+using BHCE = BH.oM.Adapters.Civil3D.Elements;
 using ACD = Autodesk.AutoCAD.DatabaseServices;
 using ACG = Autodesk.AutoCAD.Geometry;
-using BHCE = BH.oM.Adapters.Civil3D.Elements;
-
-using BH.Engine.Base;
-using BHB = BH.oM.Base;
 
 namespace BH.Civil3D.Engine.Core
 {
@@ -41,91 +33,50 @@ namespace BH.Civil3D.Engine.Core
         /***************************************************/
         /**** Public Methods                            ****/
         /***************************************************/
-        ///////////////////
-        // To Civils 3d //
-        /////////////////
-        /***************   ********************/
-        public static ACD.MText ToCivil3d(this BHCE.CadTextNote CadTextNote)
-         {
-             if (CadTextNote == null)
-                 return null;
 
-             ACD.MText mtext = new ACD.MText
-             {
-                 Contents = CadTextNote.Text,
-                 Location = new ACG.Point3d(CadTextNote.Position.X, CadTextNote.Position.Y, CadTextNote.Position.Z),
-                 Rotation = CadTextNote.Rotation
-             };
-             return mtext;
-         }
+        public static ACD.MText ToCivil3D(this BHCE.TextNote textNote)
+        {
+            if (textNote == null)
+                return null;
 
-        /////////////////////
-        // From Civils 3d //
-        ///////////////////   
-        /// 
-        /// 
+            if (textNote.Orientation == null)
+            {
+                BH.Engine.Base.Compute.RecordError("A TextNote has no Orientation, so it could not be converted to Civil 3D text.");
+                return null;
+            }
 
-        public static BHCE.CadTextNote FromCivil3d(this ACD.MText mtext)
+            ACD.MText mtext = new ACD.MText
+            {
+                Contents = textNote.Text,
+                Location = textNote.Orientation.Origin.ToACGPoint3d(),
+                Normal = textNote.Orientation.Z.ToCivil3D(),
+                Direction = textNote.Orientation.X.ToCivil3D(),
+            };
+
+            if (textNote.Height > 0)
+                mtext.TextHeight = textNote.Height;
+
+            return mtext;
+        }
+
+        /***************************************************/
+
+        public static BHCE.TextNote FromCivil3D(this ACD.MText mtext)
         {
             if (mtext == null)
                 return null;
 
-            BHCE.CadTextNote note = new BHCE.CadTextNote
+            ACG.Vector3d x = mtext.Direction;
+            ACG.Vector3d y = mtext.Normal.CrossProduct(x);
+
+            return new BHCE.TextNote
             {
                 Text = mtext.Text,
-                Position = new BHG.Point
-                {
-                    X = mtext.Location.X,
-                    Y = mtext.Location.Y,
-                    Z = mtext.Location.Z
-                },
-                Rotation = mtext.Rotation
+                Orientation = BH.Engine.Geometry.Create.CartesianCoordinateSystem(mtext.Location.FromCivil3D(), x.FromCivil3D(), y.FromCivil3D()),
+                Height = mtext.TextHeight,
             };
-
-            // Bounding box from Civil 3D geometric extents
-            try
-            {
-                ACD.Extents3d extents = mtext.GeometricExtents;
-
-                note.BoundingBox = new BHG.BoundingBox
-                {
-                    Min = new BHG.Point
-                    {
-                        X = extents.MinPoint.X,
-                        Y = extents.MinPoint.Y,
-                        Z = extents.MinPoint.Z
-                    },
-                    Max = new BHG.Point
-                    {
-                        X = extents.MaxPoint.X,
-                        Y = extents.MaxPoint.Y,
-                        Z = extents.MaxPoint.Z
-                    }
-                };
-            }
-            catch
-            {
-                // GeometricExtents can throw in rare cases (e.g. corrupted entities)
-                // Intentionally swallowing to avoid adapter failure
-            }
-
-            return note;
         }
 
-
-        // internal static BH.oM.Adapters.Civil3D.Fragments.CadTextFragment ToCadTextFragment(this ACD.MText mtext)
-        // {
-        //     return new BH.oM.Adapters.Civil3D.Fragments.CadTextFragment
-        //     {
-        //         TextHeight = mtext.TextHeight,
-        //         Width = mtext.Width,
-        //         TextStyle = mtext.TextStyleName,
-        //         Attachment = mtext.Attachment,
-        //         Annotative = mtext.Annotative == ACD.AnnotativeStates.True,
-        //     };
-        // }
-
+        /***************************************************/
     }
 }
-
-

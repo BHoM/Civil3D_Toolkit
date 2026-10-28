@@ -104,7 +104,7 @@ namespace BH.Civil3D.Adapter.Core
         //The BHoM types currently wired up in the Civil3D toolkit's Read methods.
         private static readonly Type[] m_SupportedTypes = new Type[]
         {
-            typeof(BHC.CadTextNote),
+            typeof(BHC.TextNote),
             typeof(BHG.Point),
             typeof(BHG.ICurve),
             typeof(BHC.BlockInstance),

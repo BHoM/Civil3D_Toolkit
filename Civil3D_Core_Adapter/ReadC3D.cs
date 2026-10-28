@@ -97,7 +97,7 @@ namespace BH.Civil3D.Adapter.Core
                     SymbolUtilityServices.GetBlockModelSpaceId(db),
                     OpenMode.ForRead);
 
-            if (requestedType == typeof(BHC.CadTextNote))
+            if (requestedType == typeof(BHC.TextNote))
                 return ReadText(tr, btr);
 
             if (requestedType == typeof(BHG.Point))
@@ -145,9 +145,9 @@ namespace BH.Civil3D.Adapter.Core
         /***************************************************/
 
 
-        private List<BHC.CadTextNote> ReadText(Transaction tr, BlockTableRecord btr)
+        private List<BHC.TextNote> ReadText(Transaction tr, BlockTableRecord btr)
         {
-            List<BHC.CadTextNote> textNotes = new List<BHC.CadTextNote>();
+            List<BHC.TextNote> textNotes = new List<BHC.TextNote>();
 
             // Read mtext entities 
             foreach (ObjectId id in btr)
@@ -156,7 +156,7 @@ namespace BH.Civil3D.Adapter.Core
 
                 if (ent is MText mtext)
                 {
-                    BHC.CadTextNote note = mtext.FromCivil3d();
+                    BHC.TextNote note = mtext.FromCivil3D();
 
                     if (note != null)
                     {

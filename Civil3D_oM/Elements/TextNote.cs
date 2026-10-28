@@ -1,6 +1,6 @@
 /*
  * This file is part of the Buildings and Habitats object Model (BHoM)
- * Copyright (c) 2015 - 2024, the respective contributors. All rights reserved.
+ * Copyright (c) 2015 - 2026, the respective contributors. All rights reserved.
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
@@ -20,23 +20,30 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using BH.oM.Base;
-using BH.oM.Geometry;
+using BH.oM.Geometry.CoordinateSystem;
+using BH.oM.Quantities.Attributes;
+using System.ComponentModel;
 
 namespace BH.oM.Adapters.Civil3D.Elements
 {
- 
-    public class CadTextNote : BHoMObject
+    [Description("A single- or multi-line text annotation placed in a drawing.")]
+    public class TextNote : BHoMObject
     {
-        public string Text { get; set; } = "";
-        public Point Position { get; set; } = new Point();
-        public double Rotation { get; set; } = 0;
-        public BoundingBox BoundingBox { get; set; } 
-    }
+        /***************************************************/
+        /**** Public Properties                         ****/
+        /***************************************************/
 
+        [Description("The text content without formatting codes.")]
+        public virtual string Text { get; set; } = "";
+
+        [Description("Insertion point (origin) and orientation of the text. The local X axis is the reading direction and the local Z axis is the text normal.")]
+        public virtual Cartesian Orientation { get; set; } = null;
+
+        [Length]
+        [Description("Text height, in metres.")]
+        public virtual double Height { get; set; } = 0.0;
+
+        /***************************************************/
+    }
 }
