@@ -114,7 +114,8 @@ namespace BH.Civil3D.Adapter.Core
         /***************************************************/
 
         //Converts the drawing objects of the given classes, keeps results of the requested type, scales them to SI units
-        //and attaches their drawing identifiers. Geometry is wrapped, because IRead must return IBHoMObjects.
+        //and attaches their drawing identifiers. Geometry is wrapped, because IRead must return IBHoMObjects and plain
+        //geometry cannot carry the identifiers; Push reads the layer back from the same wrapper.
         private List<IBHoMObject> ReadEntities(IEnumerable<ObjectId> ids, List<Type> entityTypes, Type type, Transaction tr, double toSI)
         {
             List<IBHoMObject> result = new List<IBHoMObject>();
@@ -131,17 +132,23 @@ namespace BH.Civil3D.Adapter.Core
                     if (converted == null || !type.IsAssignableFrom(converted.GetType()))
                         continue;
 
-                    if (converted is BHG.IGeometry)
+                    IBHoMObject obj;
+                    if (converted is BHG.IGeometry geometry)
                     {
-                        result.Add(new ObjectWrapper { WrappedObject = ((BHG.IGeometry)converted).ScaleGeometry(toSI) });
-                        continue;
+                        obj = new ObjectWrapper
+                        {
+                            WrappedObject = geometry.ScaleGeometry(toSI)
+                        };
+                    }
+                    else
+                    {
+                        obj = converted as IBHoMObject;
+                        if (obj == null)
+                            continue;
+
+                        ToSI(obj as dynamic, toSI);
                     }
 
-                    IBHoMObject obj = converted as IBHoMObject;
-                    if (obj == null)
-                        continue;
-
-                    ToSI(obj as dynamic, toSI);
                     obj.SetIdentifiers(entity);
                     result.Add(obj);
                 }

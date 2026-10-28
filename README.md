@@ -48,7 +48,9 @@ flowchart LR
 | `Alignment` | `Alignment` (spirals approximated as straight lines) | Not yet supported |
 | `Parcel` | `Parcel` (found through sites) | Not yet supported |
 
-Every pulled BHoM object carries a `DrawingIdentifiers` fragment with the drawing object's handle, layer and class name. On Push, an object's layer is taken from that fragment if the layer exists in the drawing; otherwise the current layer is used. Layers are never created.
+Every pulled object carries a `DrawingIdentifiers` fragment with the drawing object's handle, layer and class name. On Push, an object's layer is taken from that fragment if the layer exists in the drawing; otherwise the current layer is used. Layers are never created.
+
+Geometry (points and curves) cannot carry fragments, so it is pulled **wrapped in an `ObjectWrapper`**: the geometry is in its `WrappedObject` property and the `DrawingIdentifiers` fragment is on the wrapper. Use the wrapper's `WrappedObject` to work with the geometry itself. Pushing the wrapper back puts the geometry on its original layer; pushing plain geometry puts it on the current layer.
 
 Pull with a `FilterRequest` whose `Type` is one of the types above, or a base type such as `ICurve` to get every curve.
 
@@ -82,7 +84,7 @@ A build copies the files to where they are loaded from:
 
 Civil 3D reads `PackageContents.xml` at startup and loads `Civil3D_Core_Adapter_<year>.dll`. The listener first registers an assembly resolver that finds the BHoM assemblies in `C:\ProgramData\BHoM\Assemblies`, then starts listening on ports 14230 and 14231. When it is ready, the command line shows `BHoM Civil 3D listener started on ports 14230/14231.`
 
-The plug-in also adds the command `BHOMOUT`, which writes every supported object in the active drawing to a JSON file in a `BHoMOut` folder next to the drawing.
+The plug-in also adds the command `BHOMOUT`, which writes every supported object in the active drawing to a JSON file in a `BHoMOut` folder next to the drawing. Geometry is written as `ObjectWrapper`s, as on Pull.
 
 ## Debugging
 

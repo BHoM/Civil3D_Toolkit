@@ -24,7 +24,6 @@ using BH.oM.Base.Attributes;
 using BHG = BH.oM.Geometry;
 
 using ACD = Autodesk.AutoCAD.DatabaseServices;
-using ACG = Autodesk.AutoCAD.Geometry;
 
 using System.ComponentModel;
 
@@ -36,7 +35,8 @@ namespace BH.Civil3D.Engine.Core
         /**** Public Methods                            ****/
         /***************************************************/
 
-        [Description("Converts a Civil 3D Arc to BH.oM.Geometry.Arc.")]
+        [Description("Converts a Civil 3D Arc to BH.oM.Geometry.Arc. The arc is built from its centre, normal and swept angle rather than " +
+                     "fitted through three points, so very flat arcs (short chord on a large radius) convert exactly.")]
         [Input("acArc", "A Civil 3D Arc to convert.")]
         [Output("arc", "The converted BH.oM.Geometry.Arc.")]
         public static BHG.Arc FromCivil3D(this ACD.Arc acArc)
@@ -44,8 +44,15 @@ namespace BH.Civil3D.Engine.Core
             if (acArc == null)
                 return null;
 
-            ACG.Point3d mid = acArc.GetPointAtParameter((acArc.StartParam + acArc.EndParam) / 2);
-            return BH.Engine.Geometry.Create.Arc(acArc.StartPoint.FromCivil3D(), mid.FromCivil3D(), acArc.EndPoint.FromCivil3D());
+            //The X axis points at the start point, so the arc sweeps anticlockwise about its normal from angle 0 to TotalAngle,
+            //whatever the arc's object coordinate system.
+            BHG.Vector normal = acArc.Normal.FromCivil3D();
+            BHG.Vector xAxis = (acArc.StartPoint - acArc.Center).GetNormal().FromCivil3D();
+            BHG.Vector yAxis = BH.Engine.Geometry.Query.CrossProduct(normal, xAxis);
+
+            BHG.CoordinateSystem.Cartesian system = BH.Engine.Geometry.Create.CartesianCoordinateSystem(acArc.Center.FromCivil3D(), xAxis, yAxis);
+
+            return BH.Engine.Geometry.Create.Arc(system, acArc.Radius, 0.0, acArc.TotalAngle);
         }
 
         /***************************************************/
