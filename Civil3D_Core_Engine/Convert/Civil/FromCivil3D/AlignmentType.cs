@@ -25,11 +25,7 @@ using BH.oM.Base.Attributes;
 
 using ADC = Autodesk.Civil.DatabaseServices;
 
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BH.Civil3D.Engine.Core
 {

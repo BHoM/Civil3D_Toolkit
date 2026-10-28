@@ -27,11 +27,7 @@ using BHG = BH.oM.Geometry;
 using ACD = Autodesk.AutoCAD.DatabaseServices;
 using ACG = Autodesk.AutoCAD.Geometry;
 
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BH.Civil3D.Engine.Core
 {

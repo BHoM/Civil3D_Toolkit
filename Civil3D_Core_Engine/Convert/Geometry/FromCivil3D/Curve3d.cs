@@ -29,8 +29,6 @@ using ACG = Autodesk.AutoCAD.Geometry;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BH.Civil3D.Engine.Core
 {

@@ -25,13 +25,10 @@ using BH.oM.Base.Attributes;
 using BH.oM.Geometry;
 
 using Autodesk.AutoCAD.DatabaseServices;
-using ADC = Autodesk.Civil.DatabaseServices;
 
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BH.Civil3D.Engine.Core
 {

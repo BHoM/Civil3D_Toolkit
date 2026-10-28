@@ -23,14 +23,10 @@
 using BHC = BH.oM.Adapters.Civil3D.Elements;
 using BH.oM.Base.Attributes;
 
-using ACG = Autodesk.AutoCAD.Geometry;
 using ADC = Autodesk.Civil.DatabaseServices;
 
 using System;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BH.Civil3D.Engine.Core
 {

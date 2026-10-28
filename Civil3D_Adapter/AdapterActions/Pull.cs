@@ -21,14 +21,10 @@
  */
 
 using BH.oM.Adapter;
-using BH.oM.Base;
-using BH.oM.Base.Attributes;
 using BH.oM.Data.Requests;
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Threading;
 
 namespace BH.Adapter.Civil3D
 {
