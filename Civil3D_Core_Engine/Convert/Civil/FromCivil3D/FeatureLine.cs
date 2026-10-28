@@ -69,8 +69,8 @@ namespace BH.Civil3D.Engine.Core
             var segments = new List<BHG.ICurve>();
             for (int i = 0; i < piPoints.Count - 1; i++)
             {
-                var start = piPoints[i].ToACGPoint3d();
-                var end = piPoints[i + 1].ToACGPoint3d();
+                var start = piPoints[i].ToCivil3D();
+                var end = piPoints[i + 1].ToCivil3D();
                 double bulge = bulges[i];
 
                 if (Math.Abs(bulge) < 1e-12)

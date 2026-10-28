@@ -20,61 +20,31 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using BHG = BH.oM.Geometry;
-using BHCE = BH.oM.Adapters.Civil3D.Elements;
 using ACD = Autodesk.AutoCAD.DatabaseServices;
 using ACG = Autodesk.AutoCAD.Geometry;
+using Autodesk.AutoCAD.Geometry;
+using BH.Engine.Geometry;
 
 namespace BH.Civil3D.Engine.Core
 {
     public static partial class Convert
     {
-
         /***************************************************/
         /**** Public Methods                            ****/
         /***************************************************/
 
-        public static ACD.MText ToCivil3D(this BHCE.TextNote textNote)
+        public static ACD.Circle ToCivil3D(this BHG.Circle circle)
         {
-            if (textNote == null)
-                return null;
-
-            if (textNote.Orientation == null)
-            {
-                BH.Engine.Base.Compute.RecordError("A TextNote has no Orientation, so it could not be converted to Civil 3D text.");
-                return null;
-            }
-
-            ACD.MText mtext = new ACD.MText
-            {
-                Contents = textNote.Text,
-                Location = textNote.Orientation.Origin.ToACGPoint3d(),
-                Normal = textNote.Orientation.Z.ToCivil3D(),
-                Direction = textNote.Orientation.X.ToCivil3D(),
-            };
-
-            if (textNote.Height > 0)
-                mtext.TextHeight = textNote.Height;
-
-            return mtext;
-        }
-
-        /***************************************************/
-
-        public static BHCE.TextNote FromCivil3D(this ACD.MText mtext)
-        {
-            if (mtext == null)
-                return null;
-
-            ACG.Vector3d x = mtext.Direction;
-            ACG.Vector3d y = mtext.Normal.CrossProduct(x);
-
-            return new BHCE.TextNote
-            {
-                Text = mtext.Text,
-                Orientation = BH.Engine.Geometry.Create.CartesianCoordinateSystem(mtext.Location.FromCivil3D(), x.FromCivil3D(), y.FromCivil3D()),
-                Height = mtext.TextHeight,
-            };
+            var center = circle.Centre.ToCivil3D();
+            var normal = new ACG.Vector3d(circle.Normal.X, circle.Normal.Y, circle.Normal.Z);
+            
+            return new ACD.Circle(center, normal, circle.Radius);
         }
 
         /***************************************************/

@@ -25,50 +25,37 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using BHC = BH.oM.Adapters.Civil3D.Elements;
 using BHG = BH.oM.Geometry;
-
+using ACD = Autodesk.AutoCAD.DatabaseServices;
 using ACG = Autodesk.AutoCAD.Geometry;
-
-using ADC = Autodesk.Civil.DatabaseServices;
 
 namespace BH.Civil3D.Engine.Core
 {
     public static partial class Convert
     {
-
         /***************************************************/
         /**** Public Methods                            ****/
         /***************************************************/
 
-        public static BHC.CoGoPoint FromCivil3D(this ADC.CogoPoint cogoPoint)
+        public static BHG.Point FromCivil3D(this ACD.DBPoint acPoint)
         {
-            BHC.CoGoPoint pt = new BHC.CoGoPoint
-            {
-                Location = new BHG.Point { X = cogoPoint.Easting, Y = cogoPoint.Northing, Z = cogoPoint.Elevation },
-                Name = cogoPoint.PointName,
-                PointNumber = (int)cogoPoint.PointNumber,
-                FullDescription = cogoPoint.FullDescription,
-                RawDescription = cogoPoint.RawDescription
-            };
-
-            return pt;
+            return acPoint.Position.FromCivil3D();
         }
 
-        public static void ToCivil3D(this BHC.CoGoPoint bhPoint, ADC.CogoPoint c3dPoint)
-        {
-            c3dPoint.Easting = bhPoint.Location.X;
-            c3dPoint.Northing = bhPoint.Location.Y;
-            c3dPoint.Elevation = bhPoint.Location.Z;
-            c3dPoint.PointName = bhPoint.Name;
+        /***************************************************/
 
-            // A number of 0 or less keeps the number Civil 3D assigned.
-            if (bhPoint.PointNumber > 0)
-                c3dPoint.PointNumber = (uint)bhPoint.PointNumber;
+        public static BHG.Point FromCivil3D(this ACG.Point3d pt)
+        {
+            return new BHG.Point { X = pt.X, Y = pt.Y, Z = pt.Z };
+        }
+
+        /***************************************************/
+
+        public static BHG.Point FromCivil3D(this ACG.Point2d pt)
+        {
+            return new BHG.Point { X = pt.X, Y = pt.Y, Z = 0 };
         }
 
         /***************************************************/
     }
 }
-
-

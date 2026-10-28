@@ -28,55 +28,22 @@ using System.Threading.Tasks;
 using BHG = BH.oM.Geometry;
 using ACD = Autodesk.AutoCAD.DatabaseServices;
 using ACG = Autodesk.AutoCAD.Geometry;
+using Autodesk.AutoCAD.Geometry;
+using BH.Engine.Geometry;
 
 namespace BH.Civil3D.Engine.Core
 {
     public static partial class Convert
     {
-
         /***************************************************/
         /**** Public Methods                            ****/
         /***************************************************/
 
-        /***********************From BHoM to Civil3D****************************/
-
-        public static ACD.DBPoint ToCivil3D(this BHG.Point pt)
+        public static ACD.Line ToCivil3D(this BHG.Line line)
         {
-            return new ACD.DBPoint(new ACG.Point3d(pt.X, pt.Y, pt.Z));
+            return new ACD.Line(line.Start.ToCivil3D(), line.End.ToCivil3D());
         }
 
-        public static ACG.Point3d ToACGPoint3d(this BHG.Point pt)
-        {
-            return new ACG.Point3d(pt.X, pt.Y, pt.Z);
-        }
-
-        public static ACG.Point2d ToACGPoint2d(this BHG.Point pt)
-        {
-            return new ACG.Point2d(pt.X, pt.Y);
-        }
-
-
-        /***********************From Civil3D to BHoM****************************/
-
-        public static BHG.Point FromCivil3D(this ACD.DBPoint acPoint)
-        {
-            return acPoint.Position.FromCivil3D();
-        }
-
-        public static BHG.Point FromCivil3D(this ACG.Point3d pt)
-        {
-            return new BHG.Point { X = pt.X, Y = pt.Y, Z = pt.Z };
-        }
-
-        public static BHG.Point FromCivil3D(this ACG.Point2d pt)
-        {
-            return new BHG.Point { X = pt.X, Y = pt.Y, Z = 0 };
-        }
-
-      /***************************************************/
-
-
+        /***************************************************/
     }
 }
-
-

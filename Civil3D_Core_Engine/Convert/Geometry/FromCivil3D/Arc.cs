@@ -26,43 +26,45 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BHG = BH.oM.Geometry;
-
+using ACD = Autodesk.AutoCAD.DatabaseServices;
 using ACG = Autodesk.AutoCAD.Geometry;
+using Autodesk.AutoCAD.Geometry;
+using BH.Engine.Geometry;
 
 namespace BH.Civil3D.Engine.Core
 {
     public static partial class Convert
     {
-
         /***************************************************/
         /**** Public Methods                            ****/
         /***************************************************/
 
-        public static ACG.Vector3d ToCivil3D(this BHG.Vector vec)
+        public static BHG.Arc FromCivil3D(this ACD.Arc acArc)
         {
-            return new ACG.Vector3d(vec.X, vec.Y, vec.Z);
-        }
+            var c = new BHG.Point { X = acArc.Center.X, Y = acArc.Center.Y, Z = acArc.Center.Z };
 
-        /// This is a scaling vector only
-        public static ACG.Scale3d ToCivil3DScale(this BHG.Vector vec)
-        {
-            return new ACG.Scale3d(vec.X, vec.Y, vec.Z);
-        }
+            var n = new BHG.Vector { X = acArc.Normal.X, Y = acArc.Normal.Y, Z = acArc.Normal.Z };
+            n = BH.Engine.Geometry.Modify.Normalise(n);
 
-        public static BHG.Vector FromCivil3D(this ACG.Vector3d vec)
-        {
-            return new BHG.Vector { X = vec.X, Y = vec.Y, Z = vec.Z };
-        }
+            var x = BH.Engine.Geometry.Modify.Rotate(
+                BH.Engine.Geometry.Create.Vector(1, 0, 0),
+                acArc.StartAngle,
+                n
+            );
+            x = BH.Engine.Geometry.Modify.Normalise(x);
 
+            var y = BH.Engine.Geometry.Modify.Normalise(
+                BH.Engine.Geometry.Query.CrossProduct(n, x)
+            );
 
-        /// This is a scaling vector only
-        public static BHG.Vector FromCivil3D(this ACG.Scale3d vec)
-        {
-            return new BHG.Vector { X = vec.X, Y = vec.Y, Z = vec.Z };
+            var cs = BH.Engine.Geometry.Create.CartesianCoordinateSystem(c, x, y);
+
+            double sweep = acArc.EndAngle - acArc.StartAngle;
+            if (sweep < 0) sweep += 2 * Math.PI;
+
+            return BH.Engine.Geometry.Create.Arc(cs, acArc.Radius, 0.0, sweep);
         }
 
         /***************************************************/
     }
 }
-
-

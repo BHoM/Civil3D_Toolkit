@@ -152,7 +152,7 @@ namespace BH.Civil3D.Adapter.Core
         }
 
         private bool CreateCollection(IEnumerable<BH.oM.Geometry.Point> points, BHACC3d.Civil3DRuntimeContext context, string layer = "0")
-            => ProcessEntityCollection(points, context, layer, p => p.ToCivil3D(), "Could not convert a Point to a Civil 3D entity, so it was not created.");
+            => ProcessEntityCollection(points, context, layer, p => p.ToCivil3DDBPoint(), "Could not convert a Point to a Civil 3D entity, so it was not created.");
 
         private bool CreateCollection(IEnumerable<BH.oM.Geometry.Line> lines, BHACC3d.Civil3DRuntimeContext context, string layer = "0")
             => ProcessEntityCollection(lines, context, layer, l => l.ToCivil3D(), "Could not convert a Line to a Civil 3D entity, so it was not created.");
@@ -168,16 +168,12 @@ namespace BH.Civil3D.Adapter.Core
 
         private bool CreateCollection(IEnumerable<BH.oM.Geometry.Polyline> polylines, BHACC3d.Civil3DRuntimeContext context, string layer = "0")
             => ProcessPolylineCollection(polylines, context, layer, 
-                p => p.ControlPoints != null && p.ControlPoints.Any(pt => Math.Abs(pt.Z) > 1e-3) 
-                    ? (object)p.ToPolyline3D() 
-                    : (object)p.ToLWPolyline(), 
+                p => p.ToCivil3D(), 
                 "Could not convert a Polyline to a Civil 3D entity, so it was not created.");
 
         private bool CreateCollection(IEnumerable<BH.oM.Geometry.PolyCurve> polyCurves, BHACC3d.Civil3DRuntimeContext context, string layer = "0")
             => ProcessPolylineCollection(polyCurves, context, layer,
-                pc => HasNonZeroZ(pc)
-                    ? (object)pc.ToPolyline3D()
-                    : (object)pc.ToLWPolyline(),
+                pc => pc.ToCivil3D(),
                 "Could not convert a PolyCurve to a Civil 3D entity, so it was not created.");
 
         private bool CreateCollection(IEnumerable<BH.oM.Geometry.NurbsCurve> splines, BHACC3d.Civil3DRuntimeContext context, string layer = "0")
@@ -387,34 +383,6 @@ namespace BH.Civil3D.Adapter.Core
             return true;
         }
 
-        // Helper: check if PolyCurve has any non-zero Z values
-        private bool HasNonZeroZ(BH.oM.Geometry.PolyCurve polyCurve)
-        {
-            if (polyCurve == null || polyCurve.Curves == null)
-                return false;
-
-            foreach (var curve in polyCurve.Curves)
-            {
-                if (curve is BH.oM.Geometry.Line line)
-                {
-                    if (Math.Abs(line.Start.Z) > 1e-10 || Math.Abs(line.End.Z) > 1e-3)
-                        return true;
-                }
-                else if (curve is BH.oM.Geometry.Arc arc)
-                {
-                    // Check arc coordinate system origin for Z
-                    if (Math.Abs(arc.CoordinateSystem.Origin.Z) > 1e-3)
-                        return true;
-                }
-                else if (curve is BH.oM.Geometry.Polyline polyline)
-                {
-                    if (polyline.ControlPoints != null && polyline.ControlPoints.Any(pt => Math.Abs(pt.Z) > 1e-3))
-                        return true;
-                }
-            }
-
-            return false;
-        }
 
         // Helper: extract geometry (single or enumerable)
         private IEnumerable<BH.oM.Geometry.IGeometry> ExtractGeometry(BH.oM.Base.CustomObject co)
