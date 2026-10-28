@@ -29,6 +29,7 @@ using Autodesk.AutoCAD.Runtime;
 
 using BH.Adapter;
 using BH.Adapter.Socket;
+using BH.Adapter.Civil3D;
 using BH.oM.Base;
 using BH.oM.Data.Requests;
 using BH.oM.Adapters.Socket;
