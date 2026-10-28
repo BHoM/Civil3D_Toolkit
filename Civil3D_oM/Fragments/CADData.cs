@@ -28,7 +28,7 @@ using System.Threading.Tasks;
 
 using BH.oM.Base;
 
-namespace BH.oM.Civils.Fragments
+namespace BH.oM.Adapters.Civil3D.Fragments
 {
     public class CADDataFragment : IFragment
     {       

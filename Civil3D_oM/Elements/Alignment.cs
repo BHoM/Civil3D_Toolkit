@@ -28,7 +28,7 @@ using System.Threading.Tasks;
 using BH.oM.Base;
 using BH.oM.Geometry;
 
-namespace BH.oM.Civils.Elements
+namespace BH.oM.Adapters.Civil3D.Elements
 {
     public class Alignment : BHoMObject
     {
@@ -36,7 +36,7 @@ namespace BH.oM.Civils.Elements
         /**** Public Properties                         ****/
         /***************************************************/
 
-        public virtual CivAlignmentType AlignmentType { get; set; } = CivAlignmentType.Undefined;
+        public virtual AlignmentType AlignmentType { get; set; } = AlignmentType.Undefined;
         public virtual string Description { get; set; } = "";
         public virtual List<double> DesignSpeeds { get; set; } = new List<double>();
         public virtual double EndingStation { get; set; } = 0;

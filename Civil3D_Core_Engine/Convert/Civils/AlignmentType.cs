@@ -25,7 +25,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using BHC = BH.oM.Civils.Elements;
+using BHC = BH.oM.Adapters.Civil3D.Elements;
 
 using ACG = Autodesk.AutoCAD.Geometry;
 
@@ -40,22 +40,22 @@ namespace BH.Civil3D.Engine.Core
         /**** Public Methods                            ****/
         /***************************************************/
 
-        public static BHC.CivAlignmentType FromCivil3D(this ADC.AlignmentType alignmentType)
+        public static BHC.AlignmentType FromCivil3D(this ADC.AlignmentType alignmentType)
         {
             switch (alignmentType)
             {
                 case ADC.AlignmentType.Centerline:
-                    return BHC.CivAlignmentType.Centerline;
+                    return BHC.AlignmentType.Centreline;
                 case ADC.AlignmentType.CurbReturn:
-                    return BHC.CivAlignmentType.CurbReturn;
+                    return BHC.AlignmentType.KerbReturn;
                 case ADC.AlignmentType.Offset:
-                    return BHC.CivAlignmentType.Offset;
+                    return BHC.AlignmentType.Offset;
                 case ADC.AlignmentType.Rail:
-                    return BHC.CivAlignmentType.Rail;
+                    return BHC.AlignmentType.Rail;
                 case ADC.AlignmentType.Utility:
-                    return BHC.CivAlignmentType.Utility;
+                    return BHC.AlignmentType.Utility;
                 default:
-                    return BHC.CivAlignmentType.Undefined;
+                    return BHC.AlignmentType.Undefined;
             }
         }
 

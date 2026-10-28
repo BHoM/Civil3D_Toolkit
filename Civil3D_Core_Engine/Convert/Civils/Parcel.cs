@@ -25,7 +25,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using BHC = BH.oM.Civils.Elements;
+using BHC = BH.oM.Adapters.Civil3D.Elements;
 
 using ACG = Autodesk.AutoCAD.Geometry;
 

@@ -28,7 +28,7 @@ using System.Threading.Tasks;
 using BHG = BH.oM.Geometry;
 using ACD = Autodesk.AutoCAD.DatabaseServices;
 using ACG = Autodesk.AutoCAD.Geometry;
-using BHCE = BH.oM.Civils.Elements;
+using BHCE = BH.oM.Adapters.Civil3D.Elements;
 
 using BH.Engine.Base;
 using BHB = BH.oM.Base;
@@ -113,9 +113,9 @@ namespace BH.Civil3D.Engine.Core
         }
 
 
-        // internal static BH.oM.Civils.Fragments.CadTextFragment ToCadTextFragment(this ACD.MText mtext)
+        // internal static BH.oM.Adapters.Civil3D.Fragments.CadTextFragment ToCadTextFragment(this ACD.MText mtext)
         // {
-        //     return new BH.oM.Civils.Fragments.CadTextFragment
+        //     return new BH.oM.Adapters.Civil3D.Fragments.CadTextFragment
         //     {
         //         TextHeight = mtext.TextHeight,
         //         Width = mtext.Width,

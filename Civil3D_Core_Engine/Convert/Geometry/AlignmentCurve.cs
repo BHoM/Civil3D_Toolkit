@@ -32,7 +32,7 @@ using ACG = Autodesk.AutoCAD.Geometry;
 
 using ADC = Autodesk.Civil.DatabaseServices;
 
-using BHC = BH.oM.Civils.Elements;
+using BHC = BH.oM.Adapters.Civil3D.Elements;
 using BH.Engine.Geometry;
 
 namespace BH.Civil3D.Engine.Core

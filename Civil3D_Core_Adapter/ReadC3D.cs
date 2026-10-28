@@ -28,12 +28,12 @@ using System.Text;
 using System.Threading.Tasks;
 using BH.oM.Base;
 using BH.oM.Dimensional;
-using BHC = BH.oM.Civils.Elements;
+using BHC = BH.oM.Adapters.Civil3D.Elements;
 using BHG = BH.oM.Geometry;
 using BH.Civil3D.Engine.Core;
 //using BH.oM.Geometry;
 using BH.Engine;
-using BH.oM.Civils.Fragments;
+using BH.oM.Adapters.Civil3D.Fragments;
 using BH.Engine.Base;
 
 using Autodesk.Civil.ApplicationServices;
@@ -41,7 +41,7 @@ using Autodesk.Civil.Runtime;
 using ADC = Autodesk.Civil.DatabaseServices;
 using AAD = Autodesk.AutoCAD.DatabaseServices;
 using ACG = Autodesk.AutoCAD.Geometry;
-using BCF = BH.oM.Civils.Fragments;
+using BCF = BH.oM.Adapters.Civil3D.Fragments;
 
 //using Autodesk.AutoCAD.Runtime;
 

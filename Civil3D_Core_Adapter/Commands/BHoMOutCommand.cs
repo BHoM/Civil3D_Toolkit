@@ -33,7 +33,7 @@ using BH.Engine.Serialiser;
 using BH.oM.Adapter;
 using BH.oM.Data.Requests;
 
-using BHC = BH.oM.Civils.Elements;
+using BHC = BH.oM.Adapters.Civil3D.Elements;
 using BHG = BH.oM.Geometry;
 
 namespace BH.Civil3D.Adapter.Core

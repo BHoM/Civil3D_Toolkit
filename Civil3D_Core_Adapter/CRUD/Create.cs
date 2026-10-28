@@ -84,7 +84,7 @@ namespace BH.Civil3D.Adapter.Core
 
                     // ---- DISPATCH ON UNWRAPPED TYPES ----
                     ProcessCustomObjectGeometry(unwrapped, context);
-                    CreateCollection(unwrapped.OfType<BH.oM.Civils.Elements.CoGoPoint>(), context);
+                    CreateCollection(unwrapped.OfType<BH.oM.Adapters.Civil3D.Elements.CoGoPoint>(), context);
                     
                     tr.Commit();
                 }
@@ -184,7 +184,7 @@ namespace BH.Civil3D.Adapter.Core
             => ProcessEntityCollection(splines, context, layer, s => s.ToCivil3D(), "Could not convert a NurbsCurve to a Civil 3D spline, so it was not created.");
         
         private bool CreateCollection(
-            IEnumerable<BH.oM.Civils.Elements.CoGoPoint> cogos,
+            IEnumerable<BH.oM.Adapters.Civil3D.Elements.CoGoPoint> cogos,
             BHACC3d.Civil3DRuntimeContext context,
             string layer = "0",
             string desc = "",
@@ -224,7 +224,7 @@ namespace BH.Civil3D.Adapter.Core
                     return true;
 
                 // Validate points before building locations
-                var valid = new List<BH.oM.Civils.Elements.CoGoPoint>();
+                var valid = new List<BH.oM.Adapters.Civil3D.Elements.CoGoPoint>();
                 var locations = new Autodesk.AutoCAD.Geometry.Point3dCollection();
 
                 for (int i = 0; i < input.Count; i++)
@@ -453,7 +453,7 @@ namespace BH.Civil3D.Adapter.Core
             if (co == null || co.Fragments == null)
                 return null;
 
-            var cadFrag = co.Fragments.OfType<BH.oM.Civils.Fragments.CADDataFragment>().FirstOrDefault();
+            var cadFrag = co.Fragments.OfType<BH.oM.Adapters.Civil3D.Fragments.CADDataFragment>().FirstOrDefault();
 
             if (cadFrag == null)
                 return null;

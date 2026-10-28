@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.Linq;
 using BH.oM.Base;
 using BH.oM.Base.Attributes;
-using BH.oM.Civils.Elements;
 using BH.oM.Geometry;
 using BH.Engine.Geometry;
 

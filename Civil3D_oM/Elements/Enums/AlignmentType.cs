@@ -1,6 +1,6 @@
 /*
  * This file is part of the Buildings and Habitats object Model (BHoM)
- * Copyright (c) 2015 - 2024, the respective contributors. All rights reserved.
+ * Copyright (c) 2015 - 2026, the respective contributors. All rights reserved.
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
@@ -20,18 +20,24 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
 
-namespace BH.oM.Civils.Elements
+using System.ComponentModel;
+
+namespace BH.oM.Adapters.Civil3D.Elements
 {
-    public enum CivAlignmentType
+    [Description("Defines the purpose of a horizontal alignment.")]
+    public enum AlignmentType
     {
+        [Description("The alignment type is not known or not set.")]
         Undefined,
-        MemberName,
-        Centerline,
+        [Description("A road or corridor centreline.")]
+        Centreline,
+        [Description("An alignment offset from a parent alignment.")]
         Offset,
-        CurbReturn,
+        [Description("A kerb return at a junction.")]
+        KerbReturn,
+        [Description("A utility alignment, e.g. for services.")]
         Utility,
+        [Description("A rail alignment.")]
         Rail,
     }
 }
-
-

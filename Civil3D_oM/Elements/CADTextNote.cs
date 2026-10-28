@@ -28,7 +28,7 @@ using System.Threading.Tasks;
 using BH.oM.Base;
 using BH.oM.Geometry;
 
-namespace BH.oM.Civils.Elements
+namespace BH.oM.Adapters.Civil3D.Elements
 {
  
     public class CadTextNote : BHoMObject
