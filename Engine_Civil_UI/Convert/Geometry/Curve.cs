@@ -459,6 +459,10 @@ namespace BH.UI.Civil.Engine
                     break;
                 ACG.Point3d start = acadPolyline.GetPoint3dAt(i);
                 ACG.Point3d end = acadPolyline.GetPoint3dAt(next);
+                // Duplicate vertices give zero-length segments, which make the whole curve invalid in Rhino
+                // (it then cannot be pulled to, measured or joined). Skip them; the shape is unchanged.
+                if (start.DistanceTo(end) < ZeroLength)
+                    continue;
                 double bulge = acadPolyline.GetBulgeAt(i);
                 if (bulge == 0)
                 {

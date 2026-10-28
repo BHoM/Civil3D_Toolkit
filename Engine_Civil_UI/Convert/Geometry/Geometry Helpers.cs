@@ -78,8 +78,12 @@ namespace BH.UI.Civil.Engine
             double sweep = arc.EndAngle - arc.StartAngle;
             if (sweep < 0) sweep += 2 * Math.PI;
 
-            // bulge = tan(theta/4) where theta is the included angle
-            return Math.Tan(sweep / 4.0);
+            // bulge = tan(theta/4) where theta is the included angle. A BHoM arc runs counter-clockwise about its own
+            // CoordinateSystem.Z, while an AutoCAD bulge is positive for counter-clockwise in plan (WCS Z up) and
+            // negative for clockwise. So the sign follows which way the arc's Z axis points: an arc whose Z points
+            // down is clockwise in plan. Without this every clockwise arc was drawn bowing the wrong way.
+            double sign = arc.CoordinateSystem.Z.Z < 0 ? -1.0 : 1.0;
+            return sign * Math.Tan(sweep / 4.0);
         }
 
         public static void AddSegment(
@@ -88,6 +92,10 @@ namespace BH.UI.Civil.Engine
             ACG.Point3d end,
             double bulge)
         {
+            // duplicate vertices: a zero-length segment would make the whole curve invalid
+            if (start.DistanceTo(end) < ZeroLength)
+                return;
+
             if (Math.Abs(bulge) < 1e-12)
             {
                 segments.Add(new BHG.Line
@@ -101,6 +109,9 @@ namespace BH.UI.Civil.Engine
                 segments.Add(BulgeToArc(start, end, bulge));
             }
         }
+        // Polyline segments shorter than this (duplicate vertices) are skipped when reading from Civil 3D.
+        private const double ZeroLength = 1e-6;
+
         public static BHG.Arc BulgeToArc(ACG.Point3d start, ACG.Point3d end, double bulge)
         {
             double chord = start.DistanceTo(end);
@@ -132,12 +143,14 @@ namespace BH.UI.Civil.Engine
                 perpDir = new ACG.Vector3d(1, 0, 0);
             perpDir = perpDir.GetNormal();
 
-            // **Apothem** (distance from chord midpoint to center), not sagitta
+            // Signed distance from the chord midpoint to the centre, along the left normal: halfChord * (1 - b^2) / (2b).
+            // For an arc of less than 180 degrees (|b| < 1) the centre is on the bulge's side; past 180 degrees (|b| > 1,
+            // e.g. a cul-de-sac loop) it crosses to the other side. Always putting it on the bulge's side mirrored those
+            // arcs, so they no longer met their neighbours and the polyline failed to convert in Grasshopper.
             double halfChord = chord / 2.0;
-            double apothem = System.Math.Sqrt(System.Math.Max(0.0, radius * radius - halfChord * halfChord));
+            double offset = halfChord * (1.0 - bulge * bulge) / (2.0 * bulge);
 
-            // Center: choose side based on bulge sign (CW vs CCW) [2](https://lee-mac.com/bulgeconversion.html)
-            ACG.Point3d center = mid + perpDir * (System.Math.Sign(bulge) * apothem);
+            ACG.Point3d center = mid + perpDir * offset;
 
             // Local axes
             ACG.Vector3d centerToStart = (start - center).GetNormal();
