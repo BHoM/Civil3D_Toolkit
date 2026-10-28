@@ -106,7 +106,7 @@ namespace BH.Civil3D.Adapter.Core
             if (requestedType == typeof(BHG.ICurve))
                 return ReadCurves(tr, btr);
 
-            if (requestedType == typeof(BHC.BlockInstance))
+            if (requestedType == typeof(BHC.Block))
                 return ReadBlocks(tr, db, bt);
 
             if (requestedType == typeof(BHC.BlockDefinition))
@@ -306,9 +306,9 @@ namespace BH.Civil3D.Adapter.Core
         /***************************************************/
         /**** CAD Blocks                         ****/
         /***************************************************/
-        private List<BHC.BlockInstance> ReadBlocks(Transaction tr, Database db, BlockTable bt)
+        private List<BHC.Block> ReadBlocks(Transaction tr, Database db, BlockTable bt)
         {
-            List<BHC.BlockInstance> blocks = new List<BHC.BlockInstance>();
+            List<BHC.Block> blocks = new List<BHC.Block>();
               
             BlockTableRecord ms = (BlockTableRecord)tr.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForRead);
 
@@ -330,6 +330,7 @@ namespace BH.Civil3D.Adapter.Core
         private List<BHC.BlockDefinition> ReadBlockDefs(Transaction tr, Database db, BlockTable bt)
         {
             var defs = new List<BHC.BlockDefinition>();
+            var cache = new Dictionary<ObjectId, BHC.BlockDefinition>();
 
             foreach (ObjectId btrId in bt)
             {
@@ -338,42 +339,10 @@ namespace BH.Civil3D.Adapter.Core
                 if (btr.IsLayout || btr.Name.StartsWith("*"))
                     continue;
 
-                var bhomDef = new BHC.BlockDefinition
-                {
-                    Name = btr.Name,
-                    Geometry = new List<BHG.IGeometry>()
-                };
-
-                ReadBlockGeometryRecursive(
-                    tr,
-                    btr,
-                    bhomDef.Geometry);
-
-                defs.Add(bhomDef);
+                defs.Add(btr.FromCivil3D(tr, db, cache));
             }
 
             return defs;
-        }
-
-
-        private void ReadBlockGeometryRecursive(
-            Transaction tr,
-            BlockTableRecord btr,
-            IList<BHG.IGeometry> output)
-        {
-            foreach (ObjectId id in btr)
-            {
-                if (!(tr.GetObject(id, OpenMode.ForRead) is Entity ent))
-                    continue;
-
-                // Nested blocks stay as BlockReferences
-                if (ent is BlockReference)
-                    continue;
-
-                var bho = ent.FromCivil3D();
-                if (bho is BHG.IGeometry geom)
-                    output.Add(geom);
-            }
         }
 
 

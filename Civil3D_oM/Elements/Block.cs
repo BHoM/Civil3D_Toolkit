@@ -1,6 +1,6 @@
 /*
  * This file is part of the Buildings and Habitats object Model (BHoM)
- * Copyright (c) 2015 - 2024, the respective contributors. All rights reserved.
+ * Copyright (c) 2015 - 2026, the respective contributors. All rights reserved.
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
@@ -20,35 +20,29 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using BH.oM.Base;
 using BH.oM.Geometry;
+using BH.oM.Geometry.CoordinateSystem;
+using System.ComponentModel;
 
 namespace BH.oM.Adapters.Civil3D.Elements
 {
-    public class BlockInstance : BHoMObject
+    [Description("An instance of a block definition placed in a drawing.")]
+    public class Block : BHoMObject
     {
         /***************************************************/
         /**** Public Properties                         ****/
         /***************************************************/
-        //Name used to identify block definition in Civil 3D drawing
-        public virtual Point Position { get; set; } = new Point();
-        public virtual double Rotation { get; set; } = 0;  /// Rotation in radians about World Z (planar assumption)
-        public virtual Vector Scale { get; set; } = new Vector { X = 1, Y = 1, Z = 1 };
-        public virtual Vector Normal { get; set; } = new Vector { Z = 1 };
+
+        [Description("Name of the block definition this instance refers to.")]
+        public virtual string DefinitionName { get; set; } = "";
+
+        [Description("Insertion point (origin) and orientation of the instance. The local Z axis is the block normal.")]
+        public virtual Cartesian Orientation { get; set; } = null;
+
+        [Description("Scale factors along the instance's local X, Y and Z axes. Null means 1, 1, 1.")]
+        public virtual Vector Scale { get; set; } = null;
+
         /***************************************************/
     }
-    public class BlockDefinition : BHoMObject
-    {
-        public virtual List<IGeometry> Geometry { get; set; } = new List<IGeometry>();
-        
-        public virtual List<BlockInstance> NestedBlocks { get; set; } = new List<BlockInstance>();
-
-    }
 }
-
-

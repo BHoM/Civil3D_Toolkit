@@ -45,10 +45,10 @@ namespace BH.Civil3D.Engine.Core
         /// <summary>
         /// Convert a CAD BlockTableRecord (block definition) into a BHoM BlockDefinition.
         /// - Geometry is stored in local block coordinates (definition space)
-        /// - Nested block references are captured as BlockInstance objects (recursive)
+        /// - Nested block references are captured as Block objects (recursive)
         /// - Uses cache to prevent duplication and infinite recursion
         /// </summary>
-        public static BHC.BlockDefinition ToBHoMBlockDefinition(
+        public static BHC.BlockDefinition FromCivil3D(
             this BlockTableRecord definitionBtr,
             Transaction tr,
             Database db,
@@ -75,7 +75,8 @@ namespace BH.Civil3D.Engine.Core
                 // Still cache a minimal placeholder so nested refs won’t recurse forever
                 var xrefPlaceholder = new BHC.BlockDefinition
                 {
-                    Name = SafeBlockName(definitionBtr.Name)
+                    Name = SafeBlockName(definitionBtr.Name),
+                    BasePoint = definitionBtr.Origin.FromCivil3D()
                 };
                 definitionCache[definitionBtr.ObjectId] = xrefPlaceholder;
                 return xrefPlaceholder;
@@ -85,8 +86,9 @@ namespace BH.Civil3D.Engine.Core
             var bhDef = new BHC.BlockDefinition
             {
                 Name = SafeBlockName(definitionBtr.Name),
+                BasePoint = definitionBtr.Origin.FromCivil3D(),
                 Geometry = new List<IGeometry>(),
-                NestedBlocks = new List<BHC.BlockInstance>()
+                NestedBlocks = new List<BHC.Block>()
             };
             definitionCache[definitionBtr.ObjectId] = bhDef;
 
@@ -114,17 +116,17 @@ namespace BH.Civil3D.Engine.Core
                         continue;
 
                     // Recursively convert nested definition (cached)
-                    var nestedBhDef = nestedDefBtr.ToBHoMBlockDefinition(
+                    var nestedBhDef = nestedDefBtr.FromCivil3D(
                         tr, db, definitionCache,
                         includeNestedBlocks: includeNestedBlocks,
                         skipXrefBlocks: skipXrefBlocks);
 
-                    // Create instance (transform relative to THIS definition)
-                    var nestedInst = new BHC.BlockInstance
+                    // Create instance (transform relative to THIS definition). BlockReference.BlockName is the
+                    // name of the block that owns the reference, so the referenced definition's name is used.
+                    var nestedInst = new BHC.Block
                     {
-                        Name = SafeBlockName(nestedBr.BlockName),
-                        Position = nestedBr.Position.FromCivil3D(),
-                        Rotation = nestedBr.Rotation, // radians (AutoCAD)
+                        DefinitionName = SafeBlockName(nestedDefBtr.Name),
+                        Orientation = BlockOrientation(nestedBr),
                         Scale = nestedBr.ScaleFactors.FromCivil3D()
                     };
 

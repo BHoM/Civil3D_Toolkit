@@ -107,7 +107,7 @@ namespace BH.Civil3D.Adapter.Core
             typeof(BHC.TextNote),
             typeof(BHG.Point),
             typeof(BHG.ICurve),
-            typeof(BHC.BlockInstance),
+            typeof(BHC.Block),
             typeof(BHC.BlockDefinition),
             typeof(BHC.CoGoPoint)
         };
