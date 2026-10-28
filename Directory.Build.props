@@ -1,0 +1,15 @@
+<!-- Enables batch build of configurations that mix target frameworks, and passes BHoM bot checks. -->
+<Project>
+	<PropertyGroup>
+		<BaseIntermediateOutputPath>$(MSBuildProjectDirectory)\obj\$(Configuration)\</BaseIntermediateOutputPath>
+		<DefaultItemExcludes>$(DefaultItemExcludes);obj/**</DefaultItemExcludes>
+	</PropertyGroup>
+
+	<Target Name="RestoreBeforeSolutionBuild" BeforeTargets="PrepareForBuild">
+		<ItemGroup>
+			<SelectedConfigurations Include="$(Configurations)" />
+		</ItemGroup>
+		<Exec Command="dotnet restore $(SolutionPath) -p:Configuration=%(SelectedConfigurations.Identity)"
+			Condition="!Exists('$(MSBuildProjectDirectory)\obj\%(SelectedConfigurations.Identity)\project.assets.json')" />
+	</Target>
+</Project>

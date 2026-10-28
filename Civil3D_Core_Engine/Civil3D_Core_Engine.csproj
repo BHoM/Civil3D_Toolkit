@@ -1,75 +1,60 @@
 <Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-<TargetFramework>net8.0-windows</TargetFramework>
-    <OutputType>Library</OutputType>
+    <AssemblyVersion>10.0.0.0</AssemblyVersion>
+    <FileVersion>10.0.0.0</FileVersion>
+    <Description>https://github.com/BHoM/Civil3D_Toolkit</Description>
+    <Authors>BHoM</Authors>
+    <Copyright>Copyright © https://github.com/BHoM</Copyright>
     <RootNamespace>BH.Civil3D.Engine.Core</RootNamespace>
     <OutputPath>..\Build\</OutputPath>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <AssemblyTitle>Civil3D_Core_Engine</AssemblyTitle>
-    <Description>https://github.com/BHoM/Civil3D_Toolkit</Description>
-    <Product>Civil3D_Core_Engine</Product>
-    <Copyright>Copyright � https://github.com/BHoM</Copyright>
-    <AssemblyVersion>9.0.0.0</AssemblyVersion>
-    <FileVersion>9.1.0.0</FileVersion>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>None</ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
+    <Configurations>Debug;Release;Debug2026;Release2026</Configurations>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
+
+  <!-- Plain Debug/Release build the latest supported year. -->
+  <PropertyGroup Condition="'$(Configuration)'=='Debug' Or '$(Configuration)'=='Release'">
+    <Civil3DVersion>2026</Civil3DVersion>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <DefineConstants>CIVIL3D2026</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="$(Configuration.Contains('2026'))">
+    <Civil3DVersion>2026</Civil3DVersion>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <DefineConstants>CIVIL3D2026</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <AssemblyName>Civil3D_Core_Engine_$(Civil3DVersion)</AssemblyName>
+  </PropertyGroup>
+
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy &quot;$(TargetDir)$(TargetFileName)&quot;  &quot;C:\ProgramData\BHoM\Assemblies&quot; /Y" />
+    <Exec Command="if not exist &quot;$(AppData)\Autodesk\ApplicationPlugins\BHoM_Civil3D.bundle\Contents\$(Civil3DVersion)&quot; mkdir &quot;$(AppData)\Autodesk\ApplicationPlugins\BHoM_Civil3D.bundle\Contents\$(Civil3DVersion)&quot;" />
+    <Exec Command="xcopy &quot;$(TargetDir)$(TargetFileName)&quot; &quot;$(AppData)\Autodesk\ApplicationPlugins\BHoM_Civil3D.bundle\Contents\$(Civil3DVersion)\&quot; /Y" />
   </Target>
+
   <ItemGroup>
-     <Reference Include="accoremgd">
-      <HintPath>..\libs\2026\accoremgd.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="acdbmgd">
-      <HintPath>..\libs\2026\acdbmgd.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="acmgd">
-      <HintPath>..\libs\2026\acmgd.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="AecBaseMgd">
-      <HintPath>..\libs\2026\AecBaseMgd.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="AeccDbMgd">
-      <HintPath>..\libs\2026\AeccDbMgd.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="BHoM">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(ProgramData)\BHoM\Assemblies\BHoM.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="BHoM_Engine">
-      <HintPath>$(ProgramData)\BHoM\Assemblies\BHoM_Engine.dll</HintPath>
-      <Private>False</Private>
-      <SpecificVersion>False</SpecificVersion>
-    </Reference>
-    <Reference Include="Dimensional_oM">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(ProgramData)\BHoM\Assemblies\Dimensional_oM.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Geometry_Engine">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(ProgramData)\BHoM\Assemblies\Geometry_Engine.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Geometry_oM">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(ProgramData)\BHoM\Assemblies\Geometry_oM.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-        <Reference Include="Analytical_oM">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(ProgramData)\BHoM\Assemblies\Analytical_oM.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
+    <Reference Include="accoremgd"><HintPath>..\libs\$(Civil3DVersion)\accoremgd.dll</HintPath><Private>False</Private></Reference>
+    <Reference Include="acdbmgd"><HintPath>..\libs\$(Civil3DVersion)\acdbmgd.dll</HintPath><Private>False</Private></Reference>
+    <Reference Include="acmgd"><HintPath>..\libs\$(Civil3DVersion)\acmgd.dll</HintPath><Private>False</Private></Reference>
+    <Reference Include="AecBaseMgd"><HintPath>..\libs\$(Civil3DVersion)\AecBaseMgd.dll</HintPath><Private>False</Private></Reference>
+    <Reference Include="AeccDbMgd"><HintPath>..\libs\$(Civil3DVersion)\AeccDbMgd.dll</HintPath><Private>False</Private></Reference>
   </ItemGroup>
+
   <ItemGroup>
-    <ProjectReference Include="..\Civil3D_oM\Civil3D_oM.csproj" />
+    <Reference Include="BHoM"><HintPath>$(ProgramData)\BHoM\Assemblies\BHoM.dll</HintPath><Private>False</Private><SpecificVersion>False</SpecificVersion></Reference>
+    <Reference Include="BHoM_Engine"><HintPath>$(ProgramData)\BHoM\Assemblies\BHoM_Engine.dll</HintPath><Private>False</Private><SpecificVersion>False</SpecificVersion></Reference>
+    <Reference Include="Dimensional_oM"><HintPath>$(ProgramData)\BHoM\Assemblies\Dimensional_oM.dll</HintPath><Private>False</Private><SpecificVersion>False</SpecificVersion></Reference>
+    <Reference Include="Geometry_oM"><HintPath>$(ProgramData)\BHoM\Assemblies\Geometry_oM.dll</HintPath><Private>False</Private><SpecificVersion>False</SpecificVersion></Reference>
+    <Reference Include="Geometry_Engine"><HintPath>$(ProgramData)\BHoM\Assemblies\Geometry_Engine.dll</HintPath><Private>False</Private><SpecificVersion>False</SpecificVersion></Reference>
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Civil3D_oM\Civil3D_oM.csproj"><Private>False</Private></ProjectReference>
+    <ProjectReference Include="..\Civil3D_Engine\Civil3D_Engine.csproj"><Private>False</Private></ProjectReference>
+  </ItemGroup>
+
 </Project>
