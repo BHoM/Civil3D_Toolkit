@@ -21,12 +21,12 @@
  */
 
 using BH.oM.Base.Attributes;
-using System.ComponentModel;
 
 using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.Civil;
-using Autodesk.Civil.Settings;
 using Autodesk.Civil.ApplicationServices;
+using Autodesk.Civil.Settings;
+
+using System.ComponentModel;
 
 namespace BH.Civil3D.Engine.Core
 {

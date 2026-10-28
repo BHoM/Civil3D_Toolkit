@@ -23,19 +23,20 @@
 using BH.Civil3D.Engine.Core;
 using BH.Engine.Base;
 using BH.oM.Adapter;
+using BHC = BH.oM.Adapters.Civil3D.Elements;
 using BH.oM.Adapters.Civil3D.Fragments;
 using BH.oM.Base;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using BHC = BH.oM.Adapters.Civil3D.Elements;
 using BHG = BH.oM.Geometry;
 
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.Civil.ApplicationServices;
 using ACG = Autodesk.AutoCAD.Geometry;
+using Autodesk.Civil.ApplicationServices;
 using ADC = Autodesk.Civil.DatabaseServices;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace BH.Civil3D.Adapter.Core
 {

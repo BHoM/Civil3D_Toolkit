@@ -1,6 +1,6 @@
 /*
  * This file is part of the Buildings and Habitats object Model (BHoM)
- * Copyright (c) 2015 - 2024, the respective contributors. All rights reserved.
+ * Copyright (c) 2015 - 2026, the respective contributors. All rights reserved.
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
@@ -20,20 +20,17 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
 
+using BH.Engine.Geometry;
+using BH.oM.Base.Attributes;
+using BHG = BH.oM.Geometry;
+
+using ACG = Autodesk.AutoCAD.Geometry;
+
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.ComponentModel;
 using System.Text;
 using System.Threading.Tasks;
-using BHG = BH.oM.Geometry;
-using ACD = Autodesk.AutoCAD.DatabaseServices;
-using ACG = Autodesk.AutoCAD.Geometry;
-using Autodesk.AutoCAD.Geometry;
-using BH.Engine.Geometry;
-
-using BH.oM.Base.Attributes;
-
-using System.ComponentModel;
 
 namespace BH.Civil3D.Engine.Core
 {
@@ -192,9 +189,7 @@ namespace BH.Civil3D.Engine.Core
             // NURBS definition data bundle (control points, knots, weights, etc.)
             ACG.NurbCurve3dData def = ac.DefinitionData;
 
-            // -----------------------------
             // Control points
-            // -----------------------------
             var controlPoints = new List<BHG.Point>();
 
             foreach (ACG.Point3d p in def.ControlPoints)
@@ -205,9 +200,7 @@ namespace BH.Civil3D.Engine.Core
             if (controlPoints.Count < 2)
                 return null;
 
-            // -----------------------------
             // Knots (use as-is from Civil 3D)
-            // -----------------------------
             var knots = new List<double>();
 
             foreach (double k in def.Knots)
@@ -237,9 +230,7 @@ namespace BH.Civil3D.Engine.Core
                 }
             }
 
-            // -----------------------------
             // Weights
-            // -----------------------------
             var weights = new List<double>();
 
             foreach (double w in def.Weights)
@@ -262,9 +253,7 @@ namespace BH.Civil3D.Engine.Core
                 return null;
             }
 
-            // -----------------------------
             // Construct BHoM NurbsCurve
-            // -----------------------------
             return new BHG.NurbsCurve
             {
                 ControlPoints = controlPoints,
@@ -321,7 +310,7 @@ namespace BH.Civil3D.Engine.Core
         [Output("curve", "The converted curve.")]
         public static BHG.ICurve FromCivil3D(this ACG.EllipticalArc3d acEllipse)
         {
-            // Full ellipse -> map to BH.oM.Geometry.Ellipse (per your class definition)
+            // Full ellipse -> BH.oM.Geometry.Ellipse
             if (acEllipse.IsClosed())
             {
                 // Axis vectors should be direction-only in BHoM, so normalise them on the AutoCAD side
@@ -341,7 +330,7 @@ namespace BH.Civil3D.Engine.Core
 
             // Elliptical arc segment -> cannot be a BH.oM.Geometry.Arc (circular-only overloads)
             // Convert to a geometrically identical NURBS curve using AutoCAD’s constructor,
-            // then reuse your existing NurbCurve3d -> BHoM conversion.
+            // then reuse the NurbCurve3d -> BHoM conversion.
             try
             {
             ACG.NurbCurve3d nurbs = new ACG.NurbCurve3d(acEllipse);

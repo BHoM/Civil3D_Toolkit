@@ -21,10 +21,11 @@
  */
 
 using BH.oM.Base.Attributes;
-using System.ComponentModel;
 
 using ACD = Autodesk.AutoCAD.DatabaseServices;
 using ADC = Autodesk.Civil.DatabaseServices;
+
+using System.ComponentModel;
 
 namespace BH.Civil3D.Engine.Core
 {

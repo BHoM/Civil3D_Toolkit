@@ -20,13 +20,13 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
 
-using BH.Engine.Base;
 using BH.oM.Adapters.Civil3D.Fragments;
 using BH.oM.Base;
 using BH.oM.Base.Attributes;
-using System.ComponentModel;
 
 using Autodesk.AutoCAD.DatabaseServices;
+
+using System.ComponentModel;
 
 namespace BH.Civil3D.Engine.Core
 {

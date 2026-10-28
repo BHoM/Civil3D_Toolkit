@@ -1,6 +1,6 @@
 /*
  * This file is part of the Buildings and Habitats object Model (BHoM)
- * Copyright (c) 2015 - 2024, the respective contributors. All rights reserved.
+ * Copyright (c) 2015 - 2026, the respective contributors. All rights reserved.
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
@@ -21,17 +21,14 @@
  */
 
 using BH.oM.Adapter;
-using BH.Adapter.Socket;
 using BH.oM.Base;
-using BH.oM.Data.Requests;
-using BH.oM.Base.Debugging;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
 using BH.oM.Base.Attributes;
+using BH.oM.Data.Requests;
+
+using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Threading;
 
 namespace BH.Adapter.Civil3D
 {
@@ -95,5 +92,3 @@ namespace BH.Adapter.Civil3D
         /***************************************************/
     }
 }
-
-

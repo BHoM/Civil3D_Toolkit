@@ -21,12 +21,10 @@
  */
 
 using BHC = BH.oM.Adapters.Civil3D.Elements;
-
-using ACG = Autodesk.AutoCAD.Geometry;
+using BH.oM.Base.Attributes;
 
 using Autodesk.AutoCAD.DatabaseServices;
-
-using BH.oM.Base.Attributes;
+using ACG = Autodesk.AutoCAD.Geometry;
 
 using System.ComponentModel;
 

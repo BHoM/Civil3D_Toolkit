@@ -21,10 +21,11 @@
  */
 
 using BH.oM.Base.Attributes;
-using System.ComponentModel;
 using BHG = BH.oM.Geometry;
 
 using ACG = Autodesk.AutoCAD.Geometry;
+
+using System.ComponentModel;
 
 namespace BH.Civil3D.Engine.Core
 {

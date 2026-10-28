@@ -20,22 +20,20 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.IO;
-using System.Linq;
+using BH.Engine.Serialiser;
+using BH.oM.Adapter;
+using BHC = BH.oM.Adapters.Civil3D.Elements;
+using BH.oM.Data.Requests;
+using BHG = BH.oM.Geometry;
 
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Runtime;
 
-using BH.Engine.Serialiser;
-using BH.oM.Adapter;
-using BH.oM.Data.Requests;
-
-using BHC = BH.oM.Adapters.Civil3D.Elements;
-using BHG = BH.oM.Geometry;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
 
 //Limits AutoCAD's command scan to this class, so it does not reflect over BHoM types before the assembly resolver is registered
 [assembly: CommandClass(typeof(BH.Civil3D.Adapter.Core.BHoMOutCommand))]

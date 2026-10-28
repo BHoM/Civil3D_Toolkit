@@ -1,6 +1,6 @@
 /*
  * This file is part of the Buildings and Habitats object Model (BHoM)
- * Copyright (c) 2015 - 2024, the respective contributors. All rights reserved.
+ * Copyright (c) 2015 - 2026, the respective contributors. All rights reserved.
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
@@ -20,21 +20,17 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
 
+using BHC = BH.oM.Adapters.Civil3D.Elements;
+using BH.oM.Base.Attributes;
+
+using ACG = Autodesk.AutoCAD.Geometry;
+using ADC = Autodesk.Civil.DatabaseServices;
+
 using System;
-using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using BHC = BH.oM.Adapters.Civil3D.Elements;
-using BHG = BH.oM.Geometry;
-
-using ACG = Autodesk.AutoCAD.Geometry;
-
-using ADC = Autodesk.Civil.DatabaseServices;
-
-using BH.oM.Base.Attributes;
-
-using System.ComponentModel;
 
 namespace BH.Civil3D.Engine.Core
 {

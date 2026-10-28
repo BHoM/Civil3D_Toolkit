@@ -21,9 +21,10 @@
  */
 
 using BH.oM.Base.Attributes;
+using BHG = BH.oM.Geometry;
+
 using System;
 using System.ComponentModel;
-using BHG = BH.oM.Geometry;
 
 namespace BH.Civil3D.Engine.Core
 {

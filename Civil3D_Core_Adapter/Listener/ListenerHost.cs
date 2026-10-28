@@ -26,11 +26,12 @@ using BH.oM.Adapter;
 using BH.oM.Adapters.Socket;
 using BH.oM.Base;
 using BH.oM.Data.Requests;
+
+using Autodesk.AutoCAD.ApplicationServices;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
-using Autodesk.AutoCAD.ApplicationServices;
 
 namespace BH.Civil3D.Adapter.Core
 {

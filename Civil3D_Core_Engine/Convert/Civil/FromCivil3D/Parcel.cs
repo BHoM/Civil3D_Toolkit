@@ -1,6 +1,6 @@
 /*
  * This file is part of the Buildings and Habitats object Model (BHoM)
- * Copyright (c) 2015 - 2024, the respective contributors. All rights reserved.
+ * Copyright (c) 2015 - 2026, the respective contributors. All rights reserved.
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
@@ -21,13 +21,11 @@
  */
 
 using BHC = BH.oM.Adapters.Civil3D.Elements;
+using BH.oM.Base.Attributes;
 using BHG = BH.oM.Geometry;
 
 using ACD = Autodesk.AutoCAD.DatabaseServices;
-
 using ADC = Autodesk.Civil.DatabaseServices;
-
-using BH.oM.Base.Attributes;
 
 using System.ComponentModel;
 
@@ -74,5 +72,3 @@ namespace BH.Civil3D.Engine.Core
         /***************************************************/
     }
 }
-
-

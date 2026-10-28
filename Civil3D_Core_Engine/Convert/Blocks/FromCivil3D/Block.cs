@@ -1,6 +1,6 @@
 /*
  * This file is part of the Buildings and Habitats object Model (BHoM)
- * Copyright (c) 2015 - 2024, the respective contributors. All rights reserved.
+ * Copyright (c) 2015 - 2026, the respective contributors. All rights reserved.
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
@@ -21,14 +21,11 @@
  */
 
 using BHC = BH.oM.Adapters.Civil3D.Elements;
-using BHG = BH.oM.Geometry;
+using BH.oM.Base.Attributes;
 using BHCS = BH.oM.Geometry.CoordinateSystem;
 
-using ACG = Autodesk.AutoCAD.Geometry;
-
 using Autodesk.AutoCAD.DatabaseServices;
-
-using BH.oM.Base.Attributes;
+using ACG = Autodesk.AutoCAD.Geometry;
 
 using System.ComponentModel;
 
