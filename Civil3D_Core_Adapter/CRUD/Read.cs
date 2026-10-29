@@ -23,6 +23,7 @@
 using BH.Civil3D.Engine.Core;
 using BH.oM.Adapter;
 using BHC = BH.oM.Adapters.Civil3D.Elements;
+using BH.oM.Adapters.Civil3D.Fragments;
 using BH.oM.Base;
 using BHG = BH.oM.Geometry;
 
@@ -150,6 +151,11 @@ namespace BH.Civil3D.Adapter.Core
                     }
 
                     obj.SetIdentifiers(entity);
+
+                    double width = entity.GlobalWidth();
+                    if (width > 0)
+                        obj.Fragments.AddOrReplace(new PolylineWidth(width * toSI));
+
                     result.Add(obj);
                 }
                 catch (Exception e)

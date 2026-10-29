@@ -82,7 +82,9 @@ namespace BH.Civil3D.Adapter.Core
 
                     try
                     {
-                        Entity entity = ToEntity(FromSI(obj, fromSI), bt, tr, civdoc);
+                        object scaled = FromSI(obj, fromSI);
+                        Entity entity = WidePolyline(scaled, (item as IBHoMObject)?.Fragments?.OfType<PolylineWidth>().FirstOrDefault(), fromSI)
+                            ?? ToEntity(scaled, bt, tr, civdoc);
                         if (entity == null)
                             continue;
 
@@ -143,6 +145,26 @@ namespace BH.Civil3D.Adapter.Core
                     BH.Engine.Base.Compute.RecordError($"Pushing {obj?.GetType().Name} to Civil 3D is not supported.");
                     return null;
             }
+        }
+
+        /***************************************************/
+
+        //A curve carrying a width greater than 0 is drawn as one lightweight polyline of that constant width. Returns null,
+        //so that the curve is pushed as usual, when there is no width or the curve cannot be drawn as such a polyline.
+        private static Entity WidePolyline(object obj, PolylineWidth width, double fromSI)
+        {
+            if (width == null || width.GlobalWidth <= 0 || !(obj is BHG.ICurve))
+                return null;
+
+            Polyline polyline = ((BHG.ICurve)obj).ToCivil3DPolyline();
+            if (polyline == null)
+            {
+                BH.Engine.Base.Compute.RecordWarning($"The width of a pushed {obj.GetType().Name} has been ignored because it cannot be drawn as a lightweight polyline.");
+                return null;
+            }
+
+            polyline.ConstantWidth = width.GlobalWidth * fromSI;
+            return polyline;
         }
 
         /***************************************************/

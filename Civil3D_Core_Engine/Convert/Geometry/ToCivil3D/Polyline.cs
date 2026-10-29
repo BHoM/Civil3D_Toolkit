@@ -77,6 +77,46 @@ namespace BH.Civil3D.Engine.Core
             return SegmentsToCivil3D(segments);
         }
 
+        /***************************************************/
+
+        [Description("Converts a flat line, arc, polyline or polycurve made of lines and arcs to a single Civil 3D lightweight polyline (arcs as bulges), e.g. so that it can be given a width. Returns null with a warning for any other curve, or one that is not flat at a constant elevation.")]
+        [Input("curve", "A line, arc, polyline or polycurve of lines and arcs, flat at a constant elevation.")]
+        [Output("polyline", "The lightweight polyline, or null if the curve cannot be drawn as one.")]
+        public static ACD.Polyline ToCivil3DPolyline(this BHG.ICurve curve)
+        {
+            if (curve == null)
+            {
+                BH.Engine.Base.Compute.RecordError("Cannot convert a null curve to a polyline.");
+                return null;
+            }
+
+            List<BHG.ICurve> segments = new List<BHG.ICurve>();
+            if (curve is BHG.Line || curve is BHG.Arc)
+                segments.Add(curve);
+            else if (curve is BHG.Polyline)
+                segments.AddRange(((BHG.Polyline)curve).SubParts());
+            else if (!(curve is BHG.PolyCurve) || !TryFlatten((BHG.PolyCurve)curve, segments))
+            {
+                BH.Engine.Base.Compute.RecordWarning($"A {curve.GetType().Name} cannot be drawn as a lightweight polyline; only lines, arcs, polylines and polycurves of those can.");
+                return null;
+            }
+
+            if (segments.Count == 0)
+            {
+                BH.Engine.Base.Compute.RecordWarning("Cannot draw a curve with no segments as a lightweight polyline.");
+                return null;
+            }
+
+            double elevation = segments[0].IStartPoint().Z;
+            if (!segments.All(x => IsAtElevation(x, elevation)))
+            {
+                BH.Engine.Base.Compute.RecordWarning("A curve that is not flat at a constant elevation cannot be drawn as a lightweight polyline.");
+                return null;
+            }
+
+            return SegmentsToCivil3D(segments) as ACD.Polyline;
+        }
+
 
         /***************************************************/
         /**** Private Methods                           ****/
