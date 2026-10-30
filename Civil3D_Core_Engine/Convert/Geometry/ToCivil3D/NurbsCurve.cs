@@ -24,6 +24,7 @@ using BH.oM.Base.Attributes;
 using BHG = BH.oM.Geometry;
 
 using ACD = Autodesk.AutoCAD.DatabaseServices;
+using ACG = Autodesk.AutoCAD.Geometry;
 
 using System;
 using System.Collections.Generic;
@@ -43,73 +44,44 @@ namespace BH.Civil3D.Engine.Core
         [Output("spline", "The converted Civil 3D Spline.")]
         public static ACD.Spline ToCivil3D(this BHG.NurbsCurve curve)
         {
-            if (curve == null || curve.ControlPoints == null || curve.ControlPoints.Count < 2)
-                return null;
-
-            try
+            if (curve == null || curve.ControlPoints == null || curve.ControlPoints.Count < 2 || curve.Knots == null)
             {
-                // Create empty spline
-                var spline = new ACD.Spline();
-
-                // Set control points
-                for (int i = 0; i < curve.ControlPoints.Count; i++)
-                {
-                    spline.SetControlPointAt(i, curve.ControlPoints[i].ToCivil3D());
-                }
-
-                // Set weights if available
-                if (curve.Weights != null && curve.Weights.Count == curve.ControlPoints.Count)
-                {
-                    for (int i = 0; i < curve.Weights.Count; i++)
-                    {
-                        spline.SetWeightAt(i, curve.Weights[i]);
-                    }
-                }
-
-                // Insert knots if available
-                // BHoM knots are in compressed format (cp + degree - 1), need to expand to full format (cp + degree + 1)
-                if (curve.Knots != null && curve.Knots.Count > 0)
-                {
-                    List<double> knotsToInsert = curve.Knots.ToList();
-
-                    // Infer degree from knot count: degree = (knots.Count - controlPoints.Count) + 1
-                    int degree = (knotsToInsert.Count - curve.ControlPoints.Count) + 1;
-
-                    // If knots are in compressed format (cp + degree - 1), expand to full format
-                    int expectedCompressed = curve.ControlPoints.Count + degree - 1;
-                    if (knotsToInsert.Count == expectedCompressed && knotsToInsert.Count > 0)
-                    {
-                        // Add first and last knots to convert compressed -> full format
-                        double firstKnot = knotsToInsert[0];
-                        double lastKnot = knotsToInsert[knotsToInsert.Count - 1];
-                        
-                        knotsToInsert.Insert(0, firstKnot);
-                        knotsToInsert.Add(lastKnot);
-                    }
-
-                    // Insert the knots
-                    foreach (var knot in knotsToInsert)
-                    {
-                        try
-                        {
-                            spline.InsertKnot(knot);
-                        }
-                        catch (Exception ex)
-                        {
-                            BH.Engine.Base.Compute.RecordWarning($"A knot could not be inserted into the spline and was skipped: {ex.Message}");
-                        }
-                    }
-                }
-
-                return spline;
-            }
-            catch (Exception ex)
-            {
-                BH.Engine.Base.Compute.RecordWarning($"Failed to convert BHoM NurbsCurve to ACD.Spline: {ex.Message}");
+                BH.Engine.Base.Compute.RecordError("Cannot push a NurbsCurve with fewer than two control points or no knots.");
                 return null;
             }
+
+            int count = curve.ControlPoints.Count;
+
+            //BHoM stores the compressed knot vector (control points + degree - 1); AutoCAD needs the full one (+ 2)
+            int degree = curve.Knots.Count - count + 1;
+            if (degree < 1)
+            {
+                BH.Engine.Base.Compute.RecordError("Cannot push a NurbsCurve whose knot count does not match its control points.");
+                return null;
+            }
+
+            List<double> weights = curve.Weights != null && curve.Weights.Count > 0 ? curve.Weights : Enumerable.Repeat(1.0, count).ToList();
+            if (weights.Count != count || weights.Any(x => x <= 0))
+            {
+                BH.Engine.Base.Compute.RecordError("Cannot push a NurbsCurve whose weights do not match its control points or are not positive.");
+                return null;
+            }
+
+            ACG.Point3dCollection controlPoints = new ACG.Point3dCollection();
+            foreach (BHG.Point point in curve.ControlPoints)
+                controlPoints.Add(point.ToCivil3D());
+
+            ACG.DoubleCollection knots = new ACG.DoubleCollection();
+            knots.Add(curve.Knots.First());
+            foreach (double knot in curve.Knots)
+                knots.Add(knot);
+            knots.Add(curve.Knots.Last());
+
+            bool rational = weights.Any(x => Math.Abs(x - 1.0) > 1e-12);
+            ACG.DoubleCollection acadWeights = new ACG.DoubleCollection(rational ? weights.ToArray() : new double[0]);
+
+            return new ACD.Spline(degree, rational, false, false, controlPoints, knots, acadWeights, 0.0, 0.0);
         }
-
         /***************************************************/
     }
 }

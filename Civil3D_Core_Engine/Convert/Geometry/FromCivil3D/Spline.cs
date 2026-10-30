@@ -48,71 +48,69 @@ namespace BH.Civil3D.Engine.Core
             if (acSpline == null)
                 return null;
 
-            try
+            ACD.NurbsData nurbsData = acSpline.NurbsData; 
+
+            ACG.Point3dCollection cp = nurbsData.GetControlPoints();
+            DoubleCollection kn     = nurbsData.GetKnots();          
+            DoubleCollection we     = nurbsData.GetWeights();        
+
+            if (cp == null || cp.Count < 2 || kn == null || kn.Count == 0)
             {
-                ACD.NurbsData nurbsData = acSpline.NurbsData; 
-
-                ACG.Point3dCollection cp = nurbsData.GetControlPoints();
-                DoubleCollection kn     = nurbsData.GetKnots();          
-                DoubleCollection we     = nurbsData.GetWeights();        
-
-                if (cp == null || cp.Count < 2 || kn == null || kn.Count == 0)
-                    return null;
-
-                // --- Control points
-                var controlPoints = new List<BHG.Point>(cp.Count);
-                foreach (ACG.Point3d p in cp)
-                    controlPoints.Add(p.FromCivil3D());
-
-                // --- Weights
-                List<double> weights = (we != null && we.Count > 0)
-                    ? we.Cast<double>().ToList()
-                    : Enumerable.Repeat(1.0, controlPoints.Count).ToList();
-
-                if (weights.Count != controlPoints.Count)
-                    return null;
-
-                // --- Knots (AutoCAD full -> BHoM compressed)
-                List<double> knots = kn.Cast<double>().ToList();
-
-                int degree = nurbsData.Degree; // degree is explicit in AutoCAD NurbsData (used only for conversion logic)
-
-                // AutoCAD "full" knot vector commonly: cp + degree + 1
-                int expectedAcadFull = controlPoints.Count + degree + 1;
-
-                // BHoM "compressed" knot vector: cp + degree - 1
-                int expectedBhom = controlPoints.Count + degree - 1;
-
-                if (knots.Count == expectedAcadFull && knots.Count >= 2)
-                {
-                    // Drop one at each end to convert full -> compressed
-                    knots.RemoveAt(0);
-                    knots.RemoveAt(knots.Count - 1);
-                }
-                // else: already in compressed form (or unusual case) - leave as-is
-
-                // Normalise the knot domain to 0..1, as BHoM uses
-                double k0 = knots.First();
-                double k1 = knots.Last();
-                double span = k1 - k0;
-                if (span > 0)
-                    knots = knots.Select(k => (k - k0) / span).ToList();
-
-                // BHoM infers the degree from the counts:
-                // degree_bhom = (knots.Count - controlPoints.Count) + 1
-
-                return new BHG.NurbsCurve
-                {
-                    ControlPoints = controlPoints,
-                    Knots         = knots,
-                    Weights       = weights
-                };
-            }
-            catch (Exception ex)
-            {
-                BH.Engine.Base.Compute.RecordWarning($"Failed to map spline NurbsData to BHoM NurbsCurve: {ex.Message}");
+                BH.Engine.Base.Compute.RecordWarning("A spline with fewer than two control points or no knots could not be converted.");
                 return null;
             }
+
+            // --- Control points
+            var controlPoints = new List<BHG.Point>(cp.Count);
+            foreach (ACG.Point3d p in cp)
+                controlPoints.Add(p.FromCivil3D());
+
+            // --- Weights
+            List<double> weights = (we != null && we.Count > 0)
+                ? we.Cast<double>().ToList()
+                : Enumerable.Repeat(1.0, controlPoints.Count).ToList();
+
+            if (weights.Count != controlPoints.Count)
+            {
+                BH.Engine.Base.Compute.RecordWarning("A spline whose weights do not match its control points could not be converted.");
+                return null;
+            }
+
+            // --- Knots (AutoCAD full -> BHoM compressed)
+            List<double> knots = kn.Cast<double>().ToList();
+
+            int degree = nurbsData.Degree; // degree is explicit in AutoCAD NurbsData (used only for conversion logic)
+
+            // AutoCAD "full" knot vector commonly: cp + degree + 1
+            int expectedAcadFull = controlPoints.Count + degree + 1;
+
+            // BHoM "compressed" knot vector: cp + degree - 1
+            int expectedBhom = controlPoints.Count + degree - 1;
+
+            if (knots.Count == expectedAcadFull && knots.Count >= 2)
+            {
+                // Drop one at each end to convert full -> compressed
+                knots.RemoveAt(0);
+                knots.RemoveAt(knots.Count - 1);
+            }
+            // else: already in compressed form (or unusual case) - leave as-is
+
+            // Normalise the knot domain to 0..1, as BHoM uses
+            double k0 = knots.First();
+            double k1 = knots.Last();
+            double span = k1 - k0;
+            if (span > 0)
+                knots = knots.Select(k => (k - k0) / span).ToList();
+
+            // BHoM infers the degree from the counts:
+            // degree_bhom = (knots.Count - controlPoints.Count) + 1
+
+            return new BHG.NurbsCurve
+            {
+                ControlPoints = controlPoints,
+                Knots         = knots,
+                Weights       = weights
+            };
         }
 
         /***************************************************/

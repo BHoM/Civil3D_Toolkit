@@ -129,41 +129,34 @@ namespace BH.Civil3D.Adapter.Core
                 if (entity == null || !entityTypes.Any(x => x.IsInstanceOfType(entity)))
                     continue;
 
-                try
+                object converted = entity is ADC.Alignment ? ((ADC.Alignment)entity).FromCivil3D() : entity.IFromCivil3D(tr);
+                if (converted == null || !type.IsAssignableFrom(converted.GetType()))
+                    continue;
+
+                IBHoMObject obj;
+                if (converted is BHG.IGeometry geometry)
                 {
-                    object converted = entity is ADC.Alignment ? ((ADC.Alignment)entity).FromCivil3D() : entity.IFromCivil3D(tr);
-                    if (converted == null || !type.IsAssignableFrom(converted.GetType()))
+                    obj = new ObjectWrapper
+                    {
+                        WrappedObject = Scaled(geometry, toSI)
+                    };
+                }
+                else
+                {
+                    obj = converted as IBHoMObject;
+                    if (obj == null)
                         continue;
 
-                    IBHoMObject obj;
-                    if (converted is BHG.IGeometry geometry)
-                    {
-                        obj = new ObjectWrapper
-                        {
-                            WrappedObject = Scaled(geometry, toSI)
-                        };
-                    }
-                    else
-                    {
-                        obj = converted as IBHoMObject;
-                        if (obj == null)
-                            continue;
-
-                        ToSI(obj as dynamic, toSI);
-                    }
-
-                    obj.SetIdentifiers(entity);
-
-                    double width = entity.GlobalWidth();
-                    if (width > 0)
-                        obj.Fragments.AddOrReplace(new PolylineWidth(width * toSI));
-
-                    result.Add(obj);
+                    ToSI(obj as dynamic, toSI);
                 }
-                catch (Exception e)
-                {
-                    BH.Engine.Base.Compute.RecordWarning($"Could not read {entity.GetType().Name} {entity.Handle}: {e.Message}");
-                }
+
+                obj.SetIdentifiers(entity);
+
+                double width = entity.GlobalWidth();
+                if (width > 0)
+                    obj.Fragments.AddOrReplace(new PolylineWidth(width * toSI));
+
+                result.Add(obj);
             }
 
             return result;
@@ -182,16 +175,9 @@ namespace BH.Civil3D.Adapter.Core
                 if (btr.IsLayout || btr.IsAnonymous || btr.IsFromExternalReference)
                     continue;
 
-                try
-                {
-                    BHC.BlockDefinition definition = btr.FromCivil3D(tr, db, cache);
-                    ToSI(definition, toSI);
-                    result.Add(definition);
-                }
-                catch (Exception e)
-                {
-                    BH.Engine.Base.Compute.RecordWarning($"Could not read block definition {btr.Name}: {e.Message}");
-                }
+                BHC.BlockDefinition definition = btr.FromCivil3D(tr, db, cache);
+                ToSI(definition, toSI);
+                result.Add(definition);
             }
 
             return result;

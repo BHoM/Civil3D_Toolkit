@@ -36,7 +36,7 @@ namespace BH.Civil3D.Engine.Core
         /**** Public Methods                            ****/
         /***************************************************/
 
-        [Description("Applies the location, name, raw description and point number of a BH.oM.Adapters.Civil3D.Elements.CoGoPoint to an existing Civil 3D CogoPoint. A point number that is already in use is skipped with a warning.")]
+        [Description("Applies the location, name, raw description and point number of a BH.oM.Adapters.Civil3D.Elements.CoGoPoint to an existing Civil 3D CogoPoint. A point number must not already be in use in the drawing.")]
         [Input("bhPoint", "BH.oM.Adapters.Civil3D.Elements.CoGoPoint to convert.")]
         [Input("c3dPoint", "Civil 3D point to apply the values to.")]
         public static void ToCivil3D(this BHC.CoGoPoint bhPoint, ADC.CogoPoint c3dPoint)
@@ -60,18 +60,9 @@ namespace BH.Civil3D.Engine.Core
             if (!string.IsNullOrEmpty(bhPoint.RawDescription))
                 c3dPoint.RawDescription = bhPoint.RawDescription;
 
-            // A number of 0 or less keeps the number Civil 3D assigned. A number already in use cannot be applied, so the point keeps its own.
+            // A number of 0 or less keeps the number Civil 3D assigned. The caller checks that the number is free.
             if (bhPoint.PointNumber > 0)
-            {
-                try
-                {
-                    c3dPoint.PointNumber = (uint)bhPoint.PointNumber;
-                }
-                catch (Exception e)
-                {
-                    BH.Engine.Base.Compute.RecordWarning($"Point number {bhPoint.PointNumber} could not be used ({e.Message}), so Civil 3D's number {c3dPoint.PointNumber} was kept.");
-                }
-            }
+                c3dPoint.PointNumber = (uint)bhPoint.PointNumber;
         }
 
         /***************************************************/

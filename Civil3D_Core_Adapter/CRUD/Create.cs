@@ -81,27 +81,20 @@ namespace BH.Civil3D.Adapter.Core
                 {
                     object obj = item is ObjectWrapper wrapper ? wrapper.WrappedObject : item;
 
-                    try
-                    {
-                        object scaled = FromSI(obj, fromSI);
-                        Entity entity = WidePolyline(scaled, (item as IBHoMObject)?.Fragments?.OfType<PolylineWidth>().FirstOrDefault(), fromSI)
-                            ?? ToEntity(scaled, bt, tr, civdoc);
-                        if (entity == null)
-                            continue;
+                    object scaled = FromSI(obj, fromSI);
+                    Entity entity = WidePolyline(scaled, (item as IBHoMObject)?.Fragments?.OfType<PolylineWidth>().FirstOrDefault(), fromSI)
+                        ?? ToEntity(scaled, bt, tr, civdoc);
+                    if (entity == null)
+                        continue;
 
-                        if (entity.ObjectId.IsNull)
-                        {
-                            ms.AppendEntity(entity);
-                            tr.AddNewlyCreatedDBObject(entity, true);
-                        }
-
-                        entity.LayerId = LayerId(item as IBHoMObject, lt, db);
-                        created++;
-                    }
-                    catch (Exception e)
+                    if (entity.ObjectId.IsNull)
                     {
-                        BH.Engine.Base.Compute.RecordError($"Could not push {obj?.GetType().Name}: {e.Message}");
+                        ms.AppendEntity(entity);
+                        tr.AddNewlyCreatedDBObject(entity, true);
                     }
+
+                    entity.LayerId = LayerId(item as IBHoMObject, lt, db);
+                    created++;
                 }
 
                 if (created > 0)
@@ -183,6 +176,14 @@ namespace BH.Civil3D.Adapter.Core
             {
                 BH.Engine.Base.Compute.RecordError("Cannot push a CoGo point without a Location.");
                 return null;
+            }
+
+            //A point number already used in the drawing cannot be applied, so the new point takes Civil 3D's next number instead.
+            if (point.PointNumber > 0 && civdoc.CogoPoints.Contains((uint)point.PointNumber))
+            {
+                BH.Engine.Base.Compute.RecordWarning($"Point number {point.PointNumber} is already used in the drawing, so Civil 3D's next number was used instead.");
+                point = point.ShallowClone();
+                point.PointNumber = 0;
             }
 
             ACG.Point3dCollection locations = new ACG.Point3dCollection { point.Location.ToCivil3D() };
