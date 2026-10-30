@@ -105,11 +105,7 @@ namespace BH.Adapter.Civil3D
         //The constructor only opens the sockets when active is true, so Push and Pull check this first.
         private bool IsActive()
         {
-            if (m_linkIn != null)
-                return true;
-
-            Engine.Base.Compute.RecordWarning("The Civil 3D adapter is not active. Set active to true to connect to Civil 3D.");
-            return false;
+            return m_linkIn != null;
         }
 
         /***************************************************/
