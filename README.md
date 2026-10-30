@@ -104,7 +104,7 @@ If the listener does not start (no message on the command line):
    - add `Debug<year>;Release<year>` to `<Configurations>`;
    - add a `PropertyGroup` for `$(Configuration.Contains('<year>'))` that sets `Civil3DVersion`, `TargetFramework` and `DefineConstants` (`CIVIL3D<year>`).
 3. Add the `Debug<year>` and `Release<year>` configurations to `Civil3D_Toolkit.sln`, mapping the BHoM-side projects to plain `Debug`/`Release`.
-4. Add the two configurations to `altConfigs.txt`.
+4. Add the two configurations to `IncludedRepos/altConfigs.txt` in the BHoM_Installer repository (in a separate PR).
 5. Add a `<Components>` block for the year to `Civil3D_Core_Adapter/Listener/Files/PackageContents.xml`, with its `SeriesMin`/`SeriesMax` and `./Contents/<year>/Civil3D_Core_Adapter_<year>.dll`.
 
 ## Units
