@@ -36,12 +36,12 @@ namespace BH.Civil3D.Engine.Core
         /**** Public Methods                            ****/
         /***************************************************/
 
-        [Description("Converts a Civil 3D CogoPoint to BH.oM.Adapters.Civil3D.Elements.CoGoPoint.")]
+        [Description("Converts a Civil 3D CogoPoint to BH.oM.Adapters.Civil3D.Elements.SurveyPoint.")]
         [Input("cogoPoint", "A Civil 3D CogoPoint to convert.")]
-        [Output("coGoPoint", "The converted BH.oM.Adapters.Civil3D.Elements.CoGoPoint.")]
-        public static BHC.CoGoPoint FromCivil3D(this ADC.CogoPoint cogoPoint)
+        [Output("surveyPoint", "The converted BH.oM.Adapters.Civil3D.Elements.SurveyPoint.")]
+        public static BHC.SurveyPoint FromCivil3D(this ADC.CogoPoint cogoPoint)
         {
-            BHC.CoGoPoint pt = new BHC.CoGoPoint
+            BHC.SurveyPoint pt = new BHC.SurveyPoint
             {
                 Location = new BHG.Point { X = cogoPoint.Easting, Y = cogoPoint.Northing, Z = cogoPoint.Elevation },
                 Name = cogoPoint.PointName,

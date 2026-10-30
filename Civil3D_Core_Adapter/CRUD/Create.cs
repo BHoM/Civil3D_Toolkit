@@ -133,8 +133,8 @@ namespace BH.Civil3D.Adapter.Core
                     return textNote.ToCivil3D();
                 case BHC.Block block:
                     return block.ToCivil3D(bt, tr);
-                case BHC.CoGoPoint coGoPoint:
-                    return CreateCoGoPoint(coGoPoint, civdoc, tr);
+                case BHC.SurveyPoint surveyPoint:
+                    return CreateSurveyPoint(surveyPoint, civdoc, tr);
                 default:
                     BH.Engine.Base.Compute.RecordError($"Pushing {obj?.GetType().Name} to Civil 3D is not supported.");
                     return null;
@@ -163,18 +163,18 @@ namespace BH.Civil3D.Adapter.Core
 
         /***************************************************/
 
-        //CoGo points are created through the Civil 3D point collection, so they are already in the drawing when returned.
-        private static Entity CreateCoGoPoint(BHC.CoGoPoint point, CivilDocument civdoc, Transaction tr)
+        //Survey points are created through the Civil 3D point collection, so they are already in the drawing when returned.
+        private static Entity CreateSurveyPoint(BHC.SurveyPoint point, CivilDocument civdoc, Transaction tr)
         {
             if (civdoc == null)
             {
-                BH.Engine.Base.Compute.RecordError("CoGo points can only be pushed to a Civil 3D drawing.");
+                BH.Engine.Base.Compute.RecordError("Survey points can only be pushed to a Civil 3D drawing.");
                 return null;
             }
 
             if (point.Location == null)
             {
-                BH.Engine.Base.Compute.RecordError("Cannot push a CoGo point without a Location.");
+                BH.Engine.Base.Compute.RecordError("Cannot push a survey point without a Location.");
                 return null;
             }
 
@@ -190,7 +190,7 @@ namespace BH.Civil3D.Adapter.Core
             ObjectIdCollection ids = civdoc.CogoPoints.Add(locations, point.RawDescription ?? "", true, false, true);
             if (ids == null || ids.Count == 0)
             {
-                BH.Engine.Base.Compute.RecordError("Civil 3D did not create the CoGo point.");
+                BH.Engine.Base.Compute.RecordError("Civil 3D did not create the survey point.");
                 return null;
             }
 
@@ -239,8 +239,8 @@ namespace BH.Civil3D.Adapter.Core
                     BHC.Block instance = block.ShallowClone();
                     instance.Orientation = ScaleOrigin(instance.Orientation, f);
                     return instance;
-                case BHC.CoGoPoint coGoPoint:
-                    BHC.CoGoPoint point = coGoPoint.ShallowClone();
+                case BHC.SurveyPoint surveyPoint:
+                    BHC.SurveyPoint point = surveyPoint.ShallowClone();
                     point.Location = Scaled(point.Location, f);
                     return point;
                 default:

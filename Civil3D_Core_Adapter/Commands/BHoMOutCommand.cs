@@ -112,7 +112,7 @@ namespace BH.Civil3D.Adapter.Core
             typeof(BHG.ICurve),
             typeof(BHC.Block),
             typeof(BHC.BlockDefinition),
-            typeof(BHC.CoGoPoint)
+            typeof(BHC.SurveyPoint)
         };
 
         /***************************************************/

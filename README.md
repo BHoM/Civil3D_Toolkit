@@ -2,7 +2,7 @@
 
 Tools for Autodesk Civil 3D interoperability with the Buildings and Habitats object Model (BHoM).
 
-The toolkit lets you **pull** drawing objects (points, curves, text, blocks, CoGo points, feature lines, alignments and parcels) from the drawing open in Civil 3D into BHoM, and **push** BHoM geometry, text, block instances and CoGo points back into it, from Grasshopper, Excel or any other BHoM UI.
+The toolkit lets you **pull** drawing objects (points, curves, text, blocks, survey (COGO) points, feature lines, alignments and parcels) from the drawing open in Civil 3D into BHoM, and **push** BHoM geometry, text, block instances and survey points back into it, from Grasshopper, Excel or any other BHoM UI.
 
 ## Architecture
 
@@ -43,7 +43,7 @@ flowchart LR
 | `TextNote` | `MText`, `DBText` | `MText` |
 | `Block` | `BlockReference` | `BlockReference` (the definition must already exist in the drawing) |
 | `BlockDefinition` | `BlockTableRecord` (not layouts, anonymous or xref blocks) | Not yet supported |
-| `CoGoPoint` | `CogoPoint` | `CogoPoint` |
+| `SurveyPoint` | `CogoPoint` | `CogoPoint` |
 | `FeatureLine` | `FeatureLine` | Not yet supported |
 | `Alignment` | `Alignment` (spirals approximated as straight lines) | Not yet supported |
 | `Parcel` | `Parcel` (found through sites) | Not yet supported |

@@ -27,8 +27,8 @@ using System.ComponentModel;
 
 namespace BH.oM.Adapters.Civil3D.Elements
 {
-    [Description("A coordinate geometry (COGO) survey point with a number and descriptions. The point name is stored in the inherited Name property.")]
-    public class CoGoPoint : BHoMObject
+    [Description("A surveyed point with a number and descriptions (a COGO point in Civil 3D). The point name is stored in the inherited Name property.")]
+    public class SurveyPoint : BHoMObject
     {
         /***************************************************/
         /**** Public Properties                         ****/

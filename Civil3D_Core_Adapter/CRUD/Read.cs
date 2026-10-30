@@ -95,7 +95,7 @@ namespace BH.Civil3D.Adapter.Core
 
                 if (civdoc != null)
                 {
-                    if (readers.Any(x => x.Produces.Contains(typeof(BHC.CoGoPoint))))
+                    if (readers.Any(x => x.Produces.Contains(typeof(BHC.SurveyPoint))))
                         result.AddRange(ReadEntities(civdoc.CogoPoints.Cast<ObjectId>(), new List<Type> { typeof(ADC.CogoPoint) }, type, tr, toSI));
 
                     if (readers.Any(x => x.Produces.Contains(typeof(BHC.Alignment))))
@@ -211,7 +211,7 @@ namespace BH.Civil3D.Adapter.Core
 
         /***************************************************/
 
-        private static void ToSI(BHC.CoGoPoint obj, double f)
+        private static void ToSI(BHC.SurveyPoint obj, double f)
         {
             obj.Location = Scaled(obj.Location, f);
         }
@@ -310,7 +310,7 @@ namespace BH.Civil3D.Adapter.Core
             new ReaderEntry { Produces = new List<Type> { typeof(BHC.TextNote) }, ModelSpaceEntities = new List<Type> { typeof(MText), typeof(DBText) } },
             new ReaderEntry { Produces = new List<Type> { typeof(BHC.Block) }, ModelSpaceEntities = new List<Type> { typeof(BlockReference) } },
             new ReaderEntry { Produces = new List<Type> { typeof(BHC.BlockDefinition) }, ModelSpaceEntities = new List<Type>() },
-            new ReaderEntry { Produces = new List<Type> { typeof(BHC.CoGoPoint) }, ModelSpaceEntities = new List<Type>(), NeedsCivil = true },
+            new ReaderEntry { Produces = new List<Type> { typeof(BHC.SurveyPoint) }, ModelSpaceEntities = new List<Type>(), NeedsCivil = true },
             new ReaderEntry { Produces = new List<Type> { typeof(BHC.FeatureLine) }, ModelSpaceEntities = new List<Type> { typeof(ADC.FeatureLine) }, NeedsCivil = true },
             new ReaderEntry { Produces = new List<Type> { typeof(BHC.Alignment) }, ModelSpaceEntities = new List<Type>(), NeedsCivil = true },
             new ReaderEntry { Produces = new List<Type> { typeof(BHC.Parcel) }, ModelSpaceEntities = new List<Type>(), NeedsCivil = true },
