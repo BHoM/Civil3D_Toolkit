@@ -1,0 +1,45 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyVersion>10.0.0.0</AssemblyVersion>
+    <FileVersion>10.0.0.0</FileVersion>
+    <Description>https://github.com/BHoM/Civil3D_Toolkit</Description>
+    <Authors>BHoM</Authors>
+    <Copyright>Copyright © https://github.com/BHoM</Copyright>
+    <RootNamespace>BH.Civil3D.Loader</RootNamespace>
+    <OutputPath>..\Build\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>None</ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
+    <Configurations>Debug;Release;Debug2026;Release2026</Configurations>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+  </PropertyGroup>
+
+  <!-- Plain Debug/Release build the latest supported year. -->
+  <PropertyGroup Condition="'$(Configuration)'=='Debug' Or '$(Configuration)'=='Release'">
+    <Civil3DVersion>2026</Civil3DVersion>
+    <TargetFramework>net8.0-windows</TargetFramework>
+  </PropertyGroup>
+  <PropertyGroup Condition="$(Configuration.Contains('2026'))">
+    <Civil3DVersion>2026</Civil3DVersion>
+    <TargetFramework>net8.0-windows</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <AssemblyName>Civil3D_Loader_$(Civil3DVersion)</AssemblyName>
+  </PropertyGroup>
+
+  <!-- The loader is the only DLL in the bundle; it loads the Core adapter from C:\ProgramData\BHoM\Assemblies. -->
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="if not exist &quot;$(AppData)\Autodesk\ApplicationPlugins\BHoM_Civil3D.bundle\Contents\$(Civil3DVersion)&quot; mkdir &quot;$(AppData)\Autodesk\ApplicationPlugins\BHoM_Civil3D.bundle\Contents\$(Civil3DVersion)&quot;" />
+    <Exec Command="xcopy &quot;$(TargetDir)$(TargetFileName)&quot; &quot;$(AppData)\Autodesk\ApplicationPlugins\BHoM_Civil3D.bundle\Contents\$(Civil3DVersion)\&quot; /Y" />
+    <Exec Command="xcopy &quot;$(ProjectDir)Files\PackageContents.xml&quot; &quot;$(AppData)\Autodesk\ApplicationPlugins\BHoM_Civil3D.bundle\&quot; /Y" />
+  </Target>
+
+  <ItemGroup>
+    <Reference Include="accoremgd"><HintPath>..\libs\$(Civil3DVersion)\accoremgd.dll</HintPath><Private>False</Private></Reference>
+    <Reference Include="acdbmgd"><HintPath>..\libs\$(Civil3DVersion)\acdbmgd.dll</HintPath><Private>False</Private></Reference>
+    <Reference Include="acmgd"><HintPath>..\libs\$(Civil3DVersion)\acmgd.dll</HintPath><Private>False</Private></Reference>
+  </ItemGroup>
+
+</Project>

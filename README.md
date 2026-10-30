@@ -28,6 +28,7 @@ flowchart LR
 | `Civil3D_Adapter` | `Civil3D_Adapter` | `BH.Adapter.Civil3D` | netstandard2.0 | No |
 | `Civil3D_Core_Engine` | `Civil3D_Core_Engine_<year>` | `BH.Civil3D.Engine.Core` | net8.0-windows | Yes (`libs/<year>/`) |
 | `Civil3D_Core_Adapter` | `Civil3D_Core_Adapter_<year>` | `BH.Civil3D.Adapter.Core` | net8.0-windows | Yes (`libs/<year>/`) |
+| `Civil3D_Loader` | `Civil3D_Loader_<year>` | `BH.Civil3D.Loader` | net8.0-windows | Yes (AutoCAD only; no BHoM references) |
 
 ## Supported objects
 
@@ -79,10 +80,13 @@ A build copies the files to where they are loaded from:
 | Files | Location |
 |---|---|
 | `Civil3D_oM.dll`, `Civil3D_Engine.dll`, `Civil3D_Adapter.dll` | `C:\ProgramData\BHoM\Assemblies` |
-| `Civil3D_Core_Engine_<year>.dll`, `Civil3D_Core_Adapter_<year>.dll` | `%AppData%\Autodesk\ApplicationPlugins\BHoM_Civil3D.bundle\Contents\<year>\` |
+| `Civil3D_Core_Engine_<year>.dll`, `Civil3D_Core_Adapter_<year>.dll` | `C:\ProgramData\BHoM\Assemblies` |
+| `Civil3D_Loader_<year>.dll` | `%AppData%\Autodesk\ApplicationPlugins\BHoM_Civil3D.bundle\Contents\<year>\` |
 | `PackageContents.xml` | `%AppData%\Autodesk\ApplicationPlugins\BHoM_Civil3D.bundle\` |
 
-Civil 3D reads `PackageContents.xml` at startup and loads `Civil3D_Core_Adapter_<year>.dll`. The listener first registers an assembly resolver that finds the BHoM assemblies in `C:\ProgramData\BHoM\Assemblies`, then starts listening on ports 14230 and 14231. When it is ready, the command line shows `BHoM Civil 3D listener started on ports 14230/14231.`
+Civil 3D reads `PackageContents.xml` at startup and loads the small `Civil3D_Loader_<year>.dll` from the bundle. The loader has no BHoM references; it loads `Civil3D_Core_Adapter_<year>.dll` from `C:\ProgramData\BHoM\Assemblies` (as `NETLOAD` would), so the adapter finds the BHoM assemblies next to it. The `_<year>` suffix stops BHoM UIs such as Grasshopper from loading the Autodesk-dependent DLLs. The listener then starts on ports 14230 and 14231, and the command line shows `BHoM Civil 3D listener started on ports 14230/14231.`
+
+Use the commands `BHOMDEACTIVATE` and `BHOMACTIVATE` to stop and start (or restart) the listener.
 
 The plug-in also adds the command `BHOMOUT`, which writes every supported object in the active drawing to a JSON file in a `BHoMOut` folder next to the drawing. Geometry is written as `ObjectWrapper`s, as on Pull.
 
@@ -93,19 +97,19 @@ The plug-in also adds the command `BHOMOUT`, which writes every supported object
 3. Set breakpoints in `Civil3D_Core_Adapter` or `Civil3D_Core_Engine`, then Push or Pull from Grasshopper.
 
 If the listener does not start (no message on the command line):
-- Run `NETLOAD` and load `%AppData%\Autodesk\ApplicationPlugins\BHoM_Civil3D.bundle\Contents\2026\Civil3D_Core_Adapter_2026.dll` by hand. Any load error is shown.
-- An error about a BHoM assembly not being found means the resolver did not run first. `Civil3DListener` must not have BHoM types in its fields or method signatures.
+- Run `NETLOAD` and load `C:\ProgramData\BHoM\Assemblies\Civil3D_Core_Adapter_2026.dll` by hand. Any load error is shown.
+- If the command line says the Core adapter was not found, build the toolkit (or install BHoM) so that `Civil3D_Core_Adapter_2026.dll` is in `C:\ProgramData\BHoM\Assemblies`.
 - If the bundle is ignored, check that the `ACADVER` system variable matches `SeriesMin`/`SeriesMax` in `PackageContents.xml` (`R25.1` for 2026).
 
 ## Adding a new Civil 3D year
 
 1. Add the year's reference assemblies to `libs/<year>/`.
-2. In both `Civil3D_Core_Engine.csproj` and `Civil3D_Core_Adapter.csproj`:
+2. In `Civil3D_Core_Engine.csproj`, `Civil3D_Core_Adapter.csproj` and `Civil3D_Loader.csproj`:
    - add `Debug<year>;Release<year>` to `<Configurations>`;
    - add a `PropertyGroup` for `$(Configuration.Contains('<year>'))` that sets `Civil3DVersion`, `TargetFramework` and `DefineConstants` (`CIVIL3D<year>`).
 3. Add the `Debug<year>` and `Release<year>` configurations to `Civil3D_Toolkit.sln`, mapping the BHoM-side projects to plain `Debug`/`Release`.
 4. Add the two configurations to `IncludedRepos/altConfigs.txt` in the BHoM_Installer repository (in a separate PR).
-5. Add a `<Components>` block for the year to `Civil3D_Core_Adapter/Listener/Files/PackageContents.xml`, with its `SeriesMin`/`SeriesMax` and `./Contents/<year>/Civil3D_Core_Adapter_<year>.dll`.
+5. Add a `<Components>` block for the year to `Civil3D_Loader/Files/PackageContents.xml`, with its `SeriesMin`/`SeriesMax` and `./Contents/<year>/Civil3D_Loader_<year>.dll`.
 
 ## Units
 

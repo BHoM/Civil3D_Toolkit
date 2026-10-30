@@ -3,6 +3,6 @@
   <CompanyDetails Name="BHoM" Url="https://bhom.xyz" />
   <Components Description="Civil 3D 2026">
     <RuntimeRequirements OS="Win64" Platform="Civil3D" SeriesMin="R25.1" SeriesMax="R25.1" />
-    <ComponentEntry AppName="BHoM_Civil3D_2026" Version="10.0.0" ModuleName="./Contents/2026/Civil3D_Core_Adapter_2026.dll" AppDescription="BHoM listener for Civil 3D 2026" LoadOnAutoCADStartup="True" />
+    <ComponentEntry AppName="BHoM_Civil3D_2026" Version="10.0.0" ModuleName="./Contents/2026/Civil3D_Loader_2026.dll" AppDescription="Loads the BHoM listener for Civil 3D 2026 from C:\ProgramData\BHoM\Assemblies" LoadOnAutoCADStartup="True" />
   </Components>
 </ApplicationPackage>

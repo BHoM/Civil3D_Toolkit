@@ -32,9 +32,7 @@
   </PropertyGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="if not exist &quot;$(AppData)\Autodesk\ApplicationPlugins\BHoM_Civil3D.bundle\Contents\$(Civil3DVersion)&quot; mkdir &quot;$(AppData)\Autodesk\ApplicationPlugins\BHoM_Civil3D.bundle\Contents\$(Civil3DVersion)&quot;" />
-    <Exec Command="xcopy &quot;$(TargetDir)$(TargetFileName)&quot; &quot;$(AppData)\Autodesk\ApplicationPlugins\BHoM_Civil3D.bundle\Contents\$(Civil3DVersion)\&quot; /Y" />
-    <Exec Command="xcopy &quot;$(ProjectDir)Listener\Files\PackageContents.xml&quot; &quot;$(AppData)\Autodesk\ApplicationPlugins\BHoM_Civil3D.bundle\&quot; /Y" />
+    <Exec Command="xcopy &quot;$(TargetDir)$(TargetFileName)&quot; &quot;C:\ProgramData\BHoM\Assemblies&quot; /Y" />
   </Target>
 
   <ItemGroup>

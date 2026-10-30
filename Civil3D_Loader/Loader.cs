@@ -20,43 +20,49 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
 
+using Autodesk.AutoCAD.ApplicationServices;
+using Autodesk.AutoCAD.Runtime;
+
 using System;
+using System.ComponentModel;
 using System.IO;
 using System.Reflection;
 
-namespace BH.Civil3D.Adapter.Core
+[assembly: ExtensionApplication(typeof(BH.Civil3D.Loader.Loader))]
+
+namespace BH.Civil3D.Loader
 {
-    //Lets Civil 3D find the BHoM assemblies in ProgramData, since the bundle only holds the Core DLLs.
-    internal static class AssemblyResolver
+    //The only DLL in the BHoM_Civil3D bundle. AutoCAD loads it from the bundle; it then loads the Core adapter of the same
+    //year from C:\ProgramData\BHoM\Assemblies, as NETLOAD would, so the adapter finds the BHoM assemblies next to it.
+    //It must not reference BHoM.
+    public class Loader : IExtensionApplication
     {
         /***************************************************/
-        /**** Internal Methods                          ****/
+        /**** Public Methods                            ****/
         /***************************************************/
 
-        internal static void Register()
+        [Description("Called by Civil 3D when the bundle loads: loads the BHoM Civil 3D listener from C:\\ProgramData\\BHoM\\Assemblies.")]
+        public void Initialize()
         {
-            AppDomain.CurrentDomain.AssemblyResolve -= OnAssemblyResolve;
-            AppDomain.CurrentDomain.AssemblyResolve += OnAssemblyResolve;
+            //Civil3D_Loader_2026 loads Civil3D_Core_Adapter_2026
+            string adapterName = Assembly.GetExecutingAssembly().GetName().Name.Replace("Civil3D_Loader", "Civil3D_Core_Adapter") + ".dll";
+            string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "BHoM", "Assemblies", adapterName);
+
+            if (!File.Exists(path))
+            {
+                Application.DocumentManager.MdiActiveDocument?.Editor.WriteMessage($"\nBHoM: {path} was not found, so the Civil 3D listener was not loaded. Install BHoM or build Civil3D_Toolkit.\n");
+                return;
+            }
+
+            ExtensionLoader.Load(path);
         }
 
-
-        /***************************************************/
-        /**** Private Methods                           ****/
         /***************************************************/
 
-        private static Assembly OnAssemblyResolve(object sender, ResolveEventArgs args)
+        [Description("Called by Civil 3D when it closes. The Core adapter stops its own listener.")]
+        public void Terminate()
         {
-            string name = new AssemblyName(args.Name).Name;
-            string path = Path.Combine(m_BHoMFolder, name + ".dll");
-            return File.Exists(path) ? Assembly.LoadFrom(path) : null;
         }
-
-
-        /***************************************************/
-        /**** Private Fields                            ****/
-        /***************************************************/
-
-        private static readonly string m_BHoMFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "BHoM", "Assemblies");
 
         /***************************************************/
     }

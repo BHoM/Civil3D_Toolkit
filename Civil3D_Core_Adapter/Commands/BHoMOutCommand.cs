@@ -35,7 +35,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 
-//Limits AutoCAD's command scan to this class, so it does not reflect over BHoM types before the assembly resolver is registered
+//Commands are declared explicitly, so AutoCAD only scans the command classes for them
 [assembly: CommandClass(typeof(BH.Civil3D.Adapter.Core.BHoMOutCommand))]
 
 namespace BH.Civil3D.Adapter.Core
