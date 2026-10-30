@@ -26,6 +26,7 @@ using BH.oM.Adapter;
 using BHC = BH.oM.Adapters.Civil3D.Elements;
 using BH.oM.Adapters.Civil3D.Fragments;
 using BH.oM.Base;
+using BH.Engine.Units;
 using BHG = BH.oM.Geometry;
 
 using Autodesk.AutoCAD.ApplicationServices;
@@ -67,7 +68,7 @@ namespace BH.Civil3D.Adapter.Core
 
             Database db = doc.Database;
             CivilDocument civdoc = CivilApplication.ActiveDocument;
-            double fromSI = 1.0 / db.LengthToSI(civdoc);
+            double fromSI = 1.0.ToLength(db.DrawingLengthUnit(civdoc));
             int created = 0;
 
             using (Transaction tr = db.TransactionManager.StartTransaction())
@@ -227,7 +228,7 @@ namespace BH.Civil3D.Adapter.Core
             switch (obj)
             {
                 case BHG.IGeometry geometry:
-                    return geometry.ScaleGeometry(f);
+                    return Scaled(geometry, f);
                 case BHC.TextNote textNote:
                     BHC.TextNote text = textNote.ShallowClone();
                     text.Orientation = ScaleOrigin(text.Orientation, f);
@@ -239,7 +240,7 @@ namespace BH.Civil3D.Adapter.Core
                     return instance;
                 case BHC.CoGoPoint coGoPoint:
                     BHC.CoGoPoint point = coGoPoint.ShallowClone();
-                    point.Location = point.Location?.ScaleGeometry(f) as BHG.Point;
+                    point.Location = Scaled(point.Location, f);
                     return point;
                 default:
                     return obj;

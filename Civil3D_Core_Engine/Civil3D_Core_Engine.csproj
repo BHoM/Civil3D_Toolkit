@@ -50,6 +50,8 @@
     <Reference Include="Dimensional_oM"><HintPath>$(ProgramData)\BHoM\Assemblies\Dimensional_oM.dll</HintPath><Private>False</Private><SpecificVersion>False</SpecificVersion></Reference>
     <Reference Include="Geometry_oM"><HintPath>$(ProgramData)\BHoM\Assemblies\Geometry_oM.dll</HintPath><Private>False</Private><SpecificVersion>False</SpecificVersion></Reference>
     <Reference Include="Geometry_Engine"><HintPath>$(ProgramData)\BHoM\Assemblies\Geometry_Engine.dll</HintPath><Private>False</Private><SpecificVersion>False</SpecificVersion></Reference>
+    <Reference Include="Units_Engine"><HintPath>$(ProgramData)\BHoM\Assemblies\Units_Engine.dll</HintPath><Private>False</Private><SpecificVersion>False</SpecificVersion></Reference>
+    <Reference Include="Units_oM"><HintPath>$(ProgramData)\BHoM\Assemblies\Units_oM.dll</HintPath><Private>False</Private><SpecificVersion>False</SpecificVersion></Reference>
   </ItemGroup>
 
   <ItemGroup>

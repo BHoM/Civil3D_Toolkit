@@ -25,6 +25,8 @@ using BH.oM.Adapter;
 using BHC = BH.oM.Adapters.Civil3D.Elements;
 using BH.oM.Adapters.Civil3D.Fragments;
 using BH.oM.Base;
+using BH.Engine.Geometry;
+using BH.Engine.Units;
 using BHG = BH.oM.Geometry;
 
 using Autodesk.AutoCAD.ApplicationServices;
@@ -64,7 +66,7 @@ namespace BH.Civil3D.Adapter.Core
 
             Database db = doc.Database;
             CivilDocument civdoc = CivilApplication.ActiveDocument;
-            double toSI = db.LengthToSI(civdoc);
+            double toSI = 1.0.FromLength(db.DrawingLengthUnit(civdoc));
 
             List<ReaderEntry> readers = m_Readers.Where(x => x.Produces.Any(p => type.IsAssignableFrom(p))).ToList();
             if (readers.Count == 0)
@@ -138,7 +140,7 @@ namespace BH.Civil3D.Adapter.Core
                     {
                         obj = new ObjectWrapper
                         {
-                            WrappedObject = geometry.ScaleGeometry(toSI)
+                            WrappedObject = Scaled(geometry, toSI)
                         };
                     }
                     else
@@ -225,22 +227,22 @@ namespace BH.Civil3D.Adapter.Core
 
         private static void ToSI(BHC.CoGoPoint obj, double f)
         {
-            obj.Location = obj.Location?.ScaleGeometry(f) as BHG.Point;
+            obj.Location = Scaled(obj.Location, f);
         }
 
         /***************************************************/
 
         private static void ToSI(BHC.FeatureLine obj, double f)
         {
-            obj.Curve = obj.Curve?.ScaleGeometry(f) as BHG.ICurve;
+            obj.Curve = Scaled(obj.Curve, f);
         }
 
         /***************************************************/
 
         private static void ToSI(BHC.Alignment obj, double f)
         {
-            obj.Curve = obj.Curve?.ScaleGeometry(f) as BHG.ICurve;
-            obj.ReferencePoint = obj.ReferencePoint?.ScaleGeometry(f) as BHG.Point;
+            obj.Curve = Scaled(obj.Curve, f);
+            obj.ReferencePoint = Scaled(obj.ReferencePoint, f);
             obj.StartingStation *= f;
             obj.ReferencePointStation *= f;
         }
@@ -249,8 +251,8 @@ namespace BH.Civil3D.Adapter.Core
 
         private static void ToSI(BHC.Parcel obj, double f)
         {
-            obj.Boundary = obj.Boundary?.ScaleGeometry(f) as BHG.ICurve;
-            obj.AreaLocation = obj.AreaLocation?.ScaleGeometry(f) as BHG.Point;
+            obj.Boundary = Scaled(obj.Boundary, f);
+            obj.AreaLocation = Scaled(obj.AreaLocation, f);
         }
 
         /***************************************************/
@@ -272,9 +274,22 @@ namespace BH.Civil3D.Adapter.Core
 
         private static void ToSI(BHC.BlockDefinition obj, double f)
         {
-            obj.BasePoint = obj.BasePoint?.ScaleGeometry(f) as BHG.Point;
-            obj.Geometry = obj.Geometry.Select(x => x?.ScaleGeometry(f)).ToList();
+            obj.BasePoint = Scaled(obj.BasePoint, f);
+            obj.Geometry = obj.Geometry.Select(x => Scaled(x, f)).ToList();
             obj.NestedBlocks.ForEach(x => ToSI(x, f));
+        }
+
+        /***************************************************/
+
+        /***************************************************/
+
+        //Scales geometry uniformly about the origin. Null stays null, and a factor of 1 returns the input unchanged.
+        private static T Scaled<T>(T geometry, double f) where T : class, BHG.IGeometry
+        {
+            if (geometry == null || f == 1.0)
+                return geometry;
+
+            return geometry.IScale(new BHG.Point(), new BHG.Vector { X = f, Y = f, Z = f }) as T;
         }
 
         /***************************************************/
@@ -285,7 +300,7 @@ namespace BH.Civil3D.Adapter.Core
             if (orientation == null || f == 1.0)
                 return orientation;
 
-            return BH.Engine.Geometry.Create.CartesianCoordinateSystem(orientation.Origin.ScaleGeometry(f) as BHG.Point, orientation.X, orientation.Y);
+            return BH.Engine.Geometry.Create.CartesianCoordinateSystem(Scaled(orientation.Origin, f), orientation.X, orientation.Y);
         }
 
 

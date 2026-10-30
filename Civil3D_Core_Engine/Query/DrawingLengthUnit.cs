@@ -21,6 +21,7 @@
  */
 
 using BH.oM.Base.Attributes;
+using BH.oM.Units;
 
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.Civil.ApplicationServices;
@@ -36,34 +37,64 @@ namespace BH.Civil3D.Engine.Core
         /**** Public Methods                            ****/
         /***************************************************/
 
-        [Description("Gets the factor that converts lengths in the drawing's units to metres. Uses the Civil 3D drawing settings when a Civil 3D document is given, otherwise the drawing's INSUNITS.")]
+        [Description("Gets the length unit of a drawing, for converting with Units_Engine. Uses the Civil 3D drawing settings when a Civil 3D document is given, otherwise the drawing's INSUNITS. Units with no BHoM equivalent fall back to metres with a warning.")]
         [Input("database", "Drawing database.")]
         [Input("civilDocument", "Civil 3D document of the drawing, if there is one.")]
-        [Output("factor", "Multiply drawing lengths by this to get metres.")]
-        public static double LengthToSI(this Database database, CivilDocument civilDocument = null)
+        [Output("unit", "Length unit of the drawing.")]
+        public static LengthUnit DrawingLengthUnit(this Database database, CivilDocument civilDocument = null)
         {
             if (civilDocument != null)
             {
                 DrawingUnitType units = civilDocument.Settings.DrawingSettings.UnitZoneSettings.DrawingUnits;
                 if (units == DrawingUnitType.Feet)
-                    return 0.3048;
+                    return LengthUnit.Foot;
                 if (units == DrawingUnitType.Meters)
-                    return 1.0;
+                    return LengthUnit.Meter;
             }
 
             if (database == null)
             {
-                BH.Engine.Base.Compute.RecordError("Cannot get the units of a null drawing database.");
-                return 1.0;
+                BH.Engine.Base.Compute.RecordError("Cannot get the units of a null drawing database. Assuming metres.");
+                return LengthUnit.Meter;
             }
 
-            if (database.Insunits == UnitsValue.Undefined)
+            switch (database.Insunits)
             {
-                BH.Engine.Base.Compute.RecordWarning("Drawing units are not set (INSUNITS = 0). Assuming metres.");
-                return 1.0;
+                case UnitsValue.Inches:
+                    return LengthUnit.Inch;
+                case UnitsValue.Feet:
+                    return LengthUnit.Foot;
+                case UnitsValue.Miles:
+                    return LengthUnit.Mile;
+                case UnitsValue.Millimeters:
+                    return LengthUnit.Millimeter;
+                case UnitsValue.Centimeters:
+                    return LengthUnit.Centimeter;
+                case UnitsValue.Meters:
+                    return LengthUnit.Meter;
+                case UnitsValue.Kilometers:
+                    return LengthUnit.Kilometer;
+                case UnitsValue.MicroInches:
+                    return LengthUnit.Microinch;
+                case UnitsValue.Mils:
+                    return LengthUnit.Mil;
+                case UnitsValue.Yards:
+                    return LengthUnit.Yard;
+                case UnitsValue.Nanometers:
+                    return LengthUnit.Nanometer;
+                case UnitsValue.Microns:
+                    return LengthUnit.Micrometer;
+                case UnitsValue.Decimeters:
+                    return LengthUnit.Decimeter;
+                case UnitsValue.Hectometers:
+                    return LengthUnit.Hectometer;
+                case UnitsValue.Undefined:
+                    BH.Engine.Base.Compute.RecordWarning("Drawing units are not set (INSUNITS = 0). Assuming metres.");
+                    return LengthUnit.Meter;
+                default:
+                    BH.Engine.Base.Compute.RecordWarning($"Drawing units '{database.Insunits}' have no BHoM equivalent. Assuming metres.");
+                    return LengthUnit.Meter;
             }
-
-            return UnitsConverter.GetConversionFactor(database.Insunits, UnitsValue.Meters);
         }
 
         /***************************************************/
