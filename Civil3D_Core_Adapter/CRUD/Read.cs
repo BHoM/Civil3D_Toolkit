@@ -50,11 +50,9 @@ namespace BH.Civil3D.Adapter.Core
         {
             List<IBHoMObject> result = new List<IBHoMObject>();
 
+            //No type means every supported type
             if (type == null)
-            {
-                BH.Engine.Base.Compute.RecordError("Cannot pull from Civil 3D without a type.");
-                return result;
-            }
+                type = typeof(object);
 
             Document doc = Application.DocumentManager.MdiActiveDocument;
             if (doc == null)

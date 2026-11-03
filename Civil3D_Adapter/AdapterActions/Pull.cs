@@ -39,16 +39,11 @@ namespace BH.Adapter.Civil3D
             if (!IsActive())
                 return new List<object>();
 
-            FilterRequest filterRequest = request as FilterRequest;
+            //No request, or a FilterRequest without a Type, pulls every supported object
+            FilterRequest filterRequest = request == null ? new FilterRequest() : request as FilterRequest;
             if (filterRequest == null)
             {
                 Engine.Base.Compute.RecordError("Civil 3D only supports FilterRequest.");
-                return new List<object>();
-            }
-
-            if (filterRequest.Type == null)
-            {
-                Engine.Base.Compute.RecordError("The FilterRequest has no Type. Set the type of object to pull from Civil 3D.");
                 return new List<object>();
             }
 
