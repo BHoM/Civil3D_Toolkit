@@ -52,7 +52,8 @@ namespace BH.Civil3D.Engine.Core
 
             int count = curve.ControlPoints.Count;
 
-            //BHoM stores the compressed knot vector (control points + degree - 1); AutoCAD needs the full one (+ 2)
+            //BHoM stores the knot vector without its first and last knot (control points + degree - 1); AutoCAD needs the full one,
+            //so the first and last knots are repeated. This is the exact reverse of FromCivil3D(Spline).
             int degree = curve.Knots.Count - count + 1;
             if (degree < 1)
             {
