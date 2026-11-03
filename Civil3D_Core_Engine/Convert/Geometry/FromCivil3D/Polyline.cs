@@ -84,12 +84,12 @@ namespace BH.Civil3D.Engine.Core
         [Output("polyCurve", "The converted BH.oM.Geometry.PolyCurve.")]
         public static BHG.PolyCurve FromCivil3D(this ACD.Polyline2d polyline2d)
         {
-            var segments = new List<BHG.ICurve>();
-            var vertices = new List<ACD.Vertex2d>();
+            List<BHG.ICurve> segments = new List<BHG.ICurve>();
+            List<ACD.Vertex2d> vertices = new List<ACD.Vertex2d>();
 
             foreach (ACD.ObjectId id in polyline2d)
             {
-                var v = id.GetObject(ACD.OpenMode.ForRead) as ACD.Vertex2d;
+                ACD.Vertex2d v = id.GetObject(ACD.OpenMode.ForRead) as ACD.Vertex2d;
                 if (v != null)
                     vertices.Add(v);
             }
@@ -103,8 +103,8 @@ namespace BH.Civil3D.Engine.Core
                 if (!polyline2d.Closed && i == count - 1)
                     break;
 
-                var vStart = vertices[i];
-                var vEnd   = vertices[next];
+                ACD.Vertex2d vStart = vertices[i];
+                ACD.Vertex2d vEnd   = vertices[next];
 
                 ACG.Point3d start = new ACG.Point3d(vStart.Position.X, vStart.Position.Y, 0);
                 ACG.Point3d end   = new ACG.Point3d(vEnd.Position.X,   vEnd.Position.Y,   0);
@@ -123,13 +123,13 @@ namespace BH.Civil3D.Engine.Core
         [Output("polyCurve", "The converted BH.oM.Geometry.PolyCurve.")]
         public static BHG.PolyCurve FromCivil3D(this ACD.Polyline3d polyline3d)
         {
-            var segments = new List<BHG.ICurve>();
-            var vertices = new List<ACD.PolylineVertex3d>();
+            List<BHG.ICurve> segments = new List<BHG.ICurve>();
+            List<ACD.PolylineVertex3d> vertices = new List<ACD.PolylineVertex3d>();
 
             // Collect vertices
             foreach (ACD.ObjectId id in polyline3d)
             {
-                var v = id.GetObject(ACD.OpenMode.ForRead) as ACD.PolylineVertex3d;
+                ACD.PolylineVertex3d v = id.GetObject(ACD.OpenMode.ForRead) as ACD.PolylineVertex3d;
                 if (v != null)
                     vertices.Add(v);
             }

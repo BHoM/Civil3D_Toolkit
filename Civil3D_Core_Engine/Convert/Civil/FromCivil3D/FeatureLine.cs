@@ -47,15 +47,15 @@ namespace BH.Civil3D.Engine.Core
         [Output("featureLine", "The converted BH.oM.Adapters.Civil3D.Elements.FeatureLine.")]
         public static BHC.FeatureLine FromCivil3D(this ADC.FeatureLine civFeatureLine)
         {
-            var piPoints = new List<BHG.Point>();
-            var bulges = new List<double>();
-            var elevationPoints = new List<BHG.Point>();
+            List<BHG.Point> piPoints = new List<BHG.Point>();
+            List<double> bulges = new List<double>();
+            List<BHG.Point> elevationPoints = new List<BHG.Point>();
 
             // Get PI Points with their bulges
-            var civPIPoints = civFeatureLine.GetPoints(Autodesk.Civil.FeatureLinePointType.PIPoint);
+            ACG.Point3dCollection civPIPoints = civFeatureLine.GetPoints(Autodesk.Civil.FeatureLinePointType.PIPoint);
             for (int i = 0; i < civPIPoints.Count; i++)
             {
-                var pt = civPIPoints[i];
+                ACG.Point3d pt = civPIPoints[i];
                 piPoints.Add(new BHG.Point { X = pt.X, Y = pt.Y, Z = pt.Z });
                 
                 // Add bulge if not the last point
@@ -66,11 +66,11 @@ namespace BH.Civil3D.Engine.Core
             }
 
             // Create PolyCurve from PI Points and bulges (same logic as polyline conversion)
-            var segments = new List<BHG.ICurve>();
+            List<BHG.ICurve> segments = new List<BHG.ICurve>();
             for (int i = 0; i < piPoints.Count - 1; i++)
             {
-                var start = piPoints[i].ToCivil3D();
-                var end = piPoints[i + 1].ToCivil3D();
+                ACG.Point3d start = piPoints[i].ToCivil3D();
+                ACG.Point3d end = piPoints[i + 1].ToCivil3D();
                 double bulge = bulges[i];
 
                 if (Math.Abs(bulge) < 1e-12)
@@ -89,13 +89,13 @@ namespace BH.Civil3D.Engine.Core
                     segments.Add(arc);
                 }
             }
-            var polyCurve = new BHG.PolyCurve { Curves = segments };
+            BHG.PolyCurve polyCurve = new BHG.PolyCurve { Curves = segments };
 
             // Get Elevation Points and apply to segments
-            var civElevPoints = civFeatureLine.GetPoints(Autodesk.Civil.FeatureLinePointType.ElevationPoint);
-            foreach (var pt in civElevPoints)
+            ACG.Point3dCollection civElevPoints = civFeatureLine.GetPoints(Autodesk.Civil.FeatureLinePointType.ElevationPoint);
+            foreach (ACG.Point3d pt in civElevPoints)
             {
-                var point3d = (ACG.Point3d)pt;
+                ACG.Point3d point3d = pt;
                 elevationPoints.Add(new BHG.Point { X = point3d.X, Y = point3d.Y, Z = point3d.Z });
             }
 
