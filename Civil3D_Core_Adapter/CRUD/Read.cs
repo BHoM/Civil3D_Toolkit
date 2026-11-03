@@ -26,7 +26,6 @@ using BHC = BH.oM.Adapters.Civil3D.Elements;
 using BH.oM.Adapters.Civil3D.Fragments;
 using BH.oM.Base;
 using BH.Engine.Geometry;
-using BH.Engine.Units;
 using BHG = BH.oM.Geometry;
 
 using Autodesk.AutoCAD.ApplicationServices;
@@ -66,7 +65,7 @@ namespace BH.Civil3D.Adapter.Core
 
             Database db = doc.Database;
             CivilDocument civdoc = CivilApplication.ActiveDocument;
-            double toSI = 1.0.FromLength(db.DrawingLengthUnit(civdoc));
+            double toSI = db.LengthScaleFactor(civdoc, toSI: true);
 
             List<ReaderEntry> readers = m_Readers.Where(x => x.Produces.Any(p => type.IsAssignableFrom(p))).ToList();
             if (readers.Count == 0)
