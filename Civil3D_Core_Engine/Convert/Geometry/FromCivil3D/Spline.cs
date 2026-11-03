@@ -26,7 +26,6 @@ using BHG = BH.oM.Geometry;
 using ACD = Autodesk.AutoCAD.DatabaseServices;
 using ACG = Autodesk.AutoCAD.Geometry;
 
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
