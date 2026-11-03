@@ -26,7 +26,6 @@ using BH.oM.Adapter;
 using BHC = BH.oM.Adapters.Civil3D.Elements;
 using BH.oM.Adapters.Civil3D.Fragments;
 using BH.oM.Base;
-using BH.Engine.Units;
 using BHG = BH.oM.Geometry;
 
 using Autodesk.AutoCAD.ApplicationServices;
@@ -68,7 +67,7 @@ namespace BH.Civil3D.Adapter.Core
 
             Database db = doc.Database;
             CivilDocument civdoc = CivilApplication.ActiveDocument;
-            double fromSI = 1.0.ToLength(db.DrawingLengthUnit(civdoc));
+            double fromSI = db.LengthScaleFactor(civdoc, toSI: false);
             int created = 0;
 
             using (Transaction tr = db.TransactionManager.StartTransaction())
