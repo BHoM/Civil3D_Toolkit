@@ -25,7 +25,6 @@ using BHG = BH.oM.Geometry;
 
 using ACD = Autodesk.AutoCAD.DatabaseServices;
 using ACG = Autodesk.AutoCAD.Geometry;
-using Autodesk.AutoCAD.Geometry;
 
 using System;
 using System.Collections.Generic;
@@ -48,71 +47,30 @@ namespace BH.Civil3D.Engine.Core
             if (acSpline == null)
                 return null;
 
-            ACD.NurbsData nurbsData = acSpline.NurbsData; 
+            ACD.NurbsData nurbsData = acSpline.NurbsData;
+            List<BHG.Point> controlPoints = nurbsData.GetControlPoints().Cast<ACG.Point3d>().Select(x => x.FromCivil3D()).ToList();
+            List<double> knots = nurbsData.GetKnots().Cast<double>().ToList();
+            List<double> weights = nurbsData.GetWeights().Cast<double>().ToList();
 
-            ACG.Point3dCollection cp = nurbsData.GetControlPoints();
-            DoubleCollection kn     = nurbsData.GetKnots();          
-            DoubleCollection we     = nurbsData.GetWeights();        
+            //A non-rational spline has no weights in AutoCAD; BHoM expects one per control point
+            if (weights.Count == 0)
+                weights = Enumerable.Repeat(1.0, controlPoints.Count).ToList();
 
-            if (cp == null || cp.Count < 2 || kn == null || kn.Count == 0)
+            //AutoCAD stores the full knot vector (control points + degree + 1). BHoM stores it without the first and last knot,
+            //with the same values, so the curve and its parameters are unchanged.
+            if (controlPoints.Count < 2 || knots.Count != controlPoints.Count + nurbsData.Degree + 1 || weights.Count != controlPoints.Count)
             {
-                BH.Engine.Base.Compute.RecordWarning("A spline with fewer than two control points or no knots could not be converted.");
+                BH.Engine.Base.Compute.RecordWarning($"A spline with {controlPoints.Count} control points, {knots.Count} knots and {weights.Count} weights for degree {nurbsData.Degree} could not be converted.");
                 return null;
             }
-
-            // --- Control points
-            List<BHG.Point> controlPoints = new List<BHG.Point>(cp.Count);
-            foreach (ACG.Point3d p in cp)
-                controlPoints.Add(p.FromCivil3D());
-
-            // --- Weights
-            List<double> weights = (we != null && we.Count > 0)
-                ? we.Cast<double>().ToList()
-                : Enumerable.Repeat(1.0, controlPoints.Count).ToList();
-
-            if (weights.Count != controlPoints.Count)
-            {
-                BH.Engine.Base.Compute.RecordWarning("A spline whose weights do not match its control points could not be converted.");
-                return null;
-            }
-
-            // --- Knots (AutoCAD full -> BHoM compressed)
-            List<double> knots = kn.Cast<double>().ToList();
-
-            int degree = nurbsData.Degree; // degree is explicit in AutoCAD NurbsData (used only for conversion logic)
-
-            // AutoCAD "full" knot vector commonly: cp + degree + 1
-            int expectedAcadFull = controlPoints.Count + degree + 1;
-
-            // BHoM "compressed" knot vector: cp + degree - 1
-            int expectedBhom = controlPoints.Count + degree - 1;
-
-            if (knots.Count == expectedAcadFull && knots.Count >= 2)
-            {
-                // Drop one at each end to convert full -> compressed
-                knots.RemoveAt(0);
-                knots.RemoveAt(knots.Count - 1);
-            }
-            // else: already in compressed form (or unusual case) - leave as-is
-
-            // Normalise the knot domain to 0..1, as BHoM uses
-            double k0 = knots.First();
-            double k1 = knots.Last();
-            double span = k1 - k0;
-            if (span > 0)
-                knots = knots.Select(k => (k - k0) / span).ToList();
-
-            // BHoM infers the degree from the counts:
-            // degree_bhom = (knots.Count - controlPoints.Count) + 1
 
             return new BHG.NurbsCurve
             {
                 ControlPoints = controlPoints,
-                Knots         = knots,
-                Weights       = weights
+                Weights = weights,
+                Knots = knots.GetRange(1, knots.Count - 2),
             };
         }
-
         /***************************************************/
     }
 }
