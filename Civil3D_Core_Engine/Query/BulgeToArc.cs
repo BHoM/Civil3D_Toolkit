@@ -89,7 +89,7 @@ namespace BH.Civil3D.Engine.Core
             BHG.Vector yAxis = BH.Engine.Geometry.Query.CrossProduct(zAxis, xAxis);
             yAxis = BH.Engine.Geometry.Modify.Normalise(yAxis);
 
-            var system = BH.Engine.Geometry.Create.CartesianCoordinateSystem(
+            BHG.CoordinateSystem.Cartesian system = BH.Engine.Geometry.Create.CartesianCoordinateSystem(
                 center.FromCivil3D(),
                 xAxis,
                 yAxis

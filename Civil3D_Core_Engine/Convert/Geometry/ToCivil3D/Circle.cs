@@ -41,8 +41,8 @@ namespace BH.Civil3D.Engine.Core
         [Output("circle", "The converted Civil 3D Circle.")]
         public static ACD.Circle ToCivil3D(this BHG.Circle circle)
         {
-            var center = circle.Centre.ToCivil3D();
-            var normal = new ACG.Vector3d(circle.Normal.X, circle.Normal.Y, circle.Normal.Z);
+            ACG.Point3d center = circle.Centre.ToCivil3D();
+            ACG.Vector3d normal = new ACG.Vector3d(circle.Normal.X, circle.Normal.Y, circle.Normal.Z);
             
             return new ACD.Circle(center, normal, circle.Radius);
         }

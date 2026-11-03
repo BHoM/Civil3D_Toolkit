@@ -71,7 +71,7 @@ namespace BH.Civil3D.Engine.Core
             if (skipXrefBlocks && definitionBtr.IsFromExternalReference)
             {
                 // Still cache a minimal placeholder so nested refs won’t recurse forever
-                var xrefPlaceholder = new BHC.BlockDefinition
+                BHC.BlockDefinition xrefPlaceholder = new BHC.BlockDefinition
                 {
                     Name = SafeBlockName(definitionBtr.Name),
                     BasePoint = definitionBtr.Origin.FromCivil3D()
@@ -81,7 +81,7 @@ namespace BH.Civil3D.Engine.Core
             }
 
             // Create definition first and cache immediately (important for circular nesting)
-            var bhDef = new BHC.BlockDefinition
+            BHC.BlockDefinition bhDef = new BHC.BlockDefinition
             {
                 Name = SafeBlockName(definitionBtr.Name),
                 BasePoint = definitionBtr.Origin.FromCivil3D(),
@@ -95,7 +95,7 @@ namespace BH.Civil3D.Engine.Core
             {
                 if (!entId.IsValid || entId.IsErased) continue;
 
-                var dbo = tr.GetObject(entId, OpenMode.ForRead, false);
+                DBObject dbo = tr.GetObject(entId, OpenMode.ForRead, false);
                 if (dbo == null) continue;
 
                 // Nested block reference inside definition
@@ -109,19 +109,19 @@ namespace BH.Civil3D.Engine.Core
                     if (nestedDefId.IsNull || !nestedDefId.IsValid)
                         continue;
 
-                    var nestedDefBtr = tr.GetObject(nestedDefId, OpenMode.ForRead) as BlockTableRecord;
+                    BlockTableRecord nestedDefBtr = tr.GetObject(nestedDefId, OpenMode.ForRead) as BlockTableRecord;
                     if (nestedDefBtr == null)
                         continue;
 
                     // Recursively convert nested definition (cached)
-                    var nestedBhDef = nestedDefBtr.FromCivil3D(
+                    BHC.BlockDefinition nestedBhDef = nestedDefBtr.FromCivil3D(
                         tr, db, definitionCache,
                         includeNestedBlocks: includeNestedBlocks,
                         skipXrefBlocks: skipXrefBlocks);
 
                     // Create instance (transform relative to THIS definition). BlockReference.BlockName is the
                     // name of the block that owns the reference, so the referenced definition's name is used.
-                    var nestedInst = new BHC.Block
+                    BHC.Block nestedInst = new BHC.Block
                     {
                         DefinitionName = SafeBlockName(nestedDefBtr.Name),
                         Orientation = BlockOrientation(nestedBr),

@@ -61,7 +61,7 @@ namespace BH.Civil3D.Engine.Core
             }
 
             // --- Control points
-            var controlPoints = new List<BHG.Point>(cp.Count);
+            List<BHG.Point> controlPoints = new List<BHG.Point>(cp.Count);
             foreach (ACG.Point3d p in cp)
                 controlPoints.Add(p.FromCivil3D());
 
