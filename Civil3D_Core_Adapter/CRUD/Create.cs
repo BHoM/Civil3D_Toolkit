@@ -34,7 +34,6 @@ using ACG = Autodesk.AutoCAD.Geometry;
 using Autodesk.Civil.ApplicationServices;
 using ADC = Autodesk.Civil.DatabaseServices;
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
