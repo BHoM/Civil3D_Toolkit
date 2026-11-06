@@ -51,23 +51,33 @@ namespace BH.Civil3D.Adapter.Core
         public void BHoMOut()
         {
             Document doc = Application.DocumentManager.MdiActiveDocument;
-            Editor editor = doc?.Editor;
-
-            //A command runs on the AutoCAD main thread, so an unexpected failure must not reach Civil 3D
-            try
+            if (doc == null)
             {
-                List<object> objects = new Civil3DListenerAdapter().Pull(new FilterRequest()).ToList();
-
-                string filePath = OutputFilePath(doc);
-                new FileAdapter(filePath).Push(objects, "", PushType.DeleteThenCreate);
-
-                editor?.WriteMessage($"\nBHoM Out: wrote {objects.Count} object(s) to {filePath}");
+                BH.Engine.Base.Compute.RecordError("BHoM Out failed: there is no active drawing.");
+                return;
             }
-            catch (System.Exception ex)
+
+            Editor editor = doc.Editor;
+
+            IEnumerable<object> pulled = new Civil3DListenerAdapter().Pull(new FilterRequest());
+            List<object> objects = pulled?.Where(x => x != null).ToList() ?? new List<object>();
+            if (objects.Count == 0)
             {
-                BH.Engine.Base.Compute.RecordError("BHoM Out failed: " + ex.Message);
+                editor?.WriteMessage("\nBHoM Out: no supported objects found in the drawing, nothing was written.");
+                return;
+            }
+
+            string filePath = OutputFilePath(doc);
+            //The File adapter returns the file(s) it created, not the objects written into them
+            List<object> createdFiles = new FileAdapter(filePath).Push(objects, "", PushType.DeleteThenCreate);
+            if (createdFiles == null || createdFiles.Count == 0)
+            {
+                BH.Engine.Base.Compute.RecordError($"BHoM Out failed: the File adapter did not write {filePath}.");
                 editor?.WriteMessage("\nBHoM Out: failed, see the BHoM error log for details.");
+                return;
             }
+
+            editor?.WriteMessage($"\nBHoM Out: wrote {objects.Count} object(s) to {filePath}");
         }
 
 
@@ -79,7 +89,7 @@ namespace BH.Civil3D.Adapter.Core
         //sits alongside it and the command never needs a path provided.
         private string OutputFilePath(Document doc)
         {
-            string drawingPath = doc?.Name;
+            string drawingPath = doc.Name;
             string drawingDir = string.IsNullOrWhiteSpace(drawingPath) ? Directory.GetCurrentDirectory() : Path.GetDirectoryName(drawingPath);
             string folder = Path.Combine(drawingDir, "BHoMOut");
             Directory.CreateDirectory(folder);
