@@ -1,0 +1,23 @@
+<!-- Enables batch build of configurations that mix target frameworks, and passes BHoM bot checks. -->
+<!-- Only the per-year projects (Debug2026, Release2026, ...) need this. The netstandard2.0 projects (oM, Engine, Adapter) keep the
+	 default obj folder and the normal restore: their framework references come from files that restore generates and that MSBuild
+	 reads before the build starts, so restoring them from inside their own build (below) is too late on a clean checkout. -->
+<Project>
+	<PropertyGroup>
+		<PerConfigurationRestore Condition="'$(MSBuildProjectName)' == 'Civil3D_Core_Adapter' Or '$(MSBuildProjectName)' == 'Civil3D_Core_Engine' Or '$(MSBuildProjectName)' == 'Civil3D_Loader'">true</PerConfigurationRestore>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(PerConfigurationRestore)' == 'true'">
+		<BaseIntermediateOutputPath>$(MSBuildProjectDirectory)\obj\$(Configuration)\</BaseIntermediateOutputPath>
+		<DefaultItemExcludes>$(DefaultItemExcludes);obj/**</DefaultItemExcludes>
+	</PropertyGroup>
+
+	<Target Name="RestoreBeforeSolutionBuild" BeforeTargets="PrepareForBuild" Condition="'$(PerConfigurationRestore)' == 'true'">
+		<ItemGroup>
+			<SelectedConfigurations Include="$(Configurations)" />
+		</ItemGroup>
+		<!-- Restore only this project: a solution-wide restore from every project at once makes the restores overwrite each other's files -->
+		<Exec Command="dotnet restore &quot;$(MSBuildProjectFullPath)&quot; --no-dependencies -p:Configuration=%(SelectedConfigurations.Identity)"
+			Condition="!Exists('$(MSBuildProjectDirectory)\obj\%(SelectedConfigurations.Identity)\project.assets.json')" />
+	</Target>
+</Project>
