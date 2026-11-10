@@ -38,6 +38,7 @@ Connects Autodesk Civil 3D to the Buildings and Habitats object Model (BHoM). Pu
 | `FeatureLine` | Feature lines | — |
 | `Alignment` | Alignments (spirals come back as straight lines) | — |
 | `Parcel` | Parcels | — |
+| `TinSurface` | TIN surfaces, as a mesh of their visible triangles (grid and volume surfaces are skipped) | TIN surfaces with the drawing's default style. Civil 3D triangulates the mesh vertices within the mesh's outline and holes |
 
 ## Good to know
 
@@ -51,7 +52,6 @@ Connects Autodesk Civil 3D to the Buildings and Habitats object Model (BHoM). Pu
 These are planned, each with an issue:
 
 - [Gravity and pressure pipe networks (#119)](https://github.com/BHoM/Civil3D_Toolkit/issues/119)
-- [TIN surfaces (#120)](https://github.com/BHoM/Civil3D_Toolkit/issues/120)
 - [Vertical profiles (#121)](https://github.com/BHoM/Civil3D_Toolkit/issues/121)
 - [Infrastructure section definitions (#122)](https://github.com/BHoM/Civil3D_Toolkit/issues/122)
 - [Rainbow offset curves (#123)](https://github.com/BHoM/Civil3D_Toolkit/issues/123)
