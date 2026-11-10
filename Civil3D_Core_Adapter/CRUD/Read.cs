@@ -100,6 +100,9 @@ namespace BH.Civil3D.Adapter.Core
 
                     if (readers.Any(x => x.Produces.Contains(typeof(BHC.Parcel))))
                         result.AddRange(ReadEntities(ParcelIds(civdoc, tr), new List<Type> { typeof(ADC.Parcel) }, type, tr, toSI));
+
+                    if (readers.Any(x => x.Produces.Contains(typeof(BHC.TinSurface))))
+                        result.AddRange(ReadEntities(TinSurfaceIds(civdoc, tr), new List<Type> { typeof(ADC.TinSurface) }, type, tr, toSI));
                 }
 
                 tr.Commit();
@@ -196,6 +199,28 @@ namespace BH.Civil3D.Adapter.Core
             return ids;
         }
 
+        /***************************************************/
+
+        //Only TIN surfaces can be read. Other surfaces in the drawing (grid and volume surfaces) are skipped with a warning.
+        private static List<ObjectId> TinSurfaceIds(CivilDocument civdoc, Transaction tr)
+        {
+            List<ObjectId> ids = new List<ObjectId>();
+            List<string> skipped = new List<string>();
+            foreach (ObjectId id in civdoc.GetSurfaceIds())
+            {
+                ADC.Surface surface = tr.GetObject(id, OpenMode.ForRead) as ADC.Surface;
+                if (surface is ADC.TinSurface)
+                    ids.Add(id);
+                else if (surface != null)
+                    skipped.Add(surface.Name);
+            }
+
+            if (skipped.Count > 0)
+                BH.Engine.Base.Compute.RecordWarning($"Only TIN surfaces can be pulled, so these surfaces were skipped: {string.Join(", ", skipped)}.");
+
+            return ids;
+        }
+
 
         /***************************************************/
         /**** Private Methods - Units                   ****/
@@ -236,6 +261,13 @@ namespace BH.Civil3D.Adapter.Core
         {
             obj.Boundary = Scaled(obj.Boundary, f);
             obj.AreaLocation = Scaled(obj.AreaLocation, f);
+        }
+
+        /***************************************************/
+
+        private static void ToSI(BHC.TinSurface obj, double f)
+        {
+            obj.Mesh = Scaled(obj.Mesh, f);
         }
 
         /***************************************************/
@@ -311,6 +343,7 @@ namespace BH.Civil3D.Adapter.Core
             new ReaderEntry { Produces = new List<Type> { typeof(BHC.FeatureLine) }, ModelSpaceEntities = new List<Type> { typeof(ADC.FeatureLine) }, NeedsCivil = true },
             new ReaderEntry { Produces = new List<Type> { typeof(BHC.Alignment) }, ModelSpaceEntities = new List<Type>(), NeedsCivil = true },
             new ReaderEntry { Produces = new List<Type> { typeof(BHC.Parcel) }, ModelSpaceEntities = new List<Type>(), NeedsCivil = true },
+            new ReaderEntry { Produces = new List<Type> { typeof(BHC.TinSurface) }, ModelSpaceEntities = new List<Type>(), NeedsCivil = true },
         };
 
         /***************************************************/

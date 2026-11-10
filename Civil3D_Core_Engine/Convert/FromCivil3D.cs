@@ -35,7 +35,7 @@ namespace BH.Civil3D.Engine.Core
         /**** Public Methods                            ****/
         /***************************************************/
 
-        [Description("Converts a drawing object to the matching BHoM object: geometry for points and curves, TextNote for text, Block for block references, SurveyPoint for COGO points, and the Civil 3D element for feature lines and parcels. Returns null for any other type.")]
+        [Description("Converts a drawing object to the matching BHoM object: geometry for points and curves, TextNote for text, Block for block references, SurveyPoint for COGO points, and the Civil 3D element for feature lines, parcels and TIN surfaces. Returns null for any other type.")]
         [Input("entity", "Drawing object to convert.")]
         [Input("transaction", "Open transaction, used to look up block definitions. Only needed for block references.")]
         [Output("object", "The converted BHoM object, or null if the type is not supported.")]
@@ -49,6 +49,8 @@ namespace BH.Civil3D.Engine.Core
                     return cogoPoint.FromCivil3D();
                 case ADC.FeatureLine featureLine:
                     return featureLine.FromCivil3D();
+                case ADC.TinSurface tinSurface:
+                    return tinSurface.FromCivil3D();
                 case ADC.Parcel parcel:
                     return parcel.FromCivil3D();
                 case ACD.DBPoint point:
