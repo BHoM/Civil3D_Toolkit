@@ -133,6 +133,8 @@ namespace BH.Civil3D.Adapter.Core
                     return block.ToCivil3D(bt, tr);
                 case BHC.SurveyPoint surveyPoint:
                     return CreateSurveyPoint(surveyPoint, civdoc, tr);
+                case BHC.TinSurface tinSurface:
+                    return CreateTinSurface(tinSurface, civdoc, bt.Database, tr);
                 default:
                     BH.Engine.Base.Compute.RecordError($"Pushing {obj?.GetType().Name} to Civil 3D is not supported.");
                     return null;
@@ -199,6 +201,57 @@ namespace BH.Civil3D.Adapter.Core
 
         /***************************************************/
 
+        //TIN surfaces are created through Civil 3D with the drawing's default surface style, so they are already in the drawing when returned.
+        private static Entity CreateTinSurface(BHC.TinSurface surface, CivilDocument civdoc, Database db, Transaction tr)
+        {
+            if (civdoc == null)
+            {
+                BH.Engine.Base.Compute.RecordError("TIN surfaces can only be pushed to a Civil 3D drawing.");
+                return null;
+            }
+
+            if (surface.Mesh?.Vertices == null || surface.Mesh.Vertices.Count < 3)
+            {
+                BH.Engine.Base.Compute.RecordError($"Cannot push surface {surface.Name}: it needs a mesh with at least 3 vertices.");
+                return null;
+            }
+
+            ObjectId id = ADC.TinSurface.Create(db, UniqueSurfaceName(surface.Name, civdoc, tr));
+            ADC.TinSurface c3dSurface = (ADC.TinSurface)tr.GetObject(id, OpenMode.ForWrite);
+            surface.ToCivil3D(c3dSurface);
+            return c3dSurface;
+        }
+
+        /***************************************************/
+
+        //Surface names must be unique, so a name already used in the drawing gets a number added.
+        private static string UniqueSurfaceName(string name, CivilDocument civdoc, Transaction tr)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                name = "BHoM Surface";
+
+            HashSet<string> existing = new HashSet<string>(System.StringComparer.OrdinalIgnoreCase);
+            foreach (ObjectId id in civdoc.GetSurfaceIds())
+            {
+                ADC.Surface other = tr.GetObject(id, OpenMode.ForRead) as ADC.Surface;
+                if (other != null)
+                    existing.Add(other.Name);
+            }
+
+            if (!existing.Contains(name))
+                return name;
+
+            int number = 2;
+            while (existing.Contains($"{name} ({number})"))
+                number++;
+
+            string unique = $"{name} ({number})";
+            BH.Engine.Base.Compute.RecordWarning($"Surface name '{name}' is already used in the drawing, so the surface was named '{unique}' instead.");
+            return unique;
+        }
+
+        /***************************************************/
+
         //Uses the layer recorded on the object when it was pulled, if that layer exists; otherwise the current layer. Layers are never created.
         private static ObjectId LayerId(IBHoMObject obj, LayerTable lt, Database db)
         {
@@ -241,6 +294,10 @@ namespace BH.Civil3D.Adapter.Core
                     BHC.SurveyPoint point = surveyPoint.ShallowClone();
                     point.Location = Scaled(point.Location, f);
                     return point;
+                case BHC.TinSurface tinSurface:
+                    BHC.TinSurface surface = tinSurface.ShallowClone();
+                    surface.Mesh = Scaled(surface.Mesh, f);
+                    return surface;
                 default:
                     return obj;
             }
